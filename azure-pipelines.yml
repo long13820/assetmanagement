@@ -116,4 +116,4 @@ stages:
                     appType: 'webAppLinux'
                     WebAppName: '$(webAppName)'
                     packageForLinux: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
-                    StartupCommand: 'php artisan optimize:clear && php artisan migrate --force'
+                    StartupCommand: 'deployment/startup.sh'
