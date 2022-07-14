@@ -11,10 +11,10 @@ variables:
   azureSubscription: '2c8f065c-4ae5-43cc-841d-2f157036cfe5'
 
   # Web app name
-  webAppName: 'ams-app-1'
+  webAppName: 'ams-app-3'
 
   # Environment name
-  environmentName: 'PHP-Testing'
+  environmentName: 'AMS-Testing'
 
   # Root folder under which your composer.json file is available.
   rootFolder: $(System.DefaultWorkingDirectory)
@@ -30,7 +30,6 @@ stages:
         pool: $(agentPool)
         steps:
           - script: |
-              cp .env.deploy .env
               composer install
             workingDirectory: $(rootFolder)
             displayName: 'Install Composer packages'
