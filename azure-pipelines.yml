@@ -29,8 +29,7 @@ stages:
       - job: AppVerify
         pool: $(agentPool)
         steps:
-          - script: |
-              composer install
+          - script: composer install
             workingDirectory: $(rootFolder)
             displayName: 'Install Composer packages'
 
@@ -68,9 +67,7 @@ stages:
       - job: AppBuild
         pool: $(agentPool)
         steps:
-          - script: |
-              cp .env.deploy .env
-              composer install --no-interaction --optimize-autoloader --no-dev
+          - script: composer install --no-interaction --optimize-autoloader --no-dev
             workingDirectory: $(rootFolder)
             displayName: 'Install Composer packages'
 
@@ -78,13 +75,11 @@ stages:
               npm install
               npm run prod
             env:
-              APP_URL: $(APP_URL)
+              APP_URL: $(APP_API_URL)
             workingDirectory: $(rootFolder)
             displayName: 'Build React UI using Webpack Mix'
 
-          - script: |
-              rm -rf node_modules
-              rm .env
+          - script: rm -rf node_modules
             workingDirectory: $(rootFolder)
             displayName: 'Cleanup node_modules packages'
 
