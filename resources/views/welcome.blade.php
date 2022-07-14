@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Welcome to Your Workspace</title>
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+        <title>Asset Management System</title>
     </head>
     <body class="antialiased">
         <div id="root"></div>
