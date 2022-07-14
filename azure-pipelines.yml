@@ -41,6 +41,7 @@ stages:
 
           - script: |
               touch database/database.sqlite
+              php artisan key:generate --env=testing
               php artisan test --env=testing --log-junit report/unit.xml --coverage-cobertura report/cobertura/coverage.xml
             workingDirectory: $(rootFolder)
             displayName: 'Perform unit testing'
