@@ -75,7 +75,7 @@ stages:
               npm install
               npm run prod
             env:
-              APP_URL: $(APP_API_URL)
+              MIX_API_URL: $(APP_API_URL)
             workingDirectory: $(rootFolder)
             displayName: 'Build React UI using Webpack Mix'
 
