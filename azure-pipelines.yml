@@ -109,7 +109,7 @@ stages:
             deploy:
               steps:
                 - task: AzureRmWebAppDeployment@4
-                  displayName: 'Deploy to Azure App Service'
+                  displayName: 'Deploy to Azure App Services'
                   inputs:
                     ConnectionType: 'AzureRM'
                     azureSubscription: '$(azureSubscription)'

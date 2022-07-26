@@ -1,0 +1,265 @@
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 200;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-regular.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 600;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 800;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: normal;
+  font-weight: 900;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.woff2') format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.ttf') format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 200;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-200italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 300;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-300italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 400;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.woff') format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 500;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-500italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 600;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-600italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 700;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-700italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 800;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-800italic.svg#Mulish')
+      format('svg');
+}
+
+@font-face {
+  font-family: 'Mulish';
+  font-style: italic;
+  font-weight: 900;
+  src: url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.eot');
+  src: local(''),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.eot?#iefix')
+      format('embedded-opentype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.woff2')
+      format('woff2'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.woff')
+      format('woff'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.ttf')
+      format('truetype'),
+    url('../assets/fonts/Mulish/mulish-v12-vietnamese_latin-ext_latin_cyrillic-ext_cyrillic-900italic.svg#Mulish')
+      format('svg');
+}

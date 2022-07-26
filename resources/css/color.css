@@ -1,0 +1,19 @@
+.text-blue {
+  color: var(--bs-blue);
+}
+
+.text-red {
+  color: var(--bs-red);
+}
+
+.bg-blue-100 {
+  background-color: var(--bs-blue-100);
+}
+
+.bg-red-100 {
+  background-color: var(--bs-red-100);
+}
+
+.bg-gray-100 {
+  background-color: var(--bs-gray-100);
+}

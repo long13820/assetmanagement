@@ -1,8 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Welcome from './welcome';
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+
+import store from './redux/store';
+import Index from './index';
 
 ReactDOM.render(
-  <Welcome/>,
+  <Provider store={store}>
+    <BrowserRouter>
+      <Index />
+    </BrowserRouter>
+  </Provider>,
   document.getElementById('root')
 );

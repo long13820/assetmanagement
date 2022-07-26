@@ -1,0 +1,20 @@
+.filter-button {
+  width: 126px;
+}
+
+.filter-button,
+.filter-button:hover,
+button.filter-button:focus {
+  border: var(--2px) solid #ced4da;
+  background-color: var(--bs-white);
+  color: var(--bs-black);
+}
+
+.filter-button .fb-icon {
+  border-left: 2px solid #ced4da;
+  padding-left: var(--12px);
+}
+
+button.filter-button.dropdown-toggle::after {
+  content: none;
+}

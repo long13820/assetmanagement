@@ -1,0 +1,13 @@
+.custom-change-password .cp-input {
+  position: relative;
+}
+
+.custom-change-password .cp-input svg {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+
+.custom-change-password .cp-input .form-control {
+  padding-right: 36px !important;
+}

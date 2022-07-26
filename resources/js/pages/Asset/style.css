@@ -1,0 +1,43 @@
+.filter_asset {
+  display: flex;
+  height: 40px;
+}
+.asset_list_left {
+  display: flex;
+  width: 70%;
+}
+.margin_right_asset {
+  margin-right: 30px;
+}
+.filter_asset_form_select {
+  margin-right: 1% !important;
+  border: 1px solid #bfb7b7 !important;
+  border-radius: 5px;
+  width: 250px !important;
+}
+.filter_asset_form_select_search {
+  margin-right: 1% !important;
+  border-radius: 5px;
+  width: 250px !important;
+}
+.filter_asset_form_select_menu {
+  padding-left: var(--12px) !important;
+  width: 100% !important;
+}
+.custom_filter_asset_form_select {
+  position: relative !important;
+  width: 90% !important;
+  /* width: 100% !important; */
+}
+.custom_filter_asset_form_select_icon {
+  position: absolute;
+  right: 0;
+  top: 30%;
+
+  /* display: flex; */
+
+  /* margin-left: 100% !important; */
+}
+.custom_filter_asset_form_select::after {
+  display: none !important;
+}

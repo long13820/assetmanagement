@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-undef
 const mix = require('laravel-mix');
 
 /*
@@ -12,4 +13,9 @@ const mix = require('laravel-mix');
  */
 
 mix.sass('resources/css/app.scss', 'public/css');
-mix.js('resources/js/app.jsx', 'public/js').react();
+mix.js('resources/js/app.jsx', 'public/js').react().extract();
+mix.copyDirectory('resources/assets', 'public/assets');
+
+if (mix.inProduction()) {
+    mix.version();
+}

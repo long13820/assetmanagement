@@ -1,0 +1,6 @@
+#main {
+  margin-left: 340px;
+  margin-top: 60px;
+  transition: all 0.3s;
+  min-height: calc(100vh - 60px);
+}

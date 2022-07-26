@@ -1,0 +1,13 @@
+.list-group-item-detail {
+  border: none !important;
+  border-color: none !important;
+  --bs-list-group-border-color: none !important;
+  width: 100% !important;
+}
+.show-assset-list-detail {
+  display: flex;
+}
+.show-assset-list-detail-item {
+  margin-right: var(--24px);
+  width: 30% !important;
+}

@@ -2,18 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as AuthenticateTable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable
+class User extends AuthenticateTable
 {
     use HasFactory;
     use Notifiable;
+    use HasApiTokens;
 
-    public $timestamps = false;
     protected $table = 'user';
+    protected string $staff_code_prefix = 'SD';
+
+    public function userLocation(): BelongsTo
+    {
+        return $this->belongsTo(Location::class, "location_id");
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -21,11 +31,21 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        "staff_code",
         'first_name',
         'last_name',
-        'email',
+        'gender',
+        'date_of_birth',
+        'joined_date',
+        'status',
+        'username',
         'password',
+        'type',
+        'location_id',
+        'full_name'
     ];
+
+    protected $dates = ["password_change_at", "date_of_birth", "joined_date", "updated_at"];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -45,4 +65,97 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function staffCode(): Attribute
+    {
+        $count = User::query()->count();
+
+        $staffCode =
+            $this->staff_code_prefix . str_pad($count + 1, 4, 0, STR_PAD_LEFT);
+
+        return Attribute::make(
+            set: fn() => $staffCode,
+        );
+    }
+
+    public function fullName(): Attribute
+    {
+        $fullName = $this->last_name . ' ' . $this->first_name;
+
+        return Attribute::make(
+            get: fn() => $fullName,
+            set: fn() => $fullName,
+        );
+    }
+
+    public function setFullNameAttribute()
+    {
+        $this->attributes["full_name"] = "$this->last_name $this->first_name";
+    }
+
+    public function getUserName()
+    {
+        $lastName = strtolower($this->last_name);
+        $getFirstLetter = explode(" ", $this->first_name);
+        $tmp_firstLetter = "";
+        foreach ($getFirstLetter as $w) {
+            $tmp_firstLetter .= $w[0];
+        }
+        $tmp_username = $lastName . strtolower($tmp_firstLetter);
+        $count = User::query()
+            ->where("username", "LIKE", "{$tmp_username}%")
+            ->count();
+        return $tmp_username . ($count > 0 ? $count : "");
+    }
+
+    public function setUsernameAttribute()
+    {
+        $username = $this->getUserName();
+        $this->attributes["username"] = $username;
+    }
+
+    public function setPasswordAttribute($password)
+    {
+        $username = $this->getUserName();
+        $dob = Str::of(Carbon::parse($this->attributes["date_of_birth"])->format("d-m-Y"))->explode("-")->join("");
+        $password = $username . "@" . $dob;
+        $this->attributes["password"] = bcrypt($password);
+    }
+
+    public function scopeFilter($query, $request)
+    {
+        return $query
+            ->when($request->has("filter.type"), function ($query) use ($request) {
+                $list = explode(",", $request->query("filter")["type"]);
+                $query->whereIn("type", $list);
+            });
+    }
+
+    public function scopeSort($query, $request)
+    {
+        return $query
+            ->when($request->has("sort"), function ($query) use ($request) {
+                $sortBy = '';
+                $sortValue = '';
+
+                foreach ($request->query("sort") as $key => $value) {
+                    $sortBy = $key;
+                    $sortValue = $value;
+                }
+
+                $query->orderBy($sortBy, $sortValue);
+            });
+    }
+
+    public function scopeSearch($query, $request)
+    {
+        return $query
+            ->when($request->has('search'), function ($query) use ($request) {
+                $search = $request->query('search');
+                $query
+                    ->where("full_name", "ILIKE", "%{$search}%")
+                    ->orWhere("staff_code", "ILIKE", "%{$search}%");
+            });
+    }
 }

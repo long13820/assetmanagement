@@ -1,0 +1,6 @@
+#login_page {
+  height: 100vh;
+  background-image: url(../../../assets/images/banner_thinking.png);
+  background-repeat: repeat-x;
+  background-size: contain;
+}
