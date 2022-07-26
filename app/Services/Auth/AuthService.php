@@ -24,7 +24,7 @@ class AuthService
         if ($result['status'] == 200) {
             return response()->json([
                 "data" => $result,
-            ], 200)->withCookie(cookie()->forever('SESSION-TOKEN', $result['token'], '', '', true, false));
+            ], 200);
         } elseif ($result['status'] == 403) {
             return response()->json([
                 "data" => $result

@@ -1,11 +1,9 @@
-import Cookies from 'js-cookie';
-
 import { concatQueryString } from '../../utils/concatQueryString';
 import { titleToSlug } from '../../utils/titleToSlug';
 import axiosClient from '../axiosClient';
 
 export const configHeadersAuthenticate = () => {
-  const token = Cookies.get('SESSION-TOKEN');
+  const token = localStorage.getItem('token');
 
   return {
     headers: {
@@ -45,7 +43,7 @@ export const getAllAssignments = async ({ sort, filter, search, page } = {}) => 
 };
 
 export const getAssignmentById = async (id) => {
-  const url = `/api/assignments/${id}`;
+  const url = `/assignments/${id}`;
   const response = await axiosClient.get(url, configHeadersAuthenticate());
   if (response.status === 'success') return response.data;
   if (response.status !== 'success') return {};

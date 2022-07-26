@@ -1,7 +1,5 @@
-import Cookies from 'js-cookie';
-
 import axiosClient from '../axiosClient';
-const token = Cookies.get('SESSION-TOKEN');
+const token = localStorage.getItem('token');
 const assetAPI = {
   async getlistAsset(params) {
     const response = await axiosClient
@@ -26,7 +24,7 @@ const assetAPI = {
   },
   async getDetailAsset(params) {
     const response = await axiosClient
-      .get(`/api/assets/${params}`, {
+      .get(`/assets/${params}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

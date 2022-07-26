@@ -1,7 +1,5 @@
-import Cookies from 'js-cookie';
-
 import axiosClient from '../axiosClient';
-const token = Cookies.get('SESSION-TOKEN');
+const token = localStorage.getItem('token');
 const categoryAPI = {
   async getlistCategory(params) {
     const response = await axiosClient
@@ -15,7 +13,6 @@ const categoryAPI = {
         return respo;
       })
       .catch((error) => {
-        console.log('error: ' + respo);
         return error.message;
       });
 

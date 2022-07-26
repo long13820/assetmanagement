@@ -1,11 +1,9 @@
-import Cookies from 'js-cookie';
-
 import { concatQueryString } from '../../utils/concatQueryString';
 import { titleToSlug } from '../../utils/titleToSlug';
 import axiosClient from '../axiosClient';
 
 export const configHeadersAuthenticate = () => {
-  const token = Cookies.get('SESSION-TOKEN');
+  const token = localStorage.getItem('token');
 
   return {
     headers: {
@@ -49,21 +47,21 @@ export const getAllUsers = async ({ sort, filter, search, page, edit } = {}) => 
 };
 
 export const getUserById = async (id) => {
-  const url = `/api/users/${id}`;
+  const url = `/users/${id}`;
   const response = await axiosClient.get(url, configHeadersAuthenticate());
   if (response.status === 'success') return response.data;
   if (response.status !== 'success') return {};
 };
 
 export const editUserById = async (id, body) => {
-  const url = `/api/users/${id}`;
+  const url = `/users/${id}`;
   const response = await axiosClient.put(url, body, configHeadersAuthenticate());
   if (response.status === 'success') return 200;
   if (response.status !== 'success') return 404;
 };
 
 export const addUser = async (body) => {
-  const url = 'api/users';
+  const url = '/users';
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
   if (response.status === 'success') return 200;
   if (response.status !== 'success') return 404;

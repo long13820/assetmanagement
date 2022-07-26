@@ -10,8 +10,6 @@ object-assign
   http://jedwatson.github.io/classnames
 */
 
-/*! js-cookie v3.0.1 | MIT */
-
 /**
  * @license
  * Lodash <https://lodash.com/>

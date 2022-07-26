@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie';
 import * as yup from 'yup';
 
 import { handleChangePassword, handleGetInformation, handleLogout, handleSignIn } from '../../api/Auth';
@@ -31,7 +30,7 @@ export const schemaFirstChangePassword = yup
   .required();
 
 export const checkLogin = () => {
-  const token = Cookies.get('SESSION-TOKEN');
+  const token = localStorage.getItem('token');
   return token ? true : false;
 };
 
@@ -39,7 +38,7 @@ export const handleGetMe = async () => {
   if (checkLogin) {
     const response = await handleGetInformation();
     if (response === 401) {
-      Cookies.remove('SESSION-TOKEN');
+      localStorage.removeItem('token');
       window.location.href = '/login';
     } else {
       return response;

@@ -1,11 +1,10 @@
-import Cookies from 'js-cookie';
 import Notiflix from 'notiflix';
 
 import { ErrorToast, SuccessToast } from '../../components/Layouts/Alerts';
 import axiosClient from '../axiosClient';
 
 export const configHeadersAuthenticate = () => {
-  const token = Cookies.get('SESSION-TOKEN');
+  const token = localStorage.getItem('token');
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -26,6 +25,7 @@ export const handleSignIn = async (body) => {
 
   if (response.data.status === 200) {
     SuccessToast('Logged in successfully', 1000);
+    localStorage.setItem('token', response.data.token);
     setTimeout(() => {
       window.location.href = '/';
     }, 1000);
@@ -79,7 +79,7 @@ export const handleLogout = async () => {
   switch (status) {
     case 'success':
       SuccessToast('Logout successfully', 1000);
-      Cookies.remove('SESSION-TOKEN');
+      localStorage.removeItem('token');
       setTimeout(() => {
         window.location.href = '/login';
       }, 1000);
