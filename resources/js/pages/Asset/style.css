@@ -5,9 +5,10 @@
 .asset_list_left {
   display: flex;
   width: 70%;
+  margin-left: 5%;
 }
 .margin_right_asset {
-  margin-right: 30px;
+  margin-right: 5%;
 }
 .filter_asset_form_select {
   margin-right: 1% !important;
@@ -40,4 +41,8 @@
 }
 .custom_filter_asset_form_select::after {
   display: none !important;
+}
+
+.filter-button.btn-asset {
+  width: 160px !important;
 }

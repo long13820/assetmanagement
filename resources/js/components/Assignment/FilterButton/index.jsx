@@ -12,8 +12,8 @@ export default function FilterButton(props) {
 
   return (
     <Dropdown>
-      <Dropdown.Toggle className="filter-button d-flex align-items-center justity-content-center">
-        <p className="flex-grow-1 font-weight-bold">State</p>
+      <Dropdown.Toggle className="assignment-filter-button d-flex align-items-center justity-content-center">
+        <p className="afb-name flex-grow-1 font-weight-bold">State</p>
         <div className="fb-icon">
           <HiFilter />
         </div>

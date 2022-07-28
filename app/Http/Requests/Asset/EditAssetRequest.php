@@ -27,6 +27,13 @@ class EditAssetRequest extends FormRequest
      */
     public function rules()
     {
+        return [
+            "asset_name" => "max:128",
+            "installed_date" => "date_format:Y-m-d",
+            "state" => "",
+            "specification" => "min:5|max:100",
+            "category_id" => "",
+        ];
     }
 
     public function failedValidation(Validator $validator)

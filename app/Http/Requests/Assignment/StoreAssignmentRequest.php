@@ -31,6 +31,7 @@ class StoreAssignmentRequest extends FormRequest
             'user_id' => 'required',
             'asset_id' => 'required',
             'assigned_date' => 'required',
+            'admin_id' => 'required',
         ];
     }
 
@@ -40,6 +41,7 @@ class StoreAssignmentRequest extends FormRequest
             'user_id.required' => 'User ID is required',
             'asset_id.required' => 'Asset ID is required',
             'assigned_date.required' => 'Assigned date is required',
+            'admin_id.required' => 'admin id is required',
         ];
     }
 

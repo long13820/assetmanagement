@@ -6,3 +6,7 @@ export const assetFilterSelector = (state) => state.asset.filter;
 // Show detail Asset
 export const assetLoadingDetailSelector = (state) => state.asset.loadingDetail;
 export const assetDetailSelector = (state) => state.asset.detailAsset;
+// Show detail AssetAssignment
+// Show detail Asset
+export const assetAssignmentLoadingSelector = (state) => state.asset.loadingDetailAssignment;
+export const assetAssignmentDetailSelector = (state) => state.asset.detailAssetAssignment;

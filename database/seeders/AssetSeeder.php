@@ -18,7 +18,7 @@ class AssetSeeder extends Seeder
     public function run()
     {
         Asset::create([
-            "asset_code" => "",
+            "asset_code" => "LA0001",
             "asset_name" => "Laptop HP Probook 450 G1",
             "installed_date" => "2000-01-01",
             "state" => "Available",
@@ -26,7 +26,7 @@ class AssetSeeder extends Seeder
             "category_id" => rand(1, 3),
         ]);
         Asset::create([
-            "asset_code" => "",
+            "asset_code" => "LA0002",
             "asset_name" => "Laptop HP Probook 450 G2",
             "installed_date" => "2000-01-01",
             "state" => "Not Available",

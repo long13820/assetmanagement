@@ -25,11 +25,11 @@ class CreateAssetRequest extends FormRequest
     {
 
         return [
-            "asset_name" => "required|max:128",
+            "asset_name" => "required",
             "installed_date" =>
-                'required|date_format:"Y-m-d"',
+                'required',
             "state" => "required",
-            "specification" => "required|string|min:5|max:100",
+            "specification" => "required",
             "category_id" => "required",
         ];
     }

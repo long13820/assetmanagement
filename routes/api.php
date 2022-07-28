@@ -26,12 +26,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::resource('users', UserController::class);
     Route::get('/me', [AuthController::class, 'getMe']);
     Route::put('/change_password', [AuthController::class, 'changePassword']);
-    Route::resource('/assets', AssetController::class);
-    Route::resource('/categories', CategoryController::class);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::resource('users', UserController::class);
     Route::resource('/assets', AssetController::class);
     Route::resource('/categories', CategoryController::class);
     Route::resource('/assignments', AssignmentController::class);

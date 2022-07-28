@@ -2,64 +2,51 @@ import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { FaAngleDown, FaCalendarAlt } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import moment from 'moment';
 
-import ModalNotification from '../../components/ModalNotification/index';
 import { get, put } from '../../htttpHelper';
+import { formatDate } from '../../utils/formatDate';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-function EditAsset(props) {
-  let navigate = useNavigate();
+function EditAsset() {
+  const navigate = useNavigate();
   const [errorNameAsset, setErrorNameAsset] = useState('');
   const [errorSpeAsset, setErrorSpeAsset] = useState('');
   const [installedDate, setInstalledDate] = useState('');
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
-  const [showError, setShowError] = useState(false);
-  const [errorTitle, setErrorTitle] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-
   const [inputs, setInputs] = useState({
     assetName: '',
     specification: '',
     installedDate: '',
     categoryName: '',
-    state: 'AVAILABLE',
-    categoryPrefix: '',
+    state: '',
   });
+  const dataId = useParams();
+  const id = dataId.id;
 
   useEffect(() => {
     fetchAsset();
   }, []);
 
-  //   const assetCode = props.match.params.assetCode;
   const fetchAsset = () => {
-    // get(`/asset/${assetCode}`)
-    //   .then((res) => {
-    //     if (res.data.state === 'ASSIGNED' || res.data.state === 'REPAIRING') {
-    //       history.push({
-    //         pathname: '/asset',
-    //       });
-    //     }
-    //     let installedDate = res.data.installedDate.split('/').reverse().join('-');
-    //     let object = {
-    //       assetName: res.data.assetName,
-    //       specification: res.data.specification,
-    //       installedDate: installedDate,
-    //       categoryName: res.data.categoryName,
-    //       state: res.data.state,
-    //       categoryPrefix: res.data.categoryPrefix,
-    //     };
-    //     setInstalledDate(installedDate);
-    //     setInputs(object);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     history.push({
-    //       pathname: '/asset',
-    //     });
-    //   });
+    get(`/assets/${id}`)
+      .then((res) => {
+        let installedDate = res.data.data[0].installed_date.split('/').reverse().join('-');
+        let object = {
+          assetName: res.data.data[0].asset_name,
+          specification: res.data.data[0].specification,
+          installedDate: installedDate,
+          categoryName: res.data.data[0].category_name,
+          state: res.data.data[0].state,
+        };
+        setInstalledDate(installedDate);
+        setInputs(object);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const preSave = () => {
@@ -72,9 +59,6 @@ function EditAsset(props) {
       check = false;
     }
     if (inputs.installedDate === '') {
-      check = false;
-    }
-    if (inputs.categoryPrefix === '') {
       check = false;
     }
     if (inputs.state === '') {
@@ -124,21 +108,25 @@ function EditAsset(props) {
       return;
     }
 
-    inputs.installedDate = inputs.installedDate.split('-').reverse().join('/');
+    inputs.installedDate = formatDate(installedDate, 'YYYY-MM-DD');
 
-    put(`/assets/${assetCode}`, inputs)
-      .then((res) => {
-        history.push({
-          pathname: '/assets',
-          state: {
-            assetCode: res.data.assetCode,
-          },
-        });
+    inputs['asset_name'] = inputs['assetName'];
+    inputs.category_name = inputs.categoryName;
+
+    if (inputs.installedDate) {
+      inputs['installed_date'] = inputs['installedDate'];
+      delete inputs.installedDate;
+    }
+
+    delete inputs.assetName;
+    delete inputs.categoryName;
+
+    put(`/assets/${id}`, inputs)
+      .then(() => {
+        navigate('/manage_asset');
       })
       .catch((error) => {
-        setErrorTitle('Error notification');
-        setErrorMessage(error?.response?.data?.message);
-        setShowError(true);
+        console.log(error.response);
       });
   };
 
@@ -148,10 +136,13 @@ function EditAsset(props) {
 
   return (
     <>
-      <h5 className="content-title">Edit asset</h5>
-      <Col xs={6}>
-        <Form onSubmit={handleSubmit} className="content-form">
-          <Form.Group as={Row} className="mb-3">
+      <h5 className="mb-4" style={{ color: '#CF2338' }}>
+        {' '}
+        Edit asset
+      </h5>
+      <Col xs={12} sm={12} md={7}>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group as={Row} className="mb-3" controlId="firstName">
             <Form.Label column sm={3}>
               Name
             </Form.Label>
@@ -178,13 +169,12 @@ function EditAsset(props) {
             </Col>
           </Row>
 
-          <Form.Group as={Row} className="mb-3">
+          <Form.Group as={Row} className="mb-3" controlId="firstName">
             <Form.Label column sm={3}>
               Specification
             </Form.Label>
             <Col>
               <Form.Control
-                className="textarea-input"
                 name="specification"
                 as="textarea"
                 required
@@ -234,8 +224,7 @@ function EditAsset(props) {
                   name="state"
                   id="available"
                   required
-                  defaultChecked
-                  value="AVAILABLE"
+                  value="Available"
                   onChange={handleOnChange}
                   checked={inputs.state === 'Available'}
                 />
@@ -245,7 +234,7 @@ function EditAsset(props) {
                   name="state"
                   id="notavailable"
                   required
-                  value="NOT_AVAILABLE"
+                  value="Not Available"
                   onChange={handleOnChange}
                   checked={inputs.state === 'Not Available'}
                 />
@@ -255,7 +244,7 @@ function EditAsset(props) {
                   name="state"
                   id="wait"
                   required
-                  value="WAITING_FOR_RECYCLING"
+                  value="Waiting for recycling"
                   onChange={handleOnChange}
                   checked={inputs.state === 'Waiting for recycling'}
                 />
@@ -265,7 +254,7 @@ function EditAsset(props) {
                   name="state"
                   id="recycled"
                   required
-                  value="RECYCLED"
+                  value="Recycled"
                   onChange={handleOnChange}
                   checked={inputs.state === 'Recycled'}
                 />
@@ -278,18 +267,13 @@ function EditAsset(props) {
               <Button variant="danger" type="submit" disabled={!preSave()}>
                 Save
               </Button>
-              <button
-                className="btn btn-outline-secondary"
-                style={{ marginLeft: '40px' }}
-                onClick={() => navigate('../manage-asset')}
-              >
+              <Link className="btn btn-outline-secondary" style={{ marginLeft: '40px' }} to="/manage_asset">
                 Cancel
-              </button>
+              </Link>
             </Col>
           </Form.Group>
         </Form>
       </Col>
-      <ModalNotification title={errorTitle} content={errorMessage} show={showError} setShow={setShowError} />
     </>
   );
 }

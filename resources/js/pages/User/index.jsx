@@ -17,7 +17,6 @@ import UserTable from '../../components/User/Table';
 import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { setIsAdd, setIsEdit, setResetState } from '../../redux/reducer/user/user.reducer';
 import { isAddSelector, isEditSelector } from '../../redux/selectors';
-
 export default function User() {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
@@ -71,7 +70,7 @@ export default function User() {
   };
 
   const handleSort = async (sort, header) => {
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSearch;
     let tempFilter;
     let tempPage;
@@ -90,7 +89,7 @@ export default function User() {
       edit: tempSortDate,
     });
     setUser(result);
-    Notiflix.Block.remove('.main');
+    Notiflix.Block.remove('#root');
   };
 
   const handleCurrentFilter = async (value) => {
@@ -104,7 +103,7 @@ export default function User() {
       setFilter(value);
       if (value === 'Admin' || value === 'Staff') tempFilter = value;
     }
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSearch;
     let tempSort;
     let tempPage;
@@ -121,12 +120,12 @@ export default function User() {
       edit: tempSortDate,
     });
     setUser(result);
-    Notiflix.Block.remove('.main');
+    Notiflix.Block.remove('#root');
   };
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSort;
     let tempFilter;
     let tempPage;
@@ -144,12 +143,12 @@ export default function User() {
         edit: tempSortDate,
       });
       setUser(result);
-      Notiflix.Block.remove('.main');
+      Notiflix.Block.remove('#root');
       return;
     }
     const result = await getAllUsers({ sort: tempSort, filter: tempFilter, page: tempPage, edit: tempSortDate });
     setUser(result);
-    Notiflix.Block.remove('.main');
+    Notiflix.Block.remove('#root');
   };
 
   const handlePageChange = async (page) => {

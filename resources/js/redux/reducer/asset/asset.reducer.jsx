@@ -9,6 +9,9 @@ export const assetReduccer = createSlice({
     isdetailAsset: false,
     listAsset: [],
     detailAsset: {},
+    detailAssetAssignment: [],
+    isDetailAssetAssignmentSuccess: false,
+    loadingDetailAssignment: false,
     filter: {
       'filter[state]': 'Available,Not Available,Assigned',
       'filter[category]': undefined,
@@ -56,6 +59,21 @@ export const assetReduccer = createSlice({
       state.loadingDetail = false;
       state.isDetailAssetSuccess = false;
       state.detailAsset = action.payload;
+    },
+
+    fetctDetailAssetAssignment(state) {
+      state.loadingDetailAssignment = true;
+      state.isDetailAssetAssignmentSuccess = true;
+    },
+    fetctDetailAssetAssignmentSuccess(state, action) {
+      state.loadingDetailAssignment = false;
+      state.isDetailAssetAssignmentSuccess = false;
+      state.detailAssetAssignment = action.payload.data.data;
+    },
+    fetctDetaiAssetAssignmentError(state) {
+      state.loadingDetailAssignment = false;
+      state.isDetailAssetAssignmentSuccess = false;
+      state.detailAssetAssignment = [];
     },
   },
 });

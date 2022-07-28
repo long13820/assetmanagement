@@ -25,7 +25,8 @@ class AssignmentRepository
             'user_id' => $request->user_id,
             'asset_id' => $request->asset_id,
             'admin_id' => $request->admin_id,
-            'assigned_date' => $request->assigned_date
+            'assigned_date' => $request->assigned_date,
+            'note' => $request->note,
         ]);
         if ($assignment) {
             $result = [

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -32,7 +32,7 @@ function UserEdit(props) {
     register,
     handleSubmit,
     control,
-    formState: { isValid, isDirty, dirtyFields },
+    formState: { isValid, isDirty, dirtyFields, errors },
   } = useForm({
     mode: 'onChange',
     resolver: yupResolver(editSchema),
@@ -42,6 +42,11 @@ function UserEdit(props) {
       gender: userDetail.gender,
       type: userDetail.type,
     },
+  });
+
+  const date_of_birth = useWatch({
+    control,
+    name: 'date_of_birth',
   });
 
   const onSubmit = async (data) => {
@@ -77,51 +82,75 @@ function UserEdit(props) {
         <table align="center" border="0" className="table table-bordered mb-0">
           <tbody>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">First Name</p>
               </td>
-              <td>
+              <td width="70%">
                 <Form.Control defaultValue={userDetail.first_name} id="user_first_name" type="text" disabled />
               </td>
             </tr>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">Last Name</p>
               </td>
-              <td>
+              <td width="70%">
                 <Form.Control defaultValue={userDetail.last_name} id="user_last_name" type="text" disabled />
               </td>
             </tr>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">Date of birth</p>
               </td>
-              <td>
-                <Form.Control id="user_last_name" type="date" {...register('date_of_birth')} />
+              <td width="70%">
+                <Form.Control id="user_date_of_birth" type="date" {...register('date_of_birth')} />
+                <small className="text-red font-weight-semi">
+                  {errors?.date_of_birth?.type === 'date_of_birth' && errors?.date_of_birth?.message}
+                </small>
               </td>
             </tr>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">Gender</p>
               </td>
-              <td>
-                <Form.Check inline type="radio" label="Female" value="female" {...register('gender')} />
-                <Form.Check inline type="radio" label="Male" value="male" {...register('gender')} />
+              <td width="70%">
+                <Form.Check
+                  id="user_gender_female"
+                  inline
+                  type="radio"
+                  label="Female"
+                  value="female"
+                  {...register('gender')}
+                />
+                <Form.Check
+                  id="user_gender_male"
+                  inline
+                  type="radio"
+                  label="Male"
+                  value="male"
+                  {...register('gender')}
+                />
               </td>
             </tr>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">Joined Date</p>
               </td>
-              <td>
-                <Form.Control type="date" {...register('joined_date')} />
+              <td width="70%">
+                <Form.Control id="user_joined_date" type="date" {...register('joined_date')} />
+                <small className="text-red font-weight-semi">
+                  {date_of_birth !== '' && errors?.joined_date?.type === 'min' && errors?.joined_date?.message}
+                  {date_of_birth !== '' &&
+                    errors?.joined_date?.type === 'joined_date_2' &&
+                    errors?.joined_date?.message}
+                  {errors?.joined_date?.type === 'joined_date' && errors?.joined_date?.message}
+                </small>
               </td>
             </tr>
             <tr>
-              <td>
+              <td width="30%">
                 <p className="font-weight-bold">Type</p>
               </td>
-              <td>
+              <td width="70%">
                 <Controller
                   control={control}
                   name="type"
@@ -147,8 +176,8 @@ function UserEdit(props) {
               </td>
             </tr>
             <tr>
-              <td />
-              <td className="d-flex justify-content-end">
+              <td width="30%" />
+              <td width="70%" className="d-flex justify-content-end">
                 <Button
                   variant="danger"
                   type="submit"

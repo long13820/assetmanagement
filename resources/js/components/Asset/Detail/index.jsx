@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
-import Notiflix from 'notiflix';
+import { useDispatch, useSelector } from 'react-redux';
+import { isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 
-import { assetDetailSelector, assetLoadingDetailSelector } from '../../../redux/selectors/asset/asset.selector';
+import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
+import { assetAssignmentDetailSelector, assetDetailSelector } from '../../../redux/selectors/asset/asset.selector';
 import Modal from '../../Layouts/Modal';
 import Table from '../../Layouts/Table';
 
@@ -31,106 +33,104 @@ export default function ShowDetailAsset(props) {
       isSort: false,
     },
   ];
-  const body_sample_data = [
-    {
-      id: 1,
-      name: 'Asset Code',
-      isSort: false,
-    },
-    {
-      id: 2,
-      name: 'Asset Name',
-      isSort: false,
-    },
-    {
-      id: 3,
-      name: 'Category',
-      isSort: true,
-    },
-  ];
+  const dispatch = useDispatch();
+  const checkAssetDetail = useSelector(assetDetailSelector);
+  const detailAsset = checkAssetDetail != undefined && checkAssetDetail[0];
+  const id = detailAsset != undefined ? detailAsset.id : '';
   const setStateModal = (value) => {
     if (value !== 'keep') {
       props.setStateModal();
     }
   };
+  useEffect(() => {
+    dispatch(
+      assetAction.fetctDetailAssetAssignment({
+        'filter[asset_id]': id,
+      })
+    );
+  }, [id]);
+  const listAssignments = useSelector(assetAssignmentDetailSelector);
   const renderTableBodyHistory = () => {
-    return body_sample_data.map((item, index) => {
+    if (!isEmpty(listAssignments)) {
+      return listAssignments.map((item, index) => {
+        return (
+          <tr key={index + 1}>
+            <td>{detailAsset != undefined && detailAsset.asset_name}</td>
+            <td>{item.assigned_to}</td>
+            <td>{item.assigned_by}</td>
+            <td>{item.assigned_date}</td>
+          </tr>
+        );
+      });
+    } else {
       return (
-        <tr key={index + 1}>
-          <td>{item.id}</td>
-          <td>{item.name}</td>
-          <td>{item.name}</td>
-          <td>{item.name}</td>
+        <tr>
+          <td colSpan={4} className="text-danger text-center font-weight-bold">
+            There is not history !
+          </td>
         </tr>
       );
-    });
+    }
   };
 
-  const checkAssetDetail = useSelector(assetDetailSelector);
-  const detailAsset = checkAssetDetail != undefined && checkAssetDetail[0];
-
-  const assetLoadingDetail = useSelector(assetLoadingDetailSelector);
-  assetLoadingDetail
-    ? Notiflix.Loading.circle('Please wait...', {
-        messageColor: '#d6001c',
-        fontFamily: 'Mulish',
-        svgColor: '#d6001c',
-      })
-    : Notiflix.Loading.remove();
   return (
-    <Modal
-      show={props.show}
-      setStateModal={setStateModal}
-      elementModalTitle={<p>Detailed Asset Information </p>}
-      elementModalBody={
-        <div className="modal-content-asset-detail">
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">Asset Code</div>
-              <div>{detailAsset != undefined && detailAsset.asset_code}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">Asset Name</div>
-              <div>{detailAsset != undefined && detailAsset.asset_name}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">Category</div>
-              <div>{detailAsset != undefined && detailAsset.category_name}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">Installed Date</div>
-              <div>{detailAsset != undefined && detailAsset.installed_date}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">State</div>
-              <div>{detailAsset != undefined && detailAsset.state}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="show-assset-list-detail">
-              <div className="show-assset-list-detail-item">Specification</div>
-              <div>{detailAsset != undefined && detailAsset.specification}</div>
-            </ListGroup.Item>
-          </ListGroup>
-          <ListGroup className="list-group-item-detail">
-            <ListGroup.Item className="">
-              <div className="show-assset-list-detail-item">History</div>
-              <div>
-                <Table tableHeader={headerTableHistory} tableBody={renderTableBodyHistory()} />
-              </div>
-            </ListGroup.Item>
-          </ListGroup>
-        </div>
-      }
-    />
+    <>
+      <Modal
+        show={props.show}
+        setStateModal={setStateModal}
+        elementModalTitle={<p>Detailed Asset Information </p>}
+        elementModalBody={
+          <>
+            <div className="modal-content-asset-detail">
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Asset Code</div>
+                  <div>{detailAsset != undefined && detailAsset.asset_code}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Asset Name</div>
+                  <div>{detailAsset != undefined && detailAsset.asset_name}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Category</div>
+                  <div>{detailAsset != undefined && detailAsset.category_name}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Installed Date</div>
+                  <div>{detailAsset != undefined && detailAsset.installed_date}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">State</div>
+                  <div>{detailAsset != undefined && detailAsset.state}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Specification</div>
+                  <div>{detailAsset != undefined && detailAsset.specification}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="">
+                  <div className="show-assset-list-detail-item">History</div>
+                  <div>
+                    <Table tableHeader={headerTableHistory} tableBody={renderTableBodyHistory()} />
+                  </div>
+                </ListGroup.Item>
+              </ListGroup>
+            </div>
+          </>
+        }
+      />
+    </>
   );
 }
 

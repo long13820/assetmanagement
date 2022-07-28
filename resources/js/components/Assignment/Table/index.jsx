@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaPen, FaTimesCircle } from 'react-icons/fa';
+import { FaPen, FaTimesCircle, FaUndoAlt } from 'react-icons/fa';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
@@ -79,6 +79,9 @@ export default function AssignmentTable(props) {
               </button>
               <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
                 <FaTimesCircle className="text-danger font-20px" />
+              </span>
+              <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
+                <FaUndoAlt className="text-primary font-20px" />
               </span>
             </div>
           </td>

@@ -3,7 +3,8 @@ export default function EditNote() {
     <div>
       <p>
         <small>
-          (*)&nbsp;User must be <span className="font-weight-bold">over 18 years old</span>
+          (*)&nbsp;<span className="font-weight-bold">User</span> must be{' '}
+          <span className="font-weight-bold">over 18 years old</span>
         </small>
       </p>
       <p>

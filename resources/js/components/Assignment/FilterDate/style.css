@@ -1,0 +1,20 @@
+.assignment-filter-date .afd-name {
+  padding-right: var(--12px);
+}
+
+.assignment-filter-date,
+.assignment-filter-date:hover,
+button.assignment-filter-date:focus {
+  border: var(--2px) solid #ced4da;
+  background-color: var(--bs-white);
+  color: var(--bs-black);
+}
+
+.assignment-filter-date .fb-icon {
+  border-left: 2px solid #ced4da;
+  padding-left: var(--12px);
+}
+
+button.assignment-filter-date.dropdown-toggle::after {
+  content: none;
+}

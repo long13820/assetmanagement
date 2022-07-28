@@ -52,7 +52,7 @@ Table.propTypes = {
       isSortDesc: PropTypes.bool,
     })
   ),
-  tableBody: PropTypes.array.isRequired,
+  tableBody: PropTypes.any,
   handleSort: PropTypes.func,
   tableSort: PropTypes.func,
 };

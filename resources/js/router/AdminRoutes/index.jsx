@@ -55,7 +55,7 @@ export default function AdminRoutes() {
         <Route path="/login" element={<LoginLayout slot={<LoginPage />} />} />
       </Route>
       <Route path="/asset" element={<AdminLayout slot={<AssetCreate />} />} />
-      <Route path="/edit-asset" element={<AdminLayout slot={<AssetEdit />} />} />
+      <Route path="/edit-asset/:id" element={<AdminLayout slot={<AssetEdit />} />} />
     </Routes>
   );
 }

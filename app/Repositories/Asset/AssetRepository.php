@@ -35,9 +35,7 @@ class AssetRepository
             ->orderBy("asset.state")
             ->join('categories', 'asset.category_id', '=', 'categories.id')
             ->where("asset.id", "!=", auth()->id())
-            ->sort($request)
             ->paginate($per_page);
-
         return AssetResource::collection($data)->response()->getData();
     }
 
@@ -81,6 +79,6 @@ class AssetRepository
             ->join("location", "user.location_id", "=", "location.id")
             ->find($id);
 
-        return AssetResource::make($data);
+        return $data;
     }
 }

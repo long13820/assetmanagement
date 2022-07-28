@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 import { get, post } from '../../htttpHelper';
-import { normalizeSpace } from '../../utils/StringNormalize';
+import { normalizeSpace } from '../../utils/stringNormalize';
 
 import './style.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -30,7 +30,7 @@ export default function AssetCreate() {
     asset_name: '',
     specification: '',
     installed_date: '',
-    category_id: '1',
+    category_id: '',
     state: 'Available',
   });
   const [inputAddCategory, setInputAddCategory] = useState({
@@ -45,7 +45,7 @@ export default function AssetCreate() {
   const fetchCategories = () => {
     get('/categories')
       .then((res) => {
-        setCategories(res.data.data);
+        setCategories(res.data.data.data);
       })
       .catch((error) => {
         console.log(error);
@@ -154,8 +154,7 @@ export default function AssetCreate() {
     setIsSaving(true);
     post('/assets', inputs)
       .then(() => {
-        navigate('../manage-asset');
-        setInputs([...inputs]);
+        navigate('../manage_asset');
       })
       .catch((error) => {
         setIsSaving(false);
@@ -173,7 +172,7 @@ export default function AssetCreate() {
       setHeaderTitle(item.category_name);
       setInputs((prevState) => ({
         ...prevState,
-        categoryPrefix: item.category_prefix,
+        category_id: item.id,
       }));
     }
   };
@@ -233,7 +232,7 @@ export default function AssetCreate() {
 
   return (
     <>
-      <h5 className="content-title">Create asset</h5>
+      <h5 className="content-title">Create new asset</h5>
       <Col xs={6}>
         <Form onSubmit={handleSubmit} className="content-form">
           <Form.Group as={Row} className="mb-3">
@@ -410,7 +409,7 @@ export default function AssetCreate() {
               <button
                 className="btn btn-outline-secondary"
                 style={{ marginLeft: '40px' }}
-                onClick={() => navigate('../manage-asset', { replace: true })}
+                onClick={() => navigate('../manage_asset', { replace: true })}
               >
                 Cancel
               </button>

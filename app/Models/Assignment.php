@@ -11,7 +11,6 @@ class Assignment extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
     protected $table = 'assignment';
     /**
      * The attributes that are mass assignable.
@@ -54,7 +53,10 @@ class Assignment extends Model
                 $list = explode(',', $request->query('filter')['assigned_date']);
                 $query->whereDate('assigned_date', $list);
             })
-            ;
+            ->when($request->has('filter.asset_id'), function ($query) use ($request) {
+                $list = explode(',', $request->query('filter')['asset_id']);
+                $query->where('asset_id', $list);
+            });
     }
 
     public function scopeSearch($query, $request)

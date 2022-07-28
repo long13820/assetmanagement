@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTimes } from 'react-icons/fa';
+import { FaPen, FaTimesCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Notiflix from 'notiflix';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
 import { setTotalRecord } from '../../../redux/reducer/app/app.reducer';
@@ -12,12 +14,9 @@ import {
   assetListSelector,
   assetTotalRecordPageSelector,
 } from '../../../redux/selectors/asset/asset.selector';
+import { BlockUI } from '../../Layouts/Notiflix';
 import Table from '../../Layouts/Table';
 import ShowDetailAsset from '../Detail';
-
-// const body_sample_data = [...home_sample_data];
-// console.log(body_sample_data);
-
 export default function AssetTable() {
   const [renderTableHeader] = React.useState([...asset_table_header]);
   const current_page = useSelector(currentPageSelector);
@@ -115,10 +114,23 @@ export default function AssetTable() {
 
   // Show ditail
   const [showDetail, setShowDetailAsset] = useState(false);
+
   const showDetailAsset = (dataId) => {
+    BlockUI('.main');
     dispatch(assetAction.fetctDetailAsset(dataId));
+    Notiflix.Block.remove('.main');
+
     setShowDetailAsset(true);
   };
+  let navigate = useNavigate();
+
+  const handleEditAsset = (e, dataId) => {
+    e.stopPropagation();
+    let path = `/edit-asset/${dataId}`;
+    navigate(path);
+    //  console.log(dataId);
+  };
+
   const renderTableBody = () => {
     return body_sample_data.map((item, index) => {
       return (
@@ -126,17 +138,33 @@ export default function AssetTable() {
           <td>{item.asset_code}</td>
           <td>{item.asset_name}</td>
           <td>{item.category_name}</td>
-          <td>{item.state}</td>
           <td>
-            <div>
-              <FaEdit className={`text-danger font-20px ${item.state === 'Assigned' ? 'opacity-25' : ''}`} />
-              <FaTimes
-                className={`text-danger margin-left-12px  font-18px ${item.state === 'Assigned' ? 'opacity-25' : ''}`}
-              />
-              {/* <FaTimes
-                className={`text-black font-20px mx-3 ${item.state !== 'Waiting for acceptance' ? 'opacity-25' : ''}`}
-              />
-              <FaUndoAlt className={`text-blue font-18px ${item.state !== 'Accepted' ? 'opacity-25' : ''}`} /> */}
+            <p
+              className={`${
+                item.state === 'Assigned' ? 'bg-red-100 text-red' : 'bg-blue-100 text-blue'
+              } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
+            >
+              {item.state}
+            </p>
+          </td>
+          <td>
+            <div className="d-flex">
+              <button
+                className={` ${
+                  item.state === 'Assigned' ? 'opacity-25' : ''
+                } br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none`}
+                onClick={(e) => handleEditAsset(e, item.id)}
+              >
+                <FaPen className={`text-black font-20px `} />
+              </button>
+
+              <span
+                className={`${
+                  item.state === 'Assigned' ? 'opacity-25' : ''
+                } br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center`}
+              >
+                <FaTimesCircle className="text-danger font-20px " />
+              </span>
             </div>
           </td>
         </tr>

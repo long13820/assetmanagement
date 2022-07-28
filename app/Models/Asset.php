@@ -56,8 +56,8 @@ class Asset extends Model
             $categoryPrefix . str_pad($count + 1, 4, 0, STR_PAD_LEFT);
 
         return Attribute::make(
-            get: fn() => $assetCode,
-            set: fn() => $assetCode,
+            get: fn () => $assetCode,
+            set: fn () => $assetCode,
         );
     }
 
