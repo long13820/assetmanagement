@@ -9,11 +9,21 @@ import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 import * as yup from 'yup';
 
-import { handleCreate } from '../../../api/Assignment';
-import { setAssetName, setIsAdd, setUserName } from '../../../redux/reducer/assignment/assignment.reducer';
+import { getAllAssets, handleCreate } from '../../../api/Assignment';
+import { getAllUsers } from '../../../api/User';
+import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import {
+  setAssetCode,
+  setAssetName,
+  setIsAdd,
+  setStaffCode,
+  setUserName,
+} from '../../../redux/reducer/assignment/assignment.reducer';
+import { formatDate } from '../../../utils/formatDate';
 import GetAssetTable from '../../Assignment/GetAssetTable/';
 import GetUserTable from '../../Assignment/GetUserTable/';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import { BlockUI } from '../../Layouts/Notiflix';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './style.css';
@@ -22,7 +32,10 @@ const schema = yup
   .object({
     asset_name: yup.string().required(),
     user_name: yup.string().required(),
-    assigned_date: yup.date().required().min(new Date()),
+    assigned_date: yup
+      .date()
+      .required()
+      .min(new Date(Date.now() - 86400000)),
   })
   .required();
 export default function FormInput(props) {
@@ -32,6 +45,10 @@ export default function FormInput(props) {
   const [flagSaveUser, setFlagSaveUser] = React.useState(0);
   const [showUser, setShowUser] = useState(false);
   const [showAsset, setShowAsset] = useState(false);
+  const [user, setUser] = useState([]);
+  const [asset, setAsset] = useState([]);
+  const [totalRecord, setTotalRecord] = React.useState(0);
+  const [totalPage, setTotalPage] = React.useState(0);
 
   const dispatch = useDispatch();
 
@@ -58,21 +75,41 @@ export default function FormInput(props) {
   };
 
   const handleShowAsset = () => {
+    BlockUI('#root');
     if (flagSave === 0) {
       dispatch(setAssetName(''));
       setCurrentAssetName({});
       setValue('asset_name', '');
     }
-    setShowAsset(true);
+    handleGetAssets();
   };
 
   const handleShowUser = () => {
+    BlockUI('#root');
     if (flagSaveUser === 0) {
       dispatch(setUserName(''));
       setCurrentUserName({});
       setValue('user_name', '');
     }
+    handleGetUsers();
+  };
+
+  const handleGetUsers = async () => {
+    const result = await getAllUsers({ sort: [{ key: 'first_name', value: 'asc' }] });
+    setUser(result.data);
+    setTotalRecord(result.meta.total);
+    setTotalPage(result.meta.last_page);
+    Notiflix.Block.remove('#root');
     setShowUser(true);
+  };
+
+  const handleGetAssets = async () => {
+    const result = await getAllAssets();
+    setAsset(result.data);
+    setTotalRecord(result.meta.total);
+    setTotalPage(result.meta.last_page);
+    Notiflix.Block.remove('#root');
+    setShowAsset(true);
   };
 
   const admin = useSelector((state) => state.app.user);
@@ -85,15 +122,17 @@ export default function FormInput(props) {
     formState: { isValid },
   } = useForm({
     mode: 'onChange',
+    TextField: '',
     resolver: yupResolver(schema),
     defaultValues: {
-      assigned_date: new Date().toJSON().slice(0, 10).replace(/-/g, '-'),
+      assigned_date: formatDate(new Date(Date.now()), 'yyyy-MM-DD'),
     },
   });
 
-  const handleCurrentSetAssetName = (name, id) => {
+  const handleCurrentSetAssetName = (name, id, code) => {
     if (Object.keys(currentAssetName).length === 0) {
       dispatch(setAssetName(name));
+      dispatch(setAssetCode(code));
       const obj = {
         name,
         id,
@@ -106,9 +145,11 @@ export default function FormInput(props) {
       if (currentAssetName.name === name) {
         dispatch(setAssetName(''));
         setCurrentAssetName({});
+        dispatch(setAssetCode(''));
         setValue('asset_name', '');
         return;
       }
+      dispatch(setAssetCode(code));
       dispatch(setAssetName(name));
       const obj = {
         name,
@@ -120,12 +161,14 @@ export default function FormInput(props) {
     }
   };
 
-  const handleCurrentSetUserName = (name, id) => {
+  const handleCurrentSetUserName = (name, id, code) => {
     if (Object.keys(currentUserName).length === 0) {
       dispatch(setUserName(name));
+      dispatch(setStaffCode(code));
       const obj = {
         name,
         id,
+        code,
       };
       setCurrentUserName({ ...obj });
       setValue('user_name', name);
@@ -134,10 +177,12 @@ export default function FormInput(props) {
     if (Object.keys(currentUserName).length > 0) {
       if (currentUserName.name === name) {
         dispatch(setUserName(''));
+        dispatch(setStaffCode(''));
         setCurrentUserName({});
         setValue('user_name', '');
         return;
       }
+      dispatch(setStaffCode(code));
       dispatch(setUserName(name));
       const obj = {
         name,
@@ -158,10 +203,10 @@ export default function FormInput(props) {
     });
 
     if (response === 201) {
-      SuccessToast('Create user successfully', 3000);
+      SuccessToast('Create assignment is successfully', 3000);
       props.backtoManageAssignment('created_at');
     } else {
-      ErrorToast('Create user unsuccessfully', 3000);
+      ErrorToast('Created assignment is unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
     }
   };
@@ -169,30 +214,34 @@ export default function FormInput(props) {
   return (
     <div className="d-flex justify-content-center">
       <Modal
-        size="lg"
+        scrollable
         backdrop="static"
-        className="d-flex"
         show={showUser}
         onHide={() => handleStateModalUser('close')}
         centered
+        size="lg"
         contentClassName="select-user-modal"
       >
         <Modal.Body>
-          <GetUserTable handleCurrentSetUserName={handleCurrentSetUserName} />
+          <GetUserTable
+            handleCurrentSetUserName={handleCurrentSetUserName}
+            data={user}
+            totalRecord={totalRecord}
+            totalPage={totalPage}
+          />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={() => handleStateModalUser('save')}>
-            &nbsp;Save&nbsp;
+            Save
           </Button>
-          <>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>
-          <Button variant="outline-secondary" onClick={() => handleStateModalUser('close')}>
+          <Button variant="outline-secondary" onClick={() => handleStateModalUser('close')} className="ms-3">
             Cancel
           </Button>
         </Modal.Footer>
       </Modal>
       <Modal
+        scrollable
         backdrop="static"
-        className="d-flex justify-content-end"
         show={showAsset}
         onHide={() => handleStateModalAsset('close')}
         centered
@@ -200,14 +249,18 @@ export default function FormInput(props) {
         contentClassName="select-asset-modal"
       >
         <Modal.Body>
-          <GetAssetTable handleCurrentSetAssetName={handleCurrentSetAssetName} />
+          <GetAssetTable
+            handleCurrentSetAssetName={handleCurrentSetAssetName}
+            data={asset}
+            totalRecord={totalRecord}
+            totalPage={totalPage}
+          />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="danger" onClick={() => handleStateModalAsset('save')}>
-            &nbsp;Save&nbsp;
+            Save
           </Button>
-          <>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>
-          <Button variant="outline-secondary" onClick={() => handleStateModalAsset('close')}>
+          <Button variant="outline-secondary" onClick={() => handleStateModalAsset('close')} className="ms-3">
             Cancel
           </Button>
         </Modal.Footer>
@@ -220,11 +273,11 @@ export default function FormInput(props) {
                 <Form.Label className="font-weight-bold">User</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <InputGroup>
-                  <Form.Control type="text" {...register('user_name')} disabled />
-                  <Button variant="danger" onClick={handleShowUser}>
+                <InputGroup className="textFieldBoth" onClick={handleShowUser}>
+                  <Form.Control type="text" className="textField" {...register('user_name')} readOnly />
+                  <InputGroup.Text className="textField">
                     <BsSearch />
-                  </Button>
+                  </InputGroup.Text>
                 </InputGroup>
               </Col>
             </Row>
@@ -235,11 +288,11 @@ export default function FormInput(props) {
                 <Form.Label className="font-weight-bold">Asset</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <InputGroup>
-                  <Form.Control type="text" {...register('asset_name')} disabled />
-                  <Button variant="danger" onClick={handleShowAsset}>
+                <InputGroup className="textFieldBoth" onClick={handleShowAsset}>
+                  <Form.Control type="text" className="textField" {...register('asset_name')} readOnly />
+                  <InputGroup.Text className="textField">
                     <BsSearch />
-                  </Button>
+                  </InputGroup.Text>
                 </InputGroup>
               </Col>
             </Row>
@@ -264,7 +317,12 @@ export default function FormInput(props) {
                   control={control}
                   name="note"
                   render={({ field }) => (
-                    <Form.Control as="textarea" selected={field.value} onChange={(date) => field.onChange(date)} />
+                    <Form.Control
+                      name="note"
+                      as="textarea"
+                      selected={field.value}
+                      onChange={(date) => field.onChange(date)}
+                    />
                   )}
                 />
               </Col>
@@ -275,21 +333,24 @@ export default function FormInput(props) {
             <Button className="font-weight-bold" variant="danger" disabled={!isValid} type="submit">
               &nbsp;Save&nbsp;
             </Button>
-            <>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</>
             <Button
-              className="font-weight-bold"
-              onClick={() => dispatch(setIsAdd(false))}
+              className="font-weight-bold ms-3"
+              onClick={() => {
+                dispatch(setSubTitle(''));
+                dispatch(setIsAdd(false));
+              }}
               variant="outline-secondary"
               type="cancel"
             >
               Cancel
             </Button>
           </div>
-          <div className="text-justify mb-3">
-            <small>(*) Click Search button to select User and Asset name</small>
-          </div>
-          <div>
-            <small>(*) Assigned date must be current or future date</small>
+          <div className="mt-3 text-justify">
+            <small>
+              (*)&nbsp;<span className="font-weight-bold">Assigned date</span>&nbsp;must be&nbsp;
+              <span className="font-weight-bold">current</span>
+              &nbsp;or&nbsp;<span className="font-weight-bold">future date</span>
+            </small>
           </div>
         </Form>
       </div>

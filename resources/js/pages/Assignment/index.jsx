@@ -24,14 +24,16 @@ export default function Assignment() {
   const [sort, setCurrentSort] = React.useState([]);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('All');
+  const [filterDate, setFilterDate] = React.useState('');
   const [page, setPage] = React.useState(1);
   const [totalRecord, setTotalRecord] = React.useState(0);
-  const [perPage] = React.useState(8);
+  const [perPage] = React.useState(18);
   const [totalPage, setTotalPage] = React.useState(0);
   const isAdd = useSelector((state) => state.assignment.isAdd);
   const [sortDate, setSortDate] = React.useState('');
 
   React.useEffect(() => {
+    dispatch(setIsAdd(false));
     dispatch(setTitle('Manage Assignment'));
     dispatch(setSubTitle(''));
     handleGetAllAssignments();
@@ -44,31 +46,58 @@ export default function Assignment() {
   };
 
   const handleSort = async (sort, header) => {
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSearch;
     let tempFilter;
-    let tempPage;
     let tempSortDate;
+    let tempFilterDate;
     if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
     if (search !== '') tempSearch = search;
-    if (page > 1) tempPage = page;
     if (sortDate !== '') tempSortDate = sortDate;
+    if (filterDate !== '') tempFilterDate = filterDate;
     setCurrentSort(sort);
     setRenderTableHeader(header);
     const result = await getAllAssignments({
       sort,
       search: tempSearch,
       filter: tempFilter,
-      page: tempPage,
+      filterDate: tempFilterDate,
       edit: tempSortDate,
     });
-    setAssignment(result);
-    Notiflix.Block.remove('.main');
+    setAssignment(result, 'reset-page');
+    Notiflix.Block.remove('#root');
+  };
+
+  const handleCurrentFilterDate = async (value) => {
+    let tempFilterDate;
+    if (value instanceof Date) {
+      tempFilterDate = value;
+      setFilterDate(value);
+    } else {
+      setFilterDate('');
+    }
+    BlockUI('#root');
+    let tempSearch;
+    let tempSort;
+    let tempSortDate;
+    let tempFilter;
+    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (search !== '') tempSearch = search;
+    if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
+    if (sortDate !== '') tempSortDate = sortDate;
+    const result = await getAllAssignments({
+      sort: tempSort,
+      search: tempSearch,
+      filter: tempFilter,
+      filterDate: tempFilterDate,
+      edit: tempSortDate,
+    });
+    setAssignment(result, 'reset-page');
+    Notiflix.Block.remove('#root');
   };
 
   const handleCurrentFilter = async (value) => {
     let tempFilter;
-
     if ((value === filter && value === 'Accepted') || (value === filter && value === 'Waiting for acceptance')) {
       setFilter('All');
     } else if (value === filter && value === 'All') {
@@ -77,47 +106,48 @@ export default function Assignment() {
     } else {
       setFilter(value);
       if (value === 'Accepted' || value === 'Waiting for acceptance') tempFilter = value;
-      if (value instanceof Date) {
-        tempFilter = value;
-        setFilter('All');
-      }
     }
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSearch;
     let tempSort;
-    let tempPage;
     let tempSortDate;
+    let tempFilterDate;
     if (search !== '') tempSearch = search;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
-    if (page > 1) tempPage = page;
     if (sortDate !== '') tempSortDate = sortDate;
+    if (filterDate !== '') tempFilterDate = filterDate;
     const result = await getAllAssignments({
       sort: tempSort,
       search: tempSearch,
       filter: tempFilter,
-      page: tempPage,
+      filterDate: tempFilterDate,
       edit: tempSortDate,
     });
-    setAssignment(result);
-    Notiflix.Block.remove('.main');
+    setAssignment(result, 'reset-page');
+    Notiflix.Block.remove('#root');
   };
+
   const dispatch = useDispatch();
   const goToCreateNewAssignment = () => {
     dispatch(setIsAdd(true));
+    dispatch(setSubTitle('Create Assignment'));
   };
 
   const backToManageAssignment = async (field) => {
     let tempSearch;
     let tempFilter;
     let tempPage;
+    let tempFilterDate;
     if (filter === 'Accepted' || filter === 'Waiting for Acceptance') tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (page > 1) tempPage = page;
     setSortDate(field);
+    if (filterDate !== '') tempFilterDate = filterDate;
     const result = await getAllAssignments({
       sort,
       search: tempSearch,
       filter: tempFilter,
+      filterDate: tempFilterDate,
       page: tempPage,
       edit: field,
     });
@@ -128,28 +158,38 @@ export default function Assignment() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    BlockUI('.main');
+    BlockUI('#root');
     let tempSort;
     let tempFilter;
-    let tempPage;
     let tempSortDate;
+    let tempFilterDate;
     if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
-    if (page > 1) tempPage = page;
     if (sortDate !== '') tempSortDate = sortDate;
+    if (filterDate !== '') tempFilterDate = filterDate;
     if (search !== '') {
-      const result = await getAllAssignments({ sort: tempSort, search, filter: tempFilter, page: tempPage });
-      setAssignment(result);
-      Notiflix.Block.remove('.main');
+      const result = await getAllAssignments({
+        sort: tempSort,
+        search,
+        filter: tempFilter,
+        filterDate: tempFilterDate,
+      });
+      setAssignment(result, 'reset-page');
+      Notiflix.Block.remove('#root');
       return;
     }
-    const result = await getAllAssignments({ sort: tempSort, filter: tempFilter, page: tempPage, edit: tempSortDate });
-    setAssignment(result);
-    Notiflix.Block.remove('.main');
+    const result = await getAllAssignments({
+      sort: tempSort,
+      filter: tempFilter,
+      edit: tempSortDate,
+      filterDate: tempFilterDate,
+    });
+    setAssignment(result, 'reset-page');
+    Notiflix.Block.remove('#root');
   };
 
   const handlePageChange = async (page) => {
-    BlockUI('.main');
+    BlockUI('#root');
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -157,21 +197,24 @@ export default function Assignment() {
     setPage(page);
     let tempSort;
     let tempFilter;
+    let tempFilterDate;
     let tempSearch;
     let tempSortDate;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (sortDate !== '') tempSortDate = sortDate;
+    if (filterDate !== '') tempFilterDate = filterDate;
     const result = await getAllAssignments({
       sort: tempSort,
       filter: tempFilter,
       search: tempSearch,
       page,
       edit: tempSortDate,
+      filterDate: tempFilterDate,
     });
     setAssignment(result, 'page');
-    Notiflix.Block.remove('.main');
+    Notiflix.Block.remove('#root');
   };
 
   const setAssignment = (result, value) => {
@@ -184,13 +227,13 @@ export default function Assignment() {
   return (
     <section>
       {!isAdd && <h5 className="text-danger font-weight-bold mb-3">Assignment List</h5>}
-      {isAdd && <h3 className="text-danger font-weight-bold mb-3">Create Assignment</h3>}
+      {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create Assignment</h5>}
       {!isAdd ? (
         <div className="mb-3 d-flex align-items-center justify-content-between">
           <div className="d-flex">
             <FilterButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
             <div className="ms-3">
-              <FilterDate setCurrentFilter={handleCurrentFilter} />
+              <FilterDate setCurrentFilter={handleCurrentFilterDate} />
             </div>
           </div>
           <div className="d-flex">

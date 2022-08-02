@@ -20,30 +20,33 @@ export default function FilterButton(props) {
       </Dropdown.Toggle>
       <Dropdown.Menu>
         <Form>
-          <Form.Check
-            type="checkbox"
-            id="checkbox-all"
-            className="mx-4 font-weight-bold"
-            label="All"
-            checked={props.currentFilter === 'All'}
-            onChange={() => handleFilter('All')}
-          />
-          <Form.Check
-            type="checkbox"
-            id="checkbox-admin"
-            className="mx-4 my-2 font-weight-bold"
-            label="Admin"
-            checked={props.currentFilter === 'Admin'}
-            onChange={() => handleFilter('Admin')}
-          />
-          <Form.Check
-            type="checkbox"
-            id="checkbox-staff"
-            className="mx-4 font-weight-bold"
-            label="Staff"
-            checked={props.currentFilter === 'Staff'}
-            onChange={() => handleFilter('Staff')}
-          />
+          <Dropdown.Item onClick={() => handleFilter('All')}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-all"
+              className="mx-4 font-weight-bold"
+              label="All"
+              checked={props.currentFilter === 'All'}
+            />
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => handleFilter('Admin')}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-admin"
+              className="mx-4 my-2 font-weight-bold"
+              label="Admin"
+              checked={props.currentFilter === 'Admin'}
+            />
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => handleFilter('Staff')}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-staff"
+              className="mx-4 font-weight-bold"
+              label="Staff"
+              checked={props.currentFilter === 'Staff'}
+            />
+          </Dropdown.Item>
         </Form>
       </Dropdown.Menu>
     </Dropdown>

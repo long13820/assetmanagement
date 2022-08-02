@@ -16,7 +16,14 @@ export const schemaChangePassword = yup
     new_password: yup
       .string()
       .required()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})/),
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*~`()_+\-=\\[\]{};':"\\|,.<>\\/?])(?=.{8,})/)
+      .test({
+        name: 'new_password',
+        message: 'New password must be different from old password',
+        test(value) {
+          return this.parent.old_password !== value;
+        },
+      }),
   })
   .required();
 
@@ -25,7 +32,7 @@ export const schemaFirstChangePassword = yup
     new_password: yup
       .string()
       .required()
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%\\^&\\*])(?=.{8,})/),
+      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*~`()_+\-=\\[\]{};':"\\|,.<>\\/?])(?=.{8,})/),
   })
   .required();
 
@@ -37,12 +44,7 @@ export const checkLogin = () => {
 export const handleGetMe = async () => {
   if (checkLogin) {
     const response = await handleGetInformation();
-    if (response === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    } else {
-      return response;
-    }
+    return response === 401 ? 401 : response;
   }
 };
 
@@ -51,9 +53,9 @@ export const handleLogin = (data) => {
   handleSignIn(data);
 };
 
-export const changePassword = (data) => {
+export const changePassword = (data, flag) => {
   BlockUI('.modal-content');
-  return handleChangePassword(data);
+  return handleChangePassword(data, flag);
 };
 
 export const logout = () => {

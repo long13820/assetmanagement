@@ -31,17 +31,26 @@ export default function HomeTable() {
             </td>
             <td>
               <div className="d-flex">
-                <button className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none">
+                <button
+                  id="home-accept-btn"
+                  className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                >
                   <FaCheck
                     className={`text-danger font-20px ${item.state !== 'Waiting for acceptance' ? 'opacity-25' : ''}`}
                   />
                 </button>
-                <button className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3">
+                <button
+                  id="home-decline-btn"
+                  className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3"
+                >
                   <FaTimes
                     className={`text-black font-20px ${item.state !== 'Waiting for acceptance' ? 'opacity-25' : ''}`}
                   />
                 </button>
-                <button className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none">
+                <button
+                  id="home-request-btn"
+                  className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                >
                   <FaUndoAlt className={`text-blue font-18px ${item.state !== 'Accepted' ? 'opacity-25' : ''}`} />
                 </button>
               </div>

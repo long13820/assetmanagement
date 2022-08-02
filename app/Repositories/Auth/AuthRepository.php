@@ -70,11 +70,6 @@ class AuthRepository
                     'status' => 403,
                 ];
             }
-        } else {
-            $result = [
-                'message' => 'User does not exist',
-                'status' => 400,
-            ];
         }
 
         return $result;

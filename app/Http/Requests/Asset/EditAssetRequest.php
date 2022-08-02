@@ -28,13 +28,14 @@ class EditAssetRequest extends FormRequest
     public function rules()
     {
         return [
-            "asset_name" => "max:128",
+            "asset_name" => "",
             "installed_date" => "date_format:Y-m-d",
             "state" => "",
-            "specification" => "min:5|max:100",
+            "specification" => "",
             "category_id" => "",
         ];
     }
+
 
     public function failedValidation(Validator $validator)
     {

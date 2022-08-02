@@ -4,11 +4,12 @@ import PropTypes from 'prop-types';
 
 import { menu_item } from '../../../assets/data/menu_item';
 import Logo from '../../../assets/images/logo.png';
+import ExpiredToken from '../../components/Auth/ExpiredToken';
 import FirstLoginChangePassword from '../../components/Auth/FirstLoginChangePassword';
 import Drawer from '../../components/Layouts/Drawer';
 import Header from '../../components/Layouts/Header';
 import ListGroup from '../../components/Layouts/ListGroup';
-import { userSelector } from '../../redux/selectors';
+import { expiredTokenSelector, userSelector } from '../../redux/selectors';
 
 import './style.css';
 import '../../../css/style.css';
@@ -21,6 +22,8 @@ export default function AdminLayout(props) {
   const [show, setShow] = React.useState(true);
 
   const user = useSelector(userSelector);
+
+  const expiredToken = useSelector(expiredTokenSelector);
 
   return (
     <>
@@ -43,6 +46,7 @@ export default function AdminLayout(props) {
       {user?.password_change_at === null && (
         <FirstLoginChangePassword show={show} setStateModal={() => false} closeModal={() => setShow(false)} />
       )}
+      {expiredToken && <ExpiredToken show={expiredToken} setStateModal={() => true} />}
     </>
   );
 }

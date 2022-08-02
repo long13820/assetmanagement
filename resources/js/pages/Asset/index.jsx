@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Button, Dropdown, Form, InputGroup } from 'react-bootstrap';
-import { FaSistrix } from 'react-icons/fa';
-import { HiFilter } from 'react-icons/hi';
+import { Button, Form, InputGroup } from 'react-bootstrap';
+import { FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { isEmpty } from 'lodash';
 
+import FilterButtonCategory from '../../components/Asset/FilterButtonCategory';
 import FilterButtonState from '../../components/Asset/FilterButtonState';
 import AssetTable from '../../components/Asset/Table';
 import PaginationUI from '../../components/Layouts/PaginateRedux';
-import Skeleton from '../../components/Layouts/Skeleton';
 import { setCurrentPage, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
-import { assetFilterSelector, assetLoadingSelector } from '../../redux/selectors/asset/asset.selector';
-import { categoryListSelector } from '../../redux/selectors/category/category.selector';
+import { assetFilterSelector, assetListSelector } from '../../redux/selectors/asset/asset.selector';
 
 import './style.css';
 export default function Asset() {
@@ -23,8 +21,9 @@ export default function Asset() {
   };
   const filterSelectorState = useSelector(assetFilterSelector);
 
-  const [filterState, setFilterState] = useState([]);
+  const [filterState, setFilterState] = useState(['Available', 'Not Available', 'Assigned']);
   const [checkFilterStateCurrent, setcheckFilterStateCurrent] = useState([]);
+  const [checkAllState, setcheckAll] = useState(false);
   const handleFilterState = async (value) => {
     const currentIndex = checkFilterStateCurrent.indexOf(value);
     const newCheckFilterState = [...checkFilterStateCurrent];
@@ -38,10 +37,14 @@ export default function Asset() {
     if (value == 'All' && checkFilterStateCurrent.indexOf('All') == -1) {
       checkAll = true;
       newCheckFilterState.splice(currentIndex, 1);
+      setcheckAll(!checkAllState);
+      setcheckFilterStateCurrent('');
+      setFilterState([]);
     } else {
       setFilterState(newCheckFilterState);
+      setcheckFilterStateCurrent(newCheckFilterState);
     }
-    setcheckFilterStateCurrent(newCheckFilterState);
+
     const result = checkAll == true ? allFilter : newCheckFilterState.toString();
     dispatch(
       assetAction.setFilter({
@@ -51,59 +54,50 @@ export default function Asset() {
       })
     );
   };
-  // useEffect(() => {
-  //   dispatch(setTitle('Manage Asset'));
-  // }, [dispatch]);
   // Filter Category
-  const [filterCategory, setFilterCategory] = useState('');
-  const handleFilterCategory = (e) => {
-    e.target.checked
-      ? setFilterCategory(filterCategory + e.target.dataset.category + ',')
-      : setFilterCategory(
-          filterCategory.replace(
-            filterCategory.slice(
-              filterCategory.indexOf(e.target.dataset.category),
-              filterCategory.indexOf(e.target.dataset.category) + 2
-            ),
-            ''
-          )
-        );
-  };
-  const handleFilterCategoryAll = (e) => {
-    e.target.checked
-      ? dispatch(
-          assetAction.setFilter({
-            'filter[category]': undefined,
-            per_page: 20,
-          })
-        )
-      : dispatch(
-          assetAction.setFilter({
-            ...filterSelectorState,
-            'filter[category]': filterCategory ? filterCategory.slice(0, -1) : undefined,
-            per_page: 20,
-          })
-        );
+  const [filterCategory, setFilterCategory] = useState([0]);
+  const [checkFilterCategoryState, setFilterCategoryCurrent] = useState([]);
+  const [checkAllCategory, setcheckAllCategory] = useState(false);
+  const handleFilterCategory = async (value) => {
+    const currentFilterCategory = checkFilterCategoryState.indexOf(value);
+    const newCheckFilterCategory = [...checkFilterCategoryState];
+    let checkAll = false;
+    if (currentFilterCategory == -1) {
+      newCheckFilterCategory.push(value);
+    } else {
+      newCheckFilterCategory.splice(currentFilterCategory, 1);
+    }
+
+    if (value == 0 && checkFilterCategoryState.indexOf(0) == -1) {
+      checkAll = true;
+      newCheckFilterCategory.splice(currentFilterCategory, 1);
+      setFilterCategoryCurrent([]);
+      setcheckAllCategory(!checkAllCategory);
+      setFilterCategory([]);
+    } else {
+      setFilterCategoryCurrent(newCheckFilterCategory);
+      setFilterCategory(newCheckFilterCategory);
+    }
+    const allFilter = '1,2,3,4';
+    const result = checkAll == true ? allFilter : newCheckFilterCategory.toString();
+    dispatch(
+      assetAction.setFilter({
+        ...filterSelectorState,
+        'filter[category]': result ? result : undefined,
+        per_page: 20,
+      })
+    );
   };
 
   useEffect(() => {
     dispatch(setTitle('Manage Asset'));
     dispatch(setSubTitle(''));
-    dispatch(
-      assetAction.setFilter({
-        ...filterSelectorState,
-        'filter[category]': filterCategory ? filterCategory.slice(0, -1) : undefined,
-        per_page: 20,
-      })
-    );
-  }, [filterCategory]);
+  }, [dispatch]);
 
   // Search
   const [inputValueSearchAsset, setInputValueSearchAsset] = useState('');
-  const handleChangeInputAsset = (e) => {
-    setInputValueSearchAsset(e.target.value);
-  };
-  const handleSearchAsset = () => {
+  const handleSearchAsset = (e) => {
+    e.preventDefault();
     dispatch(
       assetAction.fetchListAsset({
         ...filterSelectorState,
@@ -115,67 +109,56 @@ export default function Asset() {
   const routeChange = () => {
     let path = `/asset`;
     navigate(path);
+    dispatch(assetAction.setIsAdd(true));
+    dispatch(setSubTitle('Create new asset'));
   };
-  const [...listCategory] = useSelector(categoryListSelector);
-  const statusList = useSelector(assetLoadingSelector);
+
+  const listState = useSelector(assetListSelector);
   return (
     <section>
       <h5 className="text-danger font-weight-bold mb-5">Asset List</h5>
-      <div className="filter_asset">
-        <FilterButtonState currentFilter={filterState} setCurrentFilter={handleFilterState} />
-        <div className="asset_list_left">
-          <Dropdown className="margin_right_asset">
-            <Dropdown.Toggle className="filter-button btn-asset d-flex align-items-center justity-content-center">
-              <p className="flex-grow-1 font-weight-bold css_category_title">Category</p>
-              <div className="fb-icon ">
-                <HiFilter />
-              </div>
-            </Dropdown.Toggle>
-
-            <Dropdown.Menu className="filter_asset_form_select_menu">
-              <Form.Check type="checkbox" id={'idAllCategory'} label={'All'} onChange={handleFilterCategoryAll} />
-              {listCategory.map((item, index) => {
-                return (
-                  <div key={index}>
-                    <Form.Check
-                      type="checkbox"
-                      data-category={item.id}
-                      id={`cateid_${item.id}`}
-                      label={item.category_name}
-                      onChange={handleFilterCategory}
-                    />
-                  </div>
-                );
-              })}
-            </Dropdown.Menu>
-          </Dropdown>
-          <div className="filter_asset_form_select_search ml-5 ">
-            <InputGroup className="mb-3">
-              <Form.Control
-                aria-describedby="basic-addon2"
-                value={inputValueSearchAsset}
-                onChange={handleChangeInputAsset}
-              />
-              <Button
-                variant="outline-secondary"
-                id="button-addon2"
-                onClick={handleSearchAsset}
-                disabled={isEmpty(inputValueSearchAsset) ? true : false}
-              >
-                <FaSistrix id="basic-addon2" />
-              </Button>
-            </InputGroup>
+      <div className="mb-3 d-flex align-items-center justify-content-between">
+        <div className="d-flex">
+          <FilterButtonState
+            currentFilter={filterState}
+            setCurrentFilter={handleFilterState}
+            checkAllState={checkAllState}
+          />
+          <div className="ms-3">
+            <FilterButtonCategory
+              currentFilter={filterCategory}
+              setCurrentFilter={handleFilterCategory}
+              setAllCategory={checkAllCategory}
+            />
           </div>
         </div>
-        <Button onClick={routeChange} variant="danger" id="button-addon2" className="margin-left-100px">
-          Create new asset
-        </Button>
+        <div className="d-flex">
+          <Form onSubmit={(e) => handleSearchAsset(e)}>
+            <InputGroup>
+              <Form.Control
+                placeholder="Asset Code or Asset Name"
+                aria-describedby="basic-addon2"
+                value={inputValueSearchAsset}
+                onChange={(e) => setInputValueSearchAsset(e.target.value)}
+              />
+              <Button variant="danger" type="submit">
+                <FaSearch />
+              </Button>
+            </InputGroup>
+          </Form>
+          <Button
+            onClick={routeChange}
+            variant="danger"
+            id="button-addon2"
+            className="font-weight-bold ms-3 btn btn-danger"
+          >
+            Create new asset
+          </Button>
+        </div>
       </div>
-      {statusList ? <Skeleton column={6} /> : <></>}
       <AssetTable />
-
       <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
-        <PaginationUI handlePageChange={handlePageChange} />
+        {!isEmpty(listState) && <PaginationUI handlePageChange={handlePageChange} />}
       </div>
     </section>
   );

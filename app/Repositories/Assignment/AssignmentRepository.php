@@ -7,7 +7,7 @@ use App\Models\Assignment;
 
 class AssignmentRepository
 {
-    protected int $paginate = 20;
+    protected int $paginate = 18;
 
     public function index($request)
     {

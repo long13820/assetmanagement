@@ -14,16 +14,6 @@ class Asset extends Model
 
     protected $table = 'asset';
 
-    public function category(): BelongsTo
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function assignment(): HasMany
-    {
-        return $this->hasMany(Assignment::class);
-    }
-
     /**
      * The attributes that are mass assignable.
      *
@@ -36,13 +26,25 @@ class Asset extends Model
         'installed_date',
         'state',
         'category_id',
+        'location_id'
     ];
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
 
+    public function assignment(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
     public function getCategoryPrefix($id)
     {
-        return Asset::query()
-            ->join('categories', 'categories.id', '=', 'asset.category_id')
-            ->where('asset.category_id', '=', $id)
+        return Category::query()
+            ->where('categories.id', '=', $id)
             ->value('categories.category_prefix');
     }
 
@@ -50,13 +52,14 @@ class Asset extends Model
     {
         $categoryPrefix = $this->getCategoryPrefix($this->category_id);
 
-        $count = Asset::query()->count();
+        $count = Asset::query()
+            ->where('asset.category_id', '=', $this->category_id)
+            ->count();
 
         $assetCode =
             $categoryPrefix . str_pad($count + 1, 4, 0, STR_PAD_LEFT);
 
         return Attribute::make(
-            get: fn () => $assetCode,
             set: fn () => $assetCode,
         );
     }

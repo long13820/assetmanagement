@@ -7,14 +7,18 @@ import './style.css';
 
 export default function FilterButtonState(props) {
   const [checkAll, setCheckAll] = useState(false);
+
   const handleFilter = (value) => {
-    props.setCurrentFilter(value);
     if (value == 'All') {
       setCheckAll(!checkAll);
+      props.setCurrentFilter('All');
     } else {
       setCheckAll(false);
+      props.setCurrentFilter(value);
     }
   };
+
+  var stateCheck = checkAll ? ['All'] : props.currentFilter;
   return (
     <Dropdown>
       <Dropdown.Toggle className="filter-button btn-asset d-flex align-items-center justity-content-center">
@@ -38,7 +42,7 @@ export default function FilterButtonState(props) {
             id="checkbox-assigned"
             className="mx-4 my-2 font-weight-bold"
             label="Assigned"
-            checked={props.currentFilter.indexOf('Assigned') == -1 ? false : true}
+            checked={stateCheck.indexOf('Assigned') == -1 ? false : true}
             onChange={() => handleFilter('Assigned')}
           />
           <Form.Check
@@ -46,7 +50,7 @@ export default function FilterButtonState(props) {
             id="checkbox-staff"
             className="mx-4 font-weight-bold"
             label="Available"
-            checked={props.currentFilter.indexOf('Available') == -1 ? false : true}
+            checked={stateCheck.indexOf('Available') == -1 ? false : true}
             onChange={() => handleFilter('Available')}
           />
           <Form.Check
@@ -54,7 +58,7 @@ export default function FilterButtonState(props) {
             id="checkbox-not_available"
             className="mx-4 font-weight-bold"
             label="Not available"
-            checked={props.currentFilter.indexOf('Not Available') == -1 ? false : true}
+            checked={stateCheck.indexOf('Not Available') == -1 ? false : true}
             onChange={() => handleFilter('Not Available')}
           />
           <Form.Check
@@ -62,7 +66,7 @@ export default function FilterButtonState(props) {
             id="checkbox-waiting_recycling"
             className="mx-4 font-weight-bold"
             label="Waiting for recycling"
-            checked={props.currentFilter.indexOf('Waiting for recycling') == -1 ? false : true}
+            checked={stateCheck.indexOf('Waiting for recycling') == -1 ? false : true}
             onChange={() => handleFilter('Waiting for recycling')}
           />
           <Form.Check
@@ -70,7 +74,7 @@ export default function FilterButtonState(props) {
             id="checkbox-recycled"
             className="mx-4 font-weight-bold"
             label="Recycled"
-            checked={props.currentFilter.indexOf('Recycled') == -1 ? false : true}
+            checked={stateCheck.indexOf('Recycled') == -1 ? false : true}
             onChange={() => handleFilter('Recycled')}
           />
         </Form>

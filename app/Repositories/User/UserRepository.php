@@ -11,8 +11,6 @@ class UserRepository
 
     public function getAllUser($request)
     {
-
-
         $data = User::query()
             ->select(
                 "id",
@@ -27,14 +25,8 @@ class UserRepository
             ->filter($request)
             ->sort($request)
             ->search($request)
-            ->orderBy("user.first_name")
-            ->orderBy("user.staff_code")
-            ->orderBy("user.full_name")
-            ->orderBy("user.joined_date")
-            ->orderBy("user.type")
             ->where("id", "!=", auth()->id())
             ->where("location_id", "=", auth()->user()->location_id)
-            ->sort($request)
             ->paginate($this->paginate);
 
         return UserResource::collection($data)->response()->getData();

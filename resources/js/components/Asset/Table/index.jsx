@@ -5,22 +5,26 @@ import { useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
-import { setTotalRecord } from '../../../redux/reducer/app/app.reducer';
+import { setSubTitle, setTotalRecord } from '../../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
 import { categoryAction } from '../../../redux/reducer/category/category.reducer';
 import { currentPageSelector } from '../../../redux/selectors';
 import {
   assetFilterSelector,
   assetListSelector,
+  assetLoadingSelector,
   assetTotalRecordPageSelector,
 } from '../../../redux/selectors/asset/asset.selector';
+import NotFoundData from '../../Layouts/NotFoundData';
 import { BlockUI } from '../../Layouts/Notiflix';
+import Skeleton from '../../Layouts/Skeleton';
 import Table from '../../Layouts/Table';
 import ShowDetailAsset from '../Detail';
-export default function AssetTable() {
+export default function AssetTable(props) {
   const [renderTableHeader] = React.useState([...asset_table_header]);
   const current_page = useSelector(currentPageSelector);
   const assetFilterState = useSelector(assetFilterSelector);
+  // console.log('er', assetFilterState['filter[category]']);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(
@@ -128,53 +132,67 @@ export default function AssetTable() {
     e.stopPropagation();
     let path = `/edit-asset/${dataId}`;
     navigate(path);
-    //  console.log(dataId);
+    dispatch(assetAction.setIsEdit(true));
+    dispatch(setSubTitle('Edit asset'));
   };
 
   const renderTableBody = () => {
-    return body_sample_data.map((item, index) => {
-      return (
-        <tr key={index + 1} onClick={() => showDetailAsset(item.id)}>
-          <td>{item.asset_code}</td>
-          <td>{item.asset_name}</td>
-          <td>{item.category_name}</td>
-          <td>
-            <p
-              className={`${
-                item.state === 'Assigned' ? 'bg-red-100 text-red' : 'bg-blue-100 text-blue'
-              } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
-            >
-              {item.state}
-            </p>
-          </td>
-          <td>
-            <div className="d-flex">
-              <button
-                className={` ${
-                  item.state === 'Assigned' ? 'opacity-25' : ''
-                } br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none`}
-                onClick={(e) => handleEditAsset(e, item.id)}
-              >
-                <FaPen className={`text-black font-20px `} />
-              </button>
-
-              <span
+    return body_sample_data.length > 0 ? (
+      body_sample_data.map((item, index) => {
+        return (
+          <tr key={index + 1} onClick={() => showDetailAsset(item.id)}>
+            <td>{item.asset_code}</td>
+            <td>{item.asset_name}</td>
+            <td>{item.category_name}</td>
+            <td>
+              <p
                 className={`${
-                  item.state === 'Assigned' ? 'opacity-25' : ''
-                } br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center`}
+                  item.state === 'Assigned' ? 'bg-red-100 text-red' : 'bg-blue-100 text-blue'
+                } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
               >
-                <FaTimesCircle className="text-danger font-20px " />
-              </span>
-            </div>
-          </td>
-        </tr>
-      );
-    });
-  };
+                {item.state}
+              </p>
+            </td>
+            <td>
+              <div className="d-flex">
+                <button
+                  className={` ${
+                    item.state === 'Assigned' ? 'opacity-25' : ''
+                  } br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none`}
+                  onClick={item.state === 'Assigned' ? undefined : (e) => handleEditAsset(e, item.id)}
+                >
+                  <FaPen className={`text-black font-20px `} />
+                </button>
 
+                <span
+                  className={`${
+                    item.state === 'Assigned' ? 'opacity-25' : ''
+                  } br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center`}
+                >
+                  <FaTimesCircle className="text-danger font-20px " />
+                </span>
+              </div>
+            </td>
+          </tr>
+        );
+      })
+    ) : (
+      <tr>
+        <td colSpan={4} className="text-danger text-center font-weight-bold">
+          <NotFoundData />
+        </td>
+      </tr>
+    );
+  };
+  const statusList = useSelector(assetLoadingSelector);
   return (
     <>
-      <Table tableHeader={renderTableHeader} tableBody={renderTableBody()} tableSort={handleSortState} />
+      {statusList == true ? (
+        <Skeleton column={6} />
+      ) : (
+        <Table tableHeader={renderTableHeader} tableBody={renderTableBody()} tableSort={handleSortState} />
+      )}
+
       <ShowDetailAsset show={showDetail} setStateModal={() => setShowDetailAsset(false)} />
     </>
   );

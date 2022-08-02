@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+
 use Tests\TestCase;
 use App\Models\User;
 use Database\Seeders\LocationSeeder;
@@ -50,6 +50,24 @@ class UserLogoutTest extends TestCase
             
     }
 
+     /** @test */
+     public function test_get_user_profile()
+     {
+         Sanctum::actingAs(User::factory()->create([
+            "full_name" => "",
+             "first_name" => "To Duc",
+             "last_name" => "Phuong",
+             "date_of_birth" => "2000-01-01",
+             "joined_date" => "2020-01-01",
+             "type" => "Staff",
+             "location_id" => 1,
+         ]));
+         $response = $this->json("GET", "/api/me");
+         $response->assertStatus(200);
+         $response->assertJson(["status" => "success"]);
+             
+     }
+
     /** @test */
     public function test_get_all_users()
     {
@@ -78,4 +96,5 @@ class UserLogoutTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(["data"]);
     }
+
 }

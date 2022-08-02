@@ -26,17 +26,21 @@ export const addSchema = yup
     first_name: yup
       .string()
       .required()
-      .matches(/^[aA-zZ\s]+$/, 'First name cannot contain special characters')
+      .matches(/^[a-zA-Z\s]+$/, 'Invalid first name format')
       .max(128)
+      .trim()
       .required(),
     last_name: yup
       .string()
       .required()
-      .matches(/^[aA-zZ\s]+$/, 'Last name cannot contain special characters')
+      .matches(/^[a-zA-Z\s]+$/, 'Invalid last name format')
       .max(128)
+      .trim()
       .required(),
     date_of_birth: yup
       .date('Must be a date type')
+      .max(new Date(), 'Date of birth cannot be in the future')
+      .typeError('Invalid date')
       .test(
         'date_of_birth',
         'User is under 18. Please select a different date',
@@ -45,7 +49,9 @@ export const addSchema = yup
       .required('Required'),
     gender: yup.string().required(),
     joined_date: yup
-      .date()
+      .date('Must be a date type')
+      .min(yup.ref('date_of_birth'), 'Joined date is not later than Date of Birth. Please select a different date')
+      .typeError('Invalid date')
       .test(
         'joined_date',
         'Joined date is Saturday or Sunday. Please select a different date',
@@ -53,13 +59,12 @@ export const addSchema = yup
       )
       .test({
         name: 'joined_date_2',
-        message: 'Joined date must be after the date that user turns 18',
+        message: 'User is under 18. Please select a different date',
         test(value) {
           return differenceInYears(new Date(value), new Date(this.parent.date_of_birth)) >= 18;
         },
       })
-      .min(yup.ref('date_of_birth'), 'Joined date is not later than Date of Birth. Please select a different date')
-      .required(),
+      .required('Required'),
     location_id: yup.number().required(),
   })
   .required();
@@ -67,15 +72,19 @@ export const addSchema = yup
 export const editSchema = yup
   .object({
     date_of_birth: yup
-      .date()
+      .date('Must be a date type')
+      .max(new Date(), 'Date of birth cannot be in the future')
+      .typeError('Invalid date')
       .test(
         'date_of_birth',
         'User is under 18. Please select a different date',
         (value) => differenceInYears(new Date(), new Date(value)) >= 18
       )
-      .required(),
+      .required('Required'),
     joined_date: yup
-      .date()
+      .date('Must be a date type')
+      .min(yup.ref('date_of_birth'), 'Joined date is not later than Date of Birth. Please select a different date')
+      .typeError('Invalid date')
       .test(
         'joined_date',
         'Joined date is Saturday or Sunday. Please select a different date',
@@ -83,12 +92,11 @@ export const editSchema = yup
       )
       .test({
         name: 'joined_date_2',
-        message: 'Joined date must be after the date that user turns 18',
+        message: 'User is under 18. Please select a different date',
         test(value) {
           return differenceInYears(new Date(value), new Date(this.parent.date_of_birth)) >= 18;
         },
       })
-      .min(yup.ref('date_of_birth'), 'Joined date is not later than Date of Birth. Please select a different date')
-      .required(),
+      .required('Required'),
   })
   .required();

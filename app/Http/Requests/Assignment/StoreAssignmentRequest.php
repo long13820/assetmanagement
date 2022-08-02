@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Assignment;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -30,7 +31,7 @@ class StoreAssignmentRequest extends FormRequest
         return [
             'user_id' => 'required',
             'asset_id' => 'required',
-            'assigned_date' => 'required',
+            'assigned_date' => 'required|after_or_equal:' . Carbon::now()->toDateString(),
             'admin_id' => 'required',
         ];
     }

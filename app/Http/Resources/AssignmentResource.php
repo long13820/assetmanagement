@@ -23,6 +23,7 @@ class AssignmentResource extends JsonResource
             "assigned_by" => $this->admin->username,
             "assigned_date" => $this->assigned_date,
             "state" => $this->state,
+            "note" => $this->note,
         ];
     }
 }

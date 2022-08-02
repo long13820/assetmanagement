@@ -36,11 +36,11 @@ class AssetController extends Controller
     public function store(CreateAssetRequest $request): JsonResponse
     {
         $validated = $request->validated();
-        $user = $this->assetService->store($validated);
+        $asset = $this->assetService->store($validated);
         return response()->json([
             "success" => true,
             "message" => "Create user successfully",
-            "data" => $user
+            "data" => $asset
         ]);
     }
 

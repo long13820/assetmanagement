@@ -22,8 +22,8 @@ class ChangePasswordTest extends TestCase
     {
 
         User::factory()->create([
-            "first_name" => "To Duc",
-            "last_name" => "Phuong",
+            "first_name" => "Phuong",
+            "last_name" => "To Duc",
             "date_of_birth" => "2000-01-01",
             "joined_date" => "2020-01-01",
             "type" => "Staff",
@@ -42,8 +42,8 @@ class ChangePasswordTest extends TestCase
     public function test_change_password_with_not_login()
     {
         User::factory()->create([
-            "first_name" => "To Duc",
-            "last_name" => "Phuong",
+            "first_name" => "Phuong",
+            "last_name" => "To Duc",
             "date_of_birth" => "2000-01-01",
             "joined_date" => "2020-01-01",
             "type" => "Staff",
@@ -63,8 +63,8 @@ class ChangePasswordTest extends TestCase
     public function test_change_password_with_old_password_invalid_credentials()
     {
         User::factory()->create([
-            "first_name" => "To Duc",
-            "last_name" => "Phuong",
+            "first_name" => "Phuong",
+            "last_name" => "To Duc",
             "date_of_birth" => "2000-01-01",
             "joined_date" => "2020-01-01",
             "type" => "Staff",
@@ -83,8 +83,8 @@ class ChangePasswordTest extends TestCase
     public function test_change_password_with_new_password_invalid_credentials()
     {
         User::factory()->create([
-            "first_name" => "To Duc",
-            "last_name" => "Phuong",
+            "first_name" => "Phuong",
+            "last_name" => "To Duc",
             "date_of_birth" => "2000-01-01",
             "joined_date" => "2020-01-01",
             "type" => "Staff",

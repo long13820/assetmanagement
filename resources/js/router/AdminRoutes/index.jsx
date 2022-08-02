@@ -12,7 +12,7 @@ import AssignmentPage from '../../pages/Assignment';
 import HomePage from '../../pages/Home';
 import LoginPage from '../../pages/Login';
 import UserPage from '../../pages/User';
-import { setIsLogin, setUser } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setIsLogin, setUser } from '../../redux/reducer/app/app.reducer';
 import { isLoginSelector, userSelector } from '../../redux/selectors';
 import ProtectedRoutes from '../ProtectedRoutes';
 import PublicRoutes from '../PublicRoutes';
@@ -26,7 +26,12 @@ export default function AdminRoutes() {
     dispatch(setIsLogin(checkLogin()));
     if (checkLogin()) {
       handleGetMe().then((result) => {
-        dispatch(setUser(result));
+        if (result !== 401) {
+          dispatch(setUser(result));
+        } else {
+          dispatch(setExpiredToken(true));
+          localStorage.removeItem('token');
+        }
       });
     }
   }, [dispatch]);
@@ -41,19 +46,23 @@ export default function AdminRoutes() {
           <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage />} />} />
         </Route>
       )}
+
       {user?.type === 'Staff' && (
         <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
           <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
         </Route>
       )}
+
       {Object.keys(user).length === 0 && (
         <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
           <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
         </Route>
       )}
+
       <Route element={<PublicRoutes isAuthenticate={isAuthenticate} />}>
         <Route path="/login" element={<LoginLayout slot={<LoginPage />} />} />
       </Route>
+
       <Route path="/asset" element={<AdminLayout slot={<AssetCreate />} />} />
       <Route path="/edit-asset/:id" element={<AdminLayout slot={<AssetEdit />} />} />
     </Routes>

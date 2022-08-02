@@ -18,3 +18,19 @@ button.assignment-filter-button:focus {
 button.assignment-filter-button.dropdown-toggle::after {
   content: none;
 }
+
+button.assignment-filter-button ~ .dropdown-menu.show {
+  border-width: 2px;
+  min-width: auto;
+}
+
+button.assignment-filter-button ~ .dropdown-menu.show .dropdown-item {
+  padding: 0;
+}
+
+button.assignment-filter-button ~ .dropdown-menu.show .dropdown-item:focus,
+button.assignment-filter-button ~ .dropdown-menu.show .dropdown-item:hover,
+button.assignment-filter-button ~ .dropdown-item.show .dropdown-item:active {
+  background-color: transparent !important;
+  color: inherit;
+}

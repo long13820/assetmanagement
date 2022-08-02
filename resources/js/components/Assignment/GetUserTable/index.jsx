@@ -12,24 +12,19 @@ import Pagination from '../../../components/Layouts/Pagination';
 import AssignmentUserTable from '../TableUser';
 
 export default function GetUserTable(props) {
-  const [loading, setLoading] = React.useState(true);
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(props.data);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...assignment_table_user]);
-  const [sort, setCurrentSort] = React.useState([]);
+  const [sort, setCurrentSort] = React.useState([
+    {
+      key: 'first_name',
+      value: 'asc',
+    },
+  ]);
   const [search, setSearch] = React.useState('');
   const [page, setPage] = React.useState(1);
-  const [totalRecord, setTotalRecord] = React.useState(0);
-  const [perPage] = React.useState(8);
-  const [totalPage, setTotalPage] = React.useState(0);
-
-  React.useEffect(() => {
-    const handleGetAllUsers = async () => {
-      const result = await getAllUsers();
-      setLoading(false);
-      setUser(result);
-    };
-    handleGetAllUsers();
-  }, []);
+  const [totalRecord, setTotalRecord] = React.useState(props.totalRecord);
+  const [perPage] = React.useState(20);
+  const [totalPage, setTotalPage] = React.useState(props.totalPage);
 
   const handleSort = async (sort, header) => {
     BlockUI('.select-user-modal');
@@ -55,7 +50,7 @@ export default function GetUserTable(props) {
     if (search !== '') {
       const result = await getAllUsers({ sort: tempSort, search, page: tempPage });
       setUser(result);
-      Notiflix.Block.remove('.main');
+      Notiflix.Block.remove('.select-user-modal');
       return;
     }
     const result = await getAllUsers({ sort: tempSort, page: tempPage });
@@ -78,6 +73,7 @@ export default function GetUserTable(props) {
     const result = await getAllUsers({ sort: tempSort, search: tempSearch, page });
     setUser(result, 'page');
     Notiflix.Block.remove('.select-user-modal');
+    return;
   };
 
   const setUser = (result, value) => {
@@ -87,47 +83,36 @@ export default function GetUserTable(props) {
     setTotalPage(result.meta.last_page);
   };
 
-  const handleCurrentSetUserName = (name, id) => {
-    props.handleCurrentSetUserName(name, id);
+  const handleCurrentSetUserName = (name, id, code) => {
+    props.handleCurrentSetUserName(name, id, code);
   };
 
   return (
     <section>
       <div className="mb-3 d-flex align-items-center justify-content-between">
         <h5 className="text-danger font-weight-bold pt-3 mb-3">Select User</h5>
-
-        <div className="d-flex">
-          <Form onSubmit={(e) => handleSearch(e)}>
-            <InputGroup>
-              <Form.Control
-                placeholder="Staff code or name"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Button variant="danger" type="submit">
-                <FaSearch />
-              </Button>
-            </InputGroup>
-          </Form>
-        </div>
+        <Form onSubmit={(e) => handleSearch(e)}>
+          <InputGroup>
+            <Form.Control placeholder="Staff code or name" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Button variant="danger" type="submit">
+              <FaSearch />
+            </Button>
+          </InputGroup>
+        </Form>
       </div>
-      {!loading && (
-        <>
-          {data.length > 0 ? (
-            <AssignmentUserTable
-              data={data}
-              sort={sort}
-              handleCurrentSetUserName={handleCurrentSetUserName}
-              renderTableHeader={renderTableHeader}
-              handleSort={handleSort}
-            />
-          ) : (
-            <NotFoundData />
-          )}
-        </>
+      {data.length > 0 ? (
+        <AssignmentUserTable
+          data={data}
+          sort={sort}
+          handleCurrentSetUserName={handleCurrentSetUserName}
+          renderTableHeader={renderTableHeader}
+          handleSort={handleSort}
+        />
+      ) : (
+        <NotFoundData widthImage="140px" />
       )}
       {totalPage > 1 && (
-        <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
+        <div className="d-flex justify-content-end align-items-center mt-3">
           <Pagination
             handlePageChange={handlePageChange}
             perPage={perPage}
@@ -142,4 +127,7 @@ export default function GetUserTable(props) {
 
 GetUserTable.propTypes = {
   handleCurrentSetUserName: PropTypes.func,
+  data: PropTypes.any,
+  totalRecord: PropTypes.number,
+  totalPage: PropTypes.number,
 };

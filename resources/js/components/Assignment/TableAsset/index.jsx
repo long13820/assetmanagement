@@ -2,40 +2,69 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { assetNameSelector } from '../../../redux/selectors';
+import { assetCodeSelector, assetNameSelector } from '../../../redux/selectors';
 import Table from '../../Layouts/Table';
 
 export default function AssignmentAssetTable(props) {
-  const handleSort = (key, value) => {
+  const handleSort = (key, valueAsc, valueDesc) => {
     const tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
-    const findIndex = props.sort.findIndex((e) => e.key === key);
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
-    if (findIndex !== -1 && value) {
-      tempSort[findIndex].value = 'desc';
-      tempTableHeader[findIndexHeader].isSortAsc = false;
-      tempTableHeader[findIndexHeader].isSortDesc = true;
-    }
-    if (findIndex !== -1 && !value) {
-      tempSort.splice(findIndex, 1);
+    if (!valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({ key: '', value: '' });
+      }
+      tempSort[0].key = key;
+      tempSort[0].value = 'asc';
+      if (tempSort[0].key === 'Category') {
+        tempSort[0].key = 'Categories';
+      }
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
-    }
-    if (findIndex === -1 && value) {
-      tempSort.push({
-        key: key === 'Category' ? 'Categories' : key,
-        value: 'desc',
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
       });
+    }
+
+    if (valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({ key: '', value: '' });
+      }
+      tempSort[0].key = key;
+      tempSort[0].value = 'desc';
+      if (tempSort[0].key === 'Category') {
+        tempSort[0].key = 'Categories';
+      }
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
+    }
+
+    if (!valueAsc && valueDesc) {
+      tempTableHeader[findIndexHeader].isSortAsc = false;
+      tempTableHeader[findIndexHeader].isSortDesc = false;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
     }
     props.handleSort(tempSort, tempTableHeader);
   };
 
   const assetName = useSelector(assetNameSelector);
-
-  const handleSelectAsset = (name, id) => {
-    props.handleCurrentSetAssetName(name, id);
+  const assetCode = useSelector(assetCodeSelector);
+  const handleSelectAsset = (name, id, code) => {
+    props.handleCurrentSetAssetName(name, id, code);
   };
 
   const renderTableBody = () => {
@@ -47,8 +76,8 @@ export default function AssignmentAssetTable(props) {
               type="checkbox"
               label={item.asset_name}
               className="form-check-input"
-              checked={assetName === item.asset_name}
-              onChange={() => handleSelectAsset(item.asset_name, item.id)}
+              checked={assetName === item.asset_name && assetCode === item.asset_code}
+              onChange={() => handleSelectAsset(item.asset_name, item.id, item.asset_code)}
             />
             <span className="checkmark" />
           </td>

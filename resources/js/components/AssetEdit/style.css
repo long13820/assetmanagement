@@ -1,3 +1,14 @@
+.edit_form form {
+    width: 500px;
+    background: var(--bs-white);
+    padding: var(--24px);
+    border-radius: var(--6px);
+    box-shadow: var(--box-shadow);
+  }
+
+  .edit_form form table tbody tr td {
+    vertical-align: middle;
+  }
 .DropDown {
     /* position: absolute;
     overflow: visible; */

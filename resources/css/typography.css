@@ -26,11 +26,11 @@ a {
 }
 
 .font-weight-medium {
-  font-weight: var(--font--weight-medium);
+  font-weight: var(--font-weight-medium);
 }
 
 .font-weight-semi {
-  font-weight: var(--font--weight-semi-bold);
+  font-weight: var(--font-weight-semi-bold);
 }
 
 .font-weight-bold {
@@ -38,7 +38,7 @@ a {
 }
 
 .font-weight-extra-bold {
-  font-weight: var(--font--weight-extra-bold);
+  font-weight: var(--font-weight-extra-bold);
 }
 
 .font-weight-black {
@@ -64,12 +64,19 @@ a {
 .font-20px {
   font-size: var(--20px);
 }
+
+.text-justify {
+  text-align: justify;
+}
+
 .padding-left-12px {
   padding-left: var(--12px);
 }
+
 .margin-left-12px {
   margin-left: var(--12px);
 }
+
 .margin-left-100px {
   margin-left: 10%;
 }

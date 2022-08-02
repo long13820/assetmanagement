@@ -90,7 +90,8 @@ export default function ChangePassword(props) {
           </Form.Group>
           <div className="text-justify mb-3">
             <small>
-              (*) New password must contain&nbsp;<span className="font-weight-bold">8 Characters</span>,&nbsp;
+              (*) New password must be at least contain&nbsp;<span className="font-weight-bold">8 Characters</span>
+              ,&nbsp;
               <span className="font-weight-bold">One Uppercase</span>,&nbsp;
               <span className="font-weight-bold">One Lowercase</span>,&nbsp;
               <span className="font-weight-bold">One Number</span>&nbsp;and&nbsp;

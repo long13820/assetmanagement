@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('asset_code')->nullable();
             $table->string('asset_name');
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->string('specification',70);
+            $table->foreignId('location_id')->constrained('location')->onDelete('cascade');
+            $table->string('specification');
             $table->date('installed_date');
             $table->enum('state', array('Available', 'Not Available', 'Waiting for recycling', 'Recycled', 'Assigned'));
             $table->timestamps();

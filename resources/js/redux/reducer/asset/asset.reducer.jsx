@@ -12,18 +12,26 @@ export const assetReduccer = createSlice({
     detailAssetAssignment: [],
     isDetailAssetAssignmentSuccess: false,
     loadingDetailAssignment: false,
+    isAdd: false,
+    isEdit: false,
     filter: {
       'filter[state]': 'Available,Not Available,Assigned',
       'filter[category]': undefined,
-      'sort[asset_code]': 'desc',
-      'sort[asset_name]': 'desc',
-      'sort[category_name]': 'desc',
-      'sort[state]': 'desc',
+      // 'sort[asset_code]': 'asc',
+      // 'sort[asset_name]': 'asc',
+      // 'sort[category_name]': 'asc',
+      // 'sort[state]': 'asc',
     },
     message: '',
     totalRecordPage: 0,
   },
   reducers: {
+    setIsAdd: (state, action) => {
+      state.isAdd = action.payload;
+    },
+    setIsEdit: (state, action) => {
+      state.isEdit = action.payload;
+    },
     fetchListAsset(state) {
       state.loading = true;
       state.isListAssetSuccess = true;

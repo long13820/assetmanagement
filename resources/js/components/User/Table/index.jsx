@@ -31,29 +31,50 @@ export default function UserTable(props) {
     }
   };
 
-  const handleSort = (key, value) => {
+  const handleSort = (key, valueAsc, valueDesc) => {
     const tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
-    const findIndex = props.sort.findIndex((e) => e.key === key);
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
-    if (findIndex !== -1 && value) {
-      tempSort[findIndex].value = 'desc';
-      tempTableHeader[findIndexHeader].isSortAsc = false;
-      tempTableHeader[findIndexHeader].isSortDesc = true;
-    }
-    if (findIndex !== -1 && !value) {
-      tempSort.splice(findIndex, 1);
+
+    if (!valueAsc && !valueDesc) {
+      tempSort[0].key = key;
+      tempSort[0].value = 'asc';
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
-    }
-    if (findIndex === -1 && value) {
-      tempSort.push({
-        key,
-        value: 'desc',
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 5 && index != 2) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
       });
+    }
+
+    if (valueAsc && !valueDesc) {
+      tempSort[0].key = key;
+      tempSort[0].value = 'desc';
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 5 && index != 2) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
     }
+
+    if (!valueAsc && valueDesc) {
+      tempSort[0].key = 'first_name';
+      tempSort[0].value = 'asc';
+      tempTableHeader[findIndexHeader].isSortAsc = false;
+      tempTableHeader[findIndexHeader].isSortDesc = false;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 5 && index != 2) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
+    }
+
     props.handleSort(tempSort, tempTableHeader);
   };
 
@@ -89,12 +110,13 @@ export default function UserTable(props) {
           <td>
             <div className="d-flex">
               <button
+                id="edit-user"
                 onClick={(e) => {
                   handleEditUser(e, item.id);
                 }}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                className="br-6px p-2 bg-gray-100 text-black w-48px h-48px d-flex align-items-center justify-content-center border-none"
               >
-                <FaPen className="text-black font-20px" />
+                <FaPen className="font-20px" />
               </button>
               <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
                 <FaTimesCircle className="text-danger font-20px" />

@@ -18,29 +18,66 @@ export default function AssignmentTable(props) {
     console.log(id);
   };
 
-  const handleSort = (key, value) => {
+  const handleSort = (key, valueAsc, valueDesc) => {
     const tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
-    const findIndex = props.sort.findIndex((e) => e.key === key);
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
-    if (findIndex !== -1 && value) {
-      tempSort[findIndex].value = 'desc';
-      tempTableHeader[findIndexHeader].isSortAsc = false;
-      tempTableHeader[findIndexHeader].isSortDesc = true;
-    }
-    if (findIndex !== -1 && !value) {
-      tempSort.splice(findIndex, 1);
+
+    if (!valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({
+          key: '',
+          value: '',
+        });
+      }
+      tempSort[0].key = key;
+      tempSort[0].value = 'asc';
+      if (tempSort[0].key === 'No.') {
+        tempSort[0].key = 'Id';
+      }
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
-    }
-    if (findIndex === -1 && value) {
-      tempSort.push({
-        key,
-        value: 'desc',
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 7) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
       });
+    }
+
+    if (valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({
+          key: '',
+          value: '',
+        });
+      }
+      tempSort[0].key = key;
+      tempSort[0].value = 'desc';
+      if (tempSort[0].key === 'No.') {
+        tempSort[0].key = 'Id';
+      }
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 7) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
     }
+
+    if (!valueAsc && valueDesc) {
+      tempTableHeader[findIndexHeader].isSortAsc = false;
+      tempTableHeader[findIndexHeader].isSortDesc = false;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 7) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
+    }
+
     props.handleSort(tempSort, tempTableHeader);
   };
 

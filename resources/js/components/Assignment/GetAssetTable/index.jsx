@@ -12,26 +12,14 @@ import Pagination from '../../../components/Layouts/Pagination';
 import AssignmentAssetTable from '../TableAsset';
 
 export default function GetAssetTable(props) {
-  const [loading, setLoading] = React.useState(true);
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(props.data);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...assignment_table_asset]);
   const [sort, setCurrentSort] = React.useState([]);
   const [search, setSearch] = React.useState('');
   const [page, setPage] = React.useState(1);
-  const [totalRecord, setTotalRecord] = React.useState(0);
-  const [perPage] = React.useState(8);
-  const [totalPage, setTotalPage] = React.useState(0);
-
-  React.useEffect(() => {
-    const handleGetAllAssets = async () => {
-      BlockUI('#root');
-      const result = await getAllAssets();
-      setAsset(result);
-      setLoading(false);
-      Notiflix.Block.remove('#root');
-    };
-    handleGetAllAssets();
-  }, []);
+  const [totalRecord, setTotalRecord] = React.useState(props.totalRecord);
+  const [perPage] = React.useState(20);
+  const [totalPage, setTotalPage] = React.useState(props.totalPage);
 
   const handleSort = async (sort, header) => {
     BlockUI('.select-asset-modal');
@@ -89,14 +77,14 @@ export default function GetAssetTable(props) {
     setTotalPage(result.meta.last_page);
   };
 
-  const handleCurrentSetAssetName = (name, id) => {
-    props.handleCurrentSetAssetName(name, id);
+  const handleCurrentSetAssetName = (name, id, code) => {
+    props.handleCurrentSetAssetName(name, id, code);
   };
 
   return (
     <section>
       <div className="mb-3 d-flex align-items-center justify-content-between">
-        <h5 className="text-danger font-weight-bold pt-3 mb-3">Select Asset</h5>
+        <h5 className="text-danger font-weight-bold pt-3 mb-3">Select Asset&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
         <div className="d-flex">
           <Form onSubmit={(e) => handleSearch(e)}>
             <InputGroup>
@@ -112,23 +100,19 @@ export default function GetAssetTable(props) {
           </Form>
         </div>
       </div>
-      {!loading && (
-        <>
-          {data.length > 0 ? (
-            <AssignmentAssetTable
-              data={data}
-              sort={sort}
-              handleCurrentSetAssetName={handleCurrentSetAssetName}
-              renderTableHeader={renderTableHeader}
-              handleSort={handleSort}
-            />
-          ) : (
-            <NotFoundData />
-          )}
-        </>
+      {data.length > 0 ? (
+        <AssignmentAssetTable
+          data={data}
+          sort={sort}
+          handleCurrentSetAssetName={handleCurrentSetAssetName}
+          renderTableHeader={renderTableHeader}
+          handleSort={handleSort}
+        />
+      ) : (
+        <NotFoundData widthImage="140px" />
       )}
       {totalPage > 1 && (
-        <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
+        <div className="d-flex justify-content-end align-items-center mt-3">
           <Pagination
             handlePageChange={handlePageChange}
             perPage={perPage}
@@ -143,4 +127,7 @@ export default function GetAssetTable(props) {
 
 GetAssetTable.propTypes = {
   handleCurrentSetAssetName: PropTypes.func,
+  data: PropTypes.any,
+  totalRecord: PropTypes.number,
+  totalPage: PropTypes.number,
 };

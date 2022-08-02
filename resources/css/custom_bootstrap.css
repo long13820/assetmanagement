@@ -47,3 +47,7 @@ input::-ms-clear {
   box-shadow: none;
   border-color: var(--bs-danger);
 }
+
+.modal-content {
+  border: none;
+}

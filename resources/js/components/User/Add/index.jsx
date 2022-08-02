@@ -14,6 +14,7 @@ import { setIsAdd } from '../../../redux/reducer/user/user.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
 import EditNote from '../Note';
 
@@ -23,8 +24,12 @@ function UserAdd(props) {
   const dispatch = useDispatch();
   const user = useSelector(userSelector);
 
+  const [confirmCancel, setConfirmCancel] = React.useState(false);
+  const [warningLocation, setWarningLocation] = React.useState('');
+
   const {
     register,
+    setValue,
     handleSubmit,
     control,
     formState: { isValid, errors },
@@ -40,6 +45,16 @@ function UserAdd(props) {
       type: 'Staff',
       location_id: user.location_id,
     },
+  });
+
+  const first_name = useWatch({
+    control,
+    name: 'first_name',
+  });
+
+  const last_name = useWatch({
+    control,
+    name: 'last_name',
   });
 
   const type = useWatch({
@@ -59,7 +74,7 @@ function UserAdd(props) {
     const result = await addUser(data);
     if (result === 200) {
       SuccessToast('Create user successfully', 3000);
-      props.backToManageUser('created_at');
+      props.backToManageUser('created_at', 'create');
     } else {
       ErrorToast('Create user unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
@@ -81,7 +96,13 @@ function UserAdd(props) {
                 <p className="font-weight-bold">First Name</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_first_name" type="text" {...register('first_name')} />
+                <Form.Control id="user_first_name" type="text" {...register('first_name')} maxLength="128" />
+                <div className="d-flex justify-content-between">
+                  <small className="text-red font-weight-semi">
+                    {first_name.length > 0 && errors?.first_name?.type === 'matches' && errors?.first_name?.message}
+                  </small>
+                  <small className="font-weight-bold">{first_name.length}/128</small>
+                </div>
               </td>
             </tr>
             <tr>
@@ -89,7 +110,13 @@ function UserAdd(props) {
                 <p className="font-weight-bold">Last Name</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_last_name" type="text" {...register('last_name')} />
+                <Form.Control id="user_last_name" type="text" {...register('last_name')} maxLength="128" />
+                <div className="d-flex justify-content-between">
+                  <small className="text-red font-weight-semi">
+                    {last_name.length > 0 && errors?.last_name?.type === 'matches' && errors?.last_name?.message}
+                  </small>
+                  <small className="font-weight-bold">{last_name.length}/128</small>
+                </div>
               </td>
             </tr>
             <tr>
@@ -99,6 +126,8 @@ function UserAdd(props) {
               <td width="70%">
                 <Form.Control id="user_date_of_birth" type="date" {...register('date_of_birth')} />
                 <small className="text-red font-weight-semi">
+                  {errors?.date_of_birth?.type === 'typeError' && errors?.date_of_birth?.message}
+                  {errors?.date_of_birth?.type === 'max' && errors?.date_of_birth?.message}
                   {errors?.date_of_birth?.type === 'date_of_birth' && errors?.date_of_birth?.message}
                 </small>
               </td>
@@ -137,6 +166,7 @@ function UserAdd(props) {
                   {date_of_birth !== '' &&
                     errors?.joined_date?.type === 'joined_date_2' &&
                     errors?.joined_date?.message}
+                  {errors?.joined_date?.type === 'typeError' && errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'joined_date' && errors?.joined_date?.message}
                 </small>
               </td>
@@ -153,7 +183,13 @@ function UserAdd(props) {
                   render={({ field: { value, onChange } }) => (
                     <Select
                       options={typeOptions}
-                      onChange={(options) => onChange(options?.value)}
+                      onChange={(options) => {
+                        onChange(options?.value);
+                        if (options?.value === 'Admin') {
+                          setValue('location_id', user.location_id);
+                          setWarningLocation('');
+                        }
+                      }}
                       value={typeOptions?.filter((option) => value === option?.value)}
                       placeholder=""
                       theme={(theme) => ({
@@ -183,7 +219,16 @@ function UserAdd(props) {
                     render={({ field: { value, onChange } }) => (
                       <Select
                         options={locationOptions}
-                        onChange={(options) => onChange(options?.value)}
+                        onChange={(options) => {
+                          onChange(options?.value);
+                          if (options?.value !== user.location_id) {
+                            setWarningLocation(
+                              'The created user will not show in the user list until you use the admin account in the selected location'
+                            );
+                          } else {
+                            setWarningLocation('');
+                          }
+                        }}
                         value={locationOptions?.filter((option) => value === option?.value)}
                         placeholder=""
                         theme={(theme) => ({
@@ -198,24 +243,59 @@ function UserAdd(props) {
                       />
                     )}
                   />
+                  {warningLocation !== '' && <small className="text-danger font-weight-semi">{warningLocation}</small>}
                 </td>
               </tr>
             )}
-            <tr>
-              <td width="30%" />
-              <td width="70%" className="d-flex justify-content-end">
-                <Button variant="danger" type="submit" className="font-weight-bold me-3" disabled={!isValid}>
-                  Save
-                </Button>
-                <Button onClick={backtoManagerUser} variant="outline-secondary" className="font-weight-bold">
-                  Cancel
-                </Button>
-              </td>
-            </tr>
           </tbody>
         </table>
+        <div className="d-flex justify-content-end p-2">
+          <Button
+            id="user-save-btn"
+            variant="danger"
+            type="submit"
+            className="font-weight-bold me-3"
+            disabled={!isValid}
+          >
+            Save
+          </Button>
+          <Button
+            id="user-save-cancel"
+            onClick={() => setConfirmCancel(true)}
+            variant="outline-secondary"
+            className="font-weight-bold"
+          >
+            Cancel
+          </Button>
+        </div>
         <EditNote />
       </Form>
+      <Modal
+        show={confirmCancel}
+        backdrop="true"
+        setStateModal={() => setConfirmCancel(false)}
+        elementModalTitle={<p>Notification</p>}
+        elementModalBody={
+          <div>
+            <div>
+              <h6>Do you want to cancel?</h6>
+            </div>
+            <div className="d-flex align-items-center justify-content-end">
+              <Button id="yes-btn" variant="danger" className="font-weight-bold" onClick={() => backtoManagerUser()}>
+                Yes
+              </Button>
+              <Button
+                id="no-btn"
+                variant="outline-secondary"
+                className="ms-3 font-weight-bold"
+                onClick={() => setConfirmCancel(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dropdown, Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-import { HiFilter } from 'react-icons/hi';
+import { BsFillCalendarDateFill } from 'react-icons/bs';
 import PropTypes from 'prop-types';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -18,7 +18,7 @@ export default function FilterDate(props) {
       <Dropdown.Toggle className="assignment-filter-date d-flex align-items-center justity-content-center">
         <p className="flex-grow-1 afd-name font-weight-bold">Assigned Date</p>
         <div className="fb-icon">
-          <HiFilter />
+          <BsFillCalendarDateFill />
         </div>
       </Dropdown.Toggle>
       <Dropdown.Menu className="p-3">

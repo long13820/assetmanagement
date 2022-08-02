@@ -14,6 +14,7 @@ import { setIsEdit } from '../../../redux/reducer/user/user.reducer';
 import { userDetailSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
 import EditNote from '../Note';
 
@@ -27,6 +28,8 @@ const typeOptions = [
 function UserEdit(props) {
   const dispatch = useDispatch();
   const userDetail = useSelector(userDetailSelector);
+
+  const [confirmCancel, setConfirmCancel] = React.useState(false);
 
   const {
     register,
@@ -55,16 +58,23 @@ function UserEdit(props) {
     Object.keys(tempDirtyFields).map((key) => {
       tempDirtyFields[key] = data[key];
     });
-    if (tempDirtyFields.date_of_birth) {
+    if (tempDirtyFields.date_of_birth && !tempDirtyFields.joined_date) {
       tempDirtyFields.date_of_birth = formatDate(tempDirtyFields.date_of_birth, 'YYYY-MM-DD');
+      tempDirtyFields.joined_date = formatDate(data.joined_date, 'YYYY-MM-DD');
     }
-    if (tempDirtyFields.joined_date) {
+    if (tempDirtyFields.joined_date && !tempDirtyFields.date_of_birth) {
+      tempDirtyFields.date_of_birth = formatDate(data.date_of_birth, 'YYYY-MM-DD');
       tempDirtyFields.joined_date = formatDate(tempDirtyFields.joined_date, 'YYYY-MM-DD');
     }
+    if (tempDirtyFields.date_of_birth && tempDirtyFields.joined_date) {
+      tempDirtyFields.date_of_birth = formatDate(tempDirtyFields.date_of_birth, 'YYYY-MM-DD');
+      tempDirtyFields.joined_date = formatDate(tempDirtyFields.joined_date, 'YYYY-MM-DD');
+    }
+
     const result = await editUserById(userDetail.id, tempDirtyFields);
     if (result === 200) {
       SuccessToast('Updated user successfully', 3000);
-      props.backToManageUser('updated_at');
+      props.backToManageUser('updated_at', 'edit');
     } else {
       ErrorToast('Updated user unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
@@ -104,6 +114,8 @@ function UserEdit(props) {
               <td width="70%">
                 <Form.Control id="user_date_of_birth" type="date" {...register('date_of_birth')} />
                 <small className="text-red font-weight-semi">
+                  {errors?.date_of_birth?.type === 'typeError' && errors?.date_of_birth?.message}
+                  {errors?.date_of_birth?.type === 'max' && errors?.date_of_birth?.message}
                   {errors?.date_of_birth?.type === 'date_of_birth' && errors?.date_of_birth?.message}
                 </small>
               </td>
@@ -142,6 +154,7 @@ function UserEdit(props) {
                   {date_of_birth !== '' &&
                     errors?.joined_date?.type === 'joined_date_2' &&
                     errors?.joined_date?.message}
+                  {errors?.joined_date?.type === 'typeError' && errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'joined_date' && errors?.joined_date?.message}
                 </small>
               </td>
@@ -176,25 +189,62 @@ function UserEdit(props) {
               </td>
             </tr>
             <tr>
-              <td width="30%" />
-              <td width="70%" className="d-flex justify-content-end">
-                <Button
-                  variant="danger"
-                  type="submit"
-                  className="font-weight-bold me-3"
-                  disabled={!isDirty || !isValid}
-                >
-                  Save
-                </Button>
-                <Button onClick={backtoManagerUser} variant="secondary" className="font-weight-bold">
-                  Cancel
-                </Button>
+              <td width="30%">
+                <p className="font-weight-bold">Location</p>
+              </td>
+              <td width="70%">
+                <Form.Control defaultValue={userDetail.user_location.name} id="user_location" type="text" disabled />
               </td>
             </tr>
           </tbody>
         </table>
+        <div className="d-flex justify-content-end p-2">
+          <Button
+            id="user-save-btn"
+            variant="danger"
+            type="submit"
+            className="font-weight-bold me-3"
+            disabled={!isDirty || !isValid}
+          >
+            Save
+          </Button>
+          <Button
+            id="user-save-cancel"
+            onClick={() => setConfirmCancel(true)}
+            variant="outline-secondary"
+            className="font-weight-bold"
+          >
+            Cancel
+          </Button>
+        </div>
         <EditNote />
       </Form>
+      <Modal
+        show={confirmCancel}
+        backdrop="true"
+        setStateModal={() => setConfirmCancel(false)}
+        elementModalTitle={<p>Notification</p>}
+        elementModalBody={
+          <div>
+            <div>
+              <h6>Do you want to cancel?</h6>
+            </div>
+            <div className="d-flex align-items-center justify-content-end">
+              <Button id="yes-btn" variant="danger" className="font-weight-bold" onClick={() => backtoManagerUser()}>
+                Yes
+              </Button>
+              <Button
+                id="no-btn"
+                variant="outline-secondary"
+                className="ms-3 font-weight-bold"
+                onClick={() => setConfirmCancel(false)}
+              >
+                No
+              </Button>
+            </div>
+          </div>
+        }
+      />
     </div>
   );
 }

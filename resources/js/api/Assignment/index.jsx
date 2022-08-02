@@ -36,7 +36,6 @@ export const getAllAssets = async ({ sort, filter, search, page } = {}) => {
 
   if (filter) {
     queryString.push(`filter[state]=${filter}`);
-    console.log(filter);
   }
 
   if (search) {
@@ -54,6 +53,7 @@ export const getAllAssets = async ({ sort, filter, search, page } = {}) => {
   if (response.status === 'success') return response.data;
   if (response.status !== 'success') return [];
 };
+
 export const getAllAssignmentsAsset = async (params) => {
   const token = localStorage.getItem('token');
   const response = await axiosClient
@@ -79,7 +79,7 @@ export const getAllAssignmentsAsset = async (params) => {
   if (response.status !== 'success') return [];
 };
 
-export const getAllAssignments = async ({ sort, filter, search, page, edit } = {}) => {
+export const getAllAssignments = async ({ sort, filter, search, page, edit, filterDate } = {}) => {
   const url = '/assignments';
   const queryString = [];
 
@@ -90,11 +90,11 @@ export const getAllAssignments = async ({ sort, filter, search, page, edit } = {
   }
 
   if (filter) {
-    if (filter instanceof Date) {
-      queryString.push(`filter[assigned_date]=${formatDate(filter, 'YYYYMMDD')}`);
-    } else {
-      queryString.push(`filter[state]=${filter}`);
-    }
+    queryString.push(`filter[state]=${filter}`);
+  }
+
+  if (filterDate) {
+    queryString.push(`filter[assigned_date]=${formatDate(filter, 'YYYYMMDD')}`);
   }
 
   if (search) {

@@ -6,6 +6,14 @@
   color: var(--bs-red);
 }
 
+.text-gray-100 {
+  color: var(--bs-gray-100);
+}
+
+.text-gray-300 {
+  color: var(--bs-gray-300);
+}
+
 .bg-blue-100 {
   background-color: var(--bs-blue-100);
 }

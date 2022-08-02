@@ -1,3 +1,14 @@
+.edit_form form {
+    width: 500px;
+    background: var(--bs-white);
+    padding: var(--24px);
+    border-radius: var(--6px);
+    box-shadow: var(--box-shadow);
+  }
+
+  .edit_form form table tbody tr td {
+    vertical-align: middle;
+  }
 .DropDown {
     /* position: absolute;
     overflow: visible; */
@@ -93,12 +104,14 @@
     display: flex;
     justify-content: space-between;
     cursor: text;
-  }
 
+  }
   .add_cate {
     display: flex;
-    justify-content: space-between;
     cursor: text;
+  }
+  .add_new{
+    font-style: italic;
   }
   #end_li:hover {
     background: rgb(240, 237, 233);
@@ -107,15 +120,18 @@
     text-decoration: none;
     width: 150px;
     border: black solid 1px;
+    font-style: italic;
+
   }
 
-  .right input {
+  .right {
+        margin-left: 40px;
+  }
+  .right-prefix input{
     text-decoration: none;
     width: 40px;
     border: black solid 1px;
-  }
-
-  .category_area {
+    font-style: italic;
   }
 
   #error {
@@ -153,7 +169,7 @@
   }
 
   .name_area{
-    display: inline-block;
+    display: flex;
     padding: 0px 8px;
     width: 80%;
     cursor: pointer;
@@ -162,3 +178,8 @@
   .textarea-input {
     font-size: 1.4rem;
   }
+.title_name{
+    display: flex;
+    padding: 0px 8px;
+    width: 80%;
+}

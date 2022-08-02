@@ -81,7 +81,7 @@ class User extends AuthenticateTable
 
     public function fullName(): Attribute
     {
-        $fullName = $this->last_name . ' ' . $this->first_name;
+        $fullName = $this->first_name . ' ' . $this->last_name;
 
         return Attribute::make(
             get: fn() => $fullName,
@@ -89,20 +89,16 @@ class User extends AuthenticateTable
         );
     }
 
-    public function setFullNameAttribute()
-    {
-        $this->attributes["full_name"] = "$this->last_name $this->first_name";
-    }
-
     public function getUserName()
     {
-        $lastName = strtolower($this->last_name);
-        $getFirstLetter = explode(" ", $this->first_name);
+        $firstName = strtolower($this->first_name);
+        $firstName = preg_replace('/\s+/', '', $firstName);
+        $getFirstLetter = explode(" ", $this->last_name);
         $tmp_firstLetter = "";
         foreach ($getFirstLetter as $w) {
             $tmp_firstLetter .= $w[0];
         }
-        $tmp_username = $lastName . strtolower($tmp_firstLetter);
+        $tmp_username = $firstName . strtolower($tmp_firstLetter);
         $count = User::query()
             ->where("username", "LIKE", "{$tmp_username}%")
             ->count();

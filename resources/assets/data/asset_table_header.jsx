@@ -4,6 +4,7 @@ export const asset_table_header = [
     name: 'Asset Code',
     isSortAsc: true,
     isSortDesc: false,
+    isSort: true,
     cursor: true,
   },
   {
@@ -11,6 +12,7 @@ export const asset_table_header = [
     name: 'Asset Name',
     isSortAsc: true,
     isSortDesc: false,
+    isSort: true,
     cursor: true,
   },
   {
@@ -18,20 +20,19 @@ export const asset_table_header = [
     name: 'Category',
     isSortAsc: true,
     isSortDesc: false,
+    isSort: true,
     cursor: true,
   },
   {
     id: 4,
-    name: 'Assigned Date',
+    name: 'State',
     isSortAsc: true,
     isSortDesc: false,
+    isSort: true,
     cursor: true,
   },
   {
     id: 5,
-    name: 'State',
-    isSortAsc: false,
-    isSortDesc: false,
-    cursor: false,
+    name: '',
   },
 ];

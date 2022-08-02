@@ -11,8 +11,12 @@ export const appReducer = createSlice({
     user: {},
     title: '',
     subNameTitle: '',
+    expiredToken: false,
   },
   reducers: {
+    setExpiredToken: (state, action) => {
+      state.expiredToken = action.payload;
+    },
     setIsLogin: (state, action) => {
       state.isLogin = action.payload;
     },
@@ -40,6 +44,15 @@ export const appReducer = createSlice({
   },
 });
 
-export const { setIsLogin, setRole, setCurrentPage, setTotalRecord, setUser, setMenu, setTitle, setSubTitle } =
-  appReducer.actions;
+export const {
+  setIsLogin,
+  setRole,
+  setCurrentPage,
+  setTotalRecord,
+  setUser,
+  setMenu,
+  setTitle,
+  setSubTitle,
+  setExpiredToken,
+} = appReducer.actions;
 export default appReducer.reducer;

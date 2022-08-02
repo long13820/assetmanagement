@@ -2,40 +2,62 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { userNameSelector } from '../../../redux/selectors';
+import { staffCodeSelector, userNameSelector } from '../../../redux/selectors';
 import Table from '../../Layouts/Table';
 
 export default function AssignmentUserTable(props) {
-  const handleSort = (key, value) => {
+  const handleSort = (key, valueAsc, valueDesc) => {
     const tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
-    const findIndex = props.sort.findIndex((e) => e.key === key);
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
-    if (findIndex !== -1 && value) {
-      tempSort[findIndex].value = 'desc';
-      tempTableHeader[findIndexHeader].isSortAsc = false;
-      tempTableHeader[findIndexHeader].isSortDesc = true;
-    }
-    if (findIndex !== -1 && !value) {
-      tempSort.splice(findIndex, 1);
+
+    if (!valueAsc && !valueDesc) {
+      tempSort[0].key = key;
+      tempSort[0].value = 'asc';
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
-    }
-    if (findIndex === -1 && value) {
-      tempSort.push({
-        key,
-        value: 'desc',
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
       });
+    }
+
+    if (valueAsc && !valueDesc) {
+      tempSort[0].key = key;
+      tempSort[0].value = 'desc';
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
     }
+
+    if (!valueAsc && valueDesc) {
+      tempSort[0].key = 'first_name';
+      tempSort[0].value = 'asc';
+      tempTableHeader[findIndexHeader].isSortAsc = false;
+      tempTableHeader[findIndexHeader].isSortDesc = false;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 0) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+      });
+    }
+
     props.handleSort(tempSort, tempTableHeader);
   };
 
   const userName = useSelector(userNameSelector);
+  const staffCode = useSelector(staffCodeSelector);
 
-  const handleSelectUser = (name, id) => {
-    props.handleCurrentSetUserName(name, id);
+  const handleSelectUser = (name, id, code) => {
+    props.handleCurrentSetUserName(name, id, code);
   };
 
   const renderTableBody = () => {
@@ -46,8 +68,8 @@ export default function AssignmentUserTable(props) {
             <input
               type="checkbox"
               className="form-check-input"
-              checked={userName === item.full_name}
-              onChange={() => handleSelectUser(item.full_name, item.id)}
+              checked={userName === item.full_name && staffCode === item.staff_code}
+              onChange={() => handleSelectUser(item.full_name, item.id, item.staff_code)}
             />
             <span className="checkmark" />
           </td>

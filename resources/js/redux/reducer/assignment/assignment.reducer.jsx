@@ -6,6 +6,8 @@ export const assignmentReducer = createSlice({
     asset: {},
     assetName: '',
     userName: '',
+    staffCode: '',
+    assetCode: '',
     user: [],
     isAdd: false,
     isSelect: true,
@@ -29,8 +31,15 @@ export const assignmentReducer = createSlice({
     setUserName: (state, action) => {
       state.userName = action.payload;
     },
+    setStaffCode: (state, action) => {
+      state.staffCode = action.payload;
+    },
+    setAssetCode: (state, action) => {
+      state.assetCode = action.payload;
+    },
   },
 });
 
-export const { setAsset, setUser, setIsAdd, setIsSelect, setAssetName, setUserName } = assignmentReducer.actions;
+export const { setAsset, setUser, setIsAdd, setIsSelect, setAssetName, setUserName, setStaffCode, setAssetCode } =
+  assignmentReducer.actions;
 export default assignmentReducer.reducer;

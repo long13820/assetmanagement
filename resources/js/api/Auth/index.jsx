@@ -17,7 +17,7 @@ export const handleSignIn = async (body) => {
 
   const { status } = response;
 
-  if ([400, 403].includes(status)) {
+  if ([400, 403, 422].includes(status)) {
     ErrorToast('Username or password is incorrect. Please try again', 3500);
     Notiflix.Block.remove('.sl-box');
     return;
@@ -47,7 +47,7 @@ export const handleGetInformation = async () => {
   }
 };
 
-export const handleChangePassword = async (body) => {
+export const handleChangePassword = async (body, flag) => {
   const response = await axiosClient.put('/change_password', body, configHeadersAuthenticate());
 
   const { status } = response;
@@ -61,7 +61,9 @@ export const handleChangePassword = async (body) => {
       Notiflix.Block.remove('.modal-content');
       return status;
     case 'success':
-      SuccessToast('Your password has been changed successfully', 3500);
+      if (flag !== 'no_notification') {
+        SuccessToast('Your password has been changed successfully', 3500);
+      }
       Notiflix.Block.remove('.modal-content');
       return 200;
     default:

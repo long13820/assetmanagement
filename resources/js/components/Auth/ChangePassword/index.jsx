@@ -14,6 +14,7 @@ export default function ChangePassword(props) {
   const [typeOldPassword, setShowOldPassword] = React.useState('password');
   const [typeNewPassword, setShowNewPassword] = React.useState('password');
   const [backdrop, setBackdrop] = React.useState(true);
+  const [changePasswordSuccess, setChangePasswordSuccess] = React.useState(false);
 
   const {
     register,
@@ -28,7 +29,7 @@ export default function ChangePassword(props) {
 
   const onSubmit = async (data) => {
     setBackdrop('static');
-    const status = await changePassword(data);
+    const status = await changePassword(data, 'no_notification');
     switch (status) {
       case 403:
         setError(
@@ -56,6 +57,7 @@ export default function ChangePassword(props) {
         break;
       case 200:
         setBackdrop(true);
+        setChangePasswordSuccess(true);
         setStateModal('keep');
     }
   };
@@ -74,64 +76,91 @@ export default function ChangePassword(props) {
     <Modal
       show={props.show}
       backdrop={backdrop}
-      setStateModal={() => setStateModal()}
+      setStateModal={() => {
+        setStateModal();
+        setChangePasswordSuccess(false);
+      }}
       elementModalTitle={<p>Change password</p>}
       elementModalBody={
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group className="custom-change-password mb-3">
-            <Row className="align-items-center">
-              <Col xs={4}>
-                <Form.Label className="font-weight-bold mb-0">Old password</Form.Label>
-              </Col>
-              <Col xs={8}>
-                <div className="cp-input">
-                  <Form.Control {...register('old_password')} type={typeOldPassword} />
-                  <small className="text-danger font-weight-bold">{errors?.old_password?.types?.wrong}</small>
-                  {typeOldPassword === 'text' ? (
-                    <FaEye className="text-black" onClick={() => setShowOldPassword('password')} />
-                  ) : (
-                    <FaEyeSlash className="text-black" onClick={() => setShowOldPassword('text')} />
-                  )}
-                </div>
-              </Col>
-            </Row>
-          </Form.Group>
-          <Form.Group className="custom-change-password mb-3">
-            <Row className="align-items-center">
-              <Col xs={4}>
-                <Form.Label className="font-weight-bold mb-0">New password</Form.Label>
-              </Col>
-              <Col xs={8}>
-                <div className="cp-input">
-                  <Form.Control {...register('new_password')} type={typeNewPassword} />
-                  <small className="text-danger font-weight-bold">{errors?.new_password?.types?.invalid}</small>
-                  {typeNewPassword === 'text' ? (
-                    <FaEye className="text-black" onClick={() => setShowNewPassword('password')} />
-                  ) : (
-                    <FaEyeSlash className="text-black" onClick={() => setShowNewPassword('text')} />
-                  )}
-                </div>
-              </Col>
-            </Row>
-          </Form.Group>
-          <div className="text-justify mb-3">
-            <small>
-              (*) New password must contain&nbsp;<span className="font-weight-bold">8 Characters</span>,&nbsp;
-              <span className="font-weight-bold">One Uppercase</span>,&nbsp;
-              <span className="font-weight-bold">One Lowercase</span>,&nbsp;
-              <span className="font-weight-bold">One Number</span>&nbsp;and&nbsp;
-              <span className="font-weight-bold">One Special Case Character</span>
-            </small>
-          </div>
-          <Form.Group className="d-flex justify-content-end">
-            <Button type="submit" variant="danger" disabled={!isValid} className="me-3 font-weight-bold">
-              Save
-            </Button>
-            <Button type="button" variant="secondary" className="font-weight-bold" onClick={() => setStateModal()}>
-              Cancel
-            </Button>
-          </Form.Group>
-        </Form>
+        !changePasswordSuccess ? (
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            <Form.Group className="custom-change-password mb-3">
+              <Row className="align-items-center">
+                <Col xs={4}>
+                  <Form.Label className="font-weight-bold mb-0">Old password</Form.Label>
+                </Col>
+                <Col xs={8}>
+                  <div className="cp-input">
+                    <Form.Control {...register('old_password')} type={typeOldPassword} />
+                    <small className="text-danger font-weight-bold">{errors?.old_password?.types?.wrong}</small>
+                    {typeOldPassword === 'text' ? (
+                      <FaEye className="text-black" onClick={() => setShowOldPassword('password')} />
+                    ) : (
+                      <FaEyeSlash className="text-black" onClick={() => setShowOldPassword('text')} />
+                    )}
+                  </div>
+                </Col>
+              </Row>
+            </Form.Group>
+            <Form.Group className="custom-change-password mb-3">
+              <Row className="align-items-center">
+                <Col xs={4}>
+                  <Form.Label className="font-weight-bold mb-0">New password</Form.Label>
+                </Col>
+                <Col xs={8}>
+                  <div className="cp-input">
+                    <Form.Control {...register('new_password')} type={typeNewPassword} />
+                    {errors?.new_password?.type === 'new_password' ? (
+                      <small className="text-danger font-weight-bold">{errors?.new_password?.message}</small>
+                    ) : (
+                      <small className="text-danger font-weight-bold">{errors?.new_password?.types?.invalid}</small>
+                    )}
+                    {typeNewPassword === 'text' ? (
+                      <FaEye className="text-black" onClick={() => setShowNewPassword('password')} />
+                    ) : (
+                      <FaEyeSlash className="text-black" onClick={() => setShowNewPassword('text')} />
+                    )}
+                  </div>
+                </Col>
+              </Row>
+            </Form.Group>
+            <div className="text-justify mb-3">
+              <small>
+                (*) New password must be at least contain&nbsp;<span className="font-weight-bold">8 Characters</span>
+                ,&nbsp;
+                <span className="font-weight-bold">One Uppercase</span>,&nbsp;
+                <span className="font-weight-bold">One Lowercase</span>,&nbsp;
+                <span className="font-weight-bold">One Number</span>&nbsp;and&nbsp;
+                <span className="font-weight-bold">One Special Case Character</span>
+              </small>
+            </div>
+            <Form.Group className="d-flex justify-content-end">
+              <Button type="submit" variant="danger" disabled={!isValid} className="me-3 font-weight-bold">
+                Save
+              </Button>
+              <Button type="button" variant="secondary" className="font-weight-bold" onClick={() => setStateModal()}>
+                Cancel
+              </Button>
+            </Form.Group>
+          </Form>
+        ) : (
+          <>
+            <h6 className="mb-3">Your password has been changed successfully</h6>
+            <div className="d-flex justify-content-end">
+              <Button
+                type="button"
+                variant="outline-secondary"
+                className="font-weight-bold"
+                onClick={() => {
+                  setStateModal();
+                  setChangePasswordSuccess(false);
+                }}
+              >
+                Close
+              </Button>
+            </div>
+          </>
+        )
       }
     />
   );

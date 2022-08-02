@@ -32,6 +32,7 @@ class AssetTest extends TestCase
             "state" => "Available",
             "specification" => "sfsdfsdfdsfsdsf",
             "category_id" => 1,
+            "location_id" => 1,
         ]);
 
         $response =
@@ -60,11 +61,41 @@ class AssetTest extends TestCase
             "state" => "Available",
             "specification" => "sfsdfsdfdsfsdsf",
             "category_id" => 1,
+            "location_id" => 1,
         ]);
 
         $response = $this->actingAs(User::find(1))
             ->withSession(['foo' => 'bar'])
             ->get('/api/assets');
+        $response->assertStatus(200);
+    }
+    /** @test */
+    public function test_showDetailAsset_with_valid_credentials()
+    {
+        //Create user
+        User::factory()->create([
+            "first_name" => "To Duc",
+            "last_name" => "Phuong",
+            "date_of_birth" => "2000-01-01",
+            "joined_date" => "2020-01-01",
+            "type" => "Staff",
+            "location_id" => 1,
+        ]);
+
+        // Create Asset
+        Asset::factory()->create([
+            "asset_code" => "LA0001",
+            "asset_name" => "Laptop HP Probook 450 G10",
+            "installed_date" => "2000-01-01",
+            "state" => "Available",
+            "specification" => "sfsdfsdfdsfsdsf",
+            "category_id" => 1,
+            "location_id" => 1,
+        ]);
+
+        $response = $this->actingAs(User::find(1))
+            ->withSession(['foo' => 'bar'])
+            ->get('/api/assets/1');
         $response->assertStatus(200);
     }
 }

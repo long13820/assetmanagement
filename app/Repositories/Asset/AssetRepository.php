@@ -29,12 +29,14 @@ class AssetRepository
             ->filter($request)
             ->sort($request)
             ->search($request)
+            ->orderBy('asset.updated_at', 'desc')
             ->orderBy("asset.asset_code")
             ->orderBy("asset.asset_name")
             ->orderBy("asset.category_id")
             ->orderBy("asset.state")
             ->join('categories', 'asset.category_id', '=', 'categories.id')
-            ->where("asset.id", "!=", auth()->id())
+            // ->where("asset.id", "!=", auth()->id())
+            ->where("location_id", "=", auth()->user()->location_id)
             ->paginate($per_page);
         return AssetResource::collection($data)->response()->getData();
     }
@@ -57,11 +59,15 @@ class AssetRepository
                 "categories.category_name",
                 "asset.category_id",
                 "asset.installed_date",
-                "asset.state"
+                "asset.state",
+                "location.name"
+
             )
+            ->where("location_id", "=", auth()->user()->location_id)
             ->where('asset.id', $id)
             ->with('assignment')
             ->join('categories', 'asset.category_id', '=', 'categories.id')
+            ->join('location', 'asset.location_id', '=', 'location.id')
             ->get();
         return $data;
     }

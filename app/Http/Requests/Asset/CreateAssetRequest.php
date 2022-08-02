@@ -31,6 +31,7 @@ class CreateAssetRequest extends FormRequest
             "state" => "required",
             "specification" => "required",
             "category_id" => "required",
+            "location_id" => "required"
         ];
     }
 

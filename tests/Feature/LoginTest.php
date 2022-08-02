@@ -19,9 +19,9 @@ class LoginTest extends TestCase
     /** @test */
     public function test_login_with_valid_credentials()
     {
-         User::factory()->create([
-            "first_name" => "To Duc",
-            "last_name" => "Phuong",
+        User::factory()->create([
+            "first_name" => "Phuong",
+            "last_name" => "To Duc",
             "date_of_birth" => "2000-01-01",
             "joined_date" => "2020-01-01",
             "type" => "Staff",
@@ -72,6 +72,4 @@ class LoginTest extends TestCase
         ]);
         $response->assertStatus(422);
     }
-    
-
 }

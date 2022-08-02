@@ -18,24 +18,23 @@ class CreateUserTest extends TestCase
     }
     
     /** @test */
-    // public function testCreateUser()
-    // {
-    //     Sanctum::actingAs(User::factory()->create(), ["*"]);
-    //     $user = [
-    //         "first_name" => "To Duc",
-    //         "last_name" => "Phuong",
-    //         "date_of_birth" => "2000-01-01",
-    //         "gender" => "Male",
-    //         "joined_date" => "2022-01-05",
-    //         "type" => "Staff",
-    //         "location_id" => 1,
-    //     ];
+    public function testCreateUser()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $user = [
+            "first_name" => "To Duc",
+            "last_name" => "Phuong",
+            "date_of_birth" => "2000-01-01",
+            "gender" => "Male",
+            "joined_date" => "2022-01-05",
+            "type" => "Staff",
+            "location_id" => 1,
+        ];
 
-    //     $this->json("POST", "/api/users", $user)
-    //         ->assertStatus(200)
-    //         ->assertJson(["success" => true])
-    //         ->assertJson(["data" => $user]);
-    // }
+        $this->json("POST", "/api/users", $user)
+            ->assertStatus(200)
+            ->assertJson(["status" => true]);
+    }
     /** @test */
     public function testUserUnder_18YearsOld()
     {

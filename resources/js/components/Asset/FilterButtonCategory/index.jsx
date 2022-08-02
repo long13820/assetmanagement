@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dropdown, Form } from 'react-bootstrap';
 import { HiFilter } from 'react-icons/hi';
 import { useSelector } from 'react-redux';
@@ -9,14 +9,22 @@ import { categoryListSelector } from '../../../redux/selectors/category/category
 import './style.css';
 
 export default function FilterButtonCategory(props) {
+  const [checkAll, setCheckAll] = useState(true);
   const handleFilter = (value) => {
-    props.setCurrentFilter(value);
+    if (value == 0) {
+      setCheckAll(true);
+      props.setCurrentFilter(0);
+    } else {
+      setCheckAll(false);
+      props.setCurrentFilter(value);
+    }
   };
+  var categoryCheck = checkAll ? [0] : props.currentFilter;
   const [...listCategory] = useSelector(categoryListSelector);
   return (
     <Dropdown>
-      <Dropdown.Toggle className="filter-button d-flex align-items-center justity-content-center">
-        <p className="flex-grow-1 font-weight-bold">Category</p>
+      <Dropdown.Toggle className="d-flex filter-button btn-asset align-items-center justity-content-center btn btn-primary asset_filter">
+        <p className="flex-grow-1 afd-name font-weight-bold">Category</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
@@ -28,8 +36,8 @@ export default function FilterButtonCategory(props) {
             id="checkbox-all"
             className="mx-4 font-weight-bold"
             label="All"
-            checked={props.currentFilter === 'All'}
-            onChange={() => handleFilter('All')}
+            checked={checkAll ? true : false}
+            onChange={() => handleFilter(0)}
           />
           {listCategory.map((item, index) => {
             return (
@@ -39,9 +47,9 @@ export default function FilterButtonCategory(props) {
                   className="mx-4 font-weight-bold"
                   data-category={item.id}
                   id={`cateid_${item.id}`}
-                  checked={props.currentFilter === item.category_name}
+                  checked={categoryCheck.indexOf(item.id) == -1 ? false : true}
                   label={item.category_name}
-                  onChange={() => handleFilter(item.category_name)}
+                  onChange={() => handleFilter(item.id)}
                 />
               </div>
             );
@@ -53,6 +61,6 @@ export default function FilterButtonCategory(props) {
 }
 
 FilterButtonCategory.propTypes = {
-  currentFilter: PropTypes.string,
+  currentFilter: PropTypes.any,
   setCurrentFilter: PropTypes.func,
 };

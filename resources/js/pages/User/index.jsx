@@ -21,12 +21,17 @@ export default function User() {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...user_table_header]);
-  const [sort, setCurrentSort] = React.useState([]);
+  const [sort, setCurrentSort] = React.useState([
+    {
+      key: 'first_name',
+      value: 'asc',
+    },
+  ]);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('All');
   const [page, setPage] = React.useState(1);
   const [totalRecord, setTotalRecord] = React.useState(0);
-  const [perPage] = React.useState(8);
+  const [perPage] = React.useState(20);
   const [totalPage, setTotalPage] = React.useState(0);
   const [sortDate, setSortDate] = React.useState('');
   const isAdd = useSelector(isAddSelector);
@@ -42,27 +47,37 @@ export default function User() {
   }, []);
 
   const handleGetAllUsers = async () => {
-    const result = await getAllUsers();
+    const result = await getAllUsers({ sort });
     setLoading(false);
     setUser(result);
   };
 
-  const backToManageUser = async (field) => {
-    let tempSearch;
-    let tempFilter;
-    let tempPage;
-    if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
-    if (search !== '') tempSearch = search;
-    if (page > 1) tempPage = page;
+  const backToManageUser = async (field, action) => {
     setSortDate(field);
-    const result = await getAllUsers({
-      sort,
-      search: tempSearch,
-      filter: tempFilter,
-      page: tempPage,
-      edit: field,
-    });
-    setUser(result);
+    if (action === 'edit') {
+      let tempSearch;
+      let tempFilter;
+      let tempPage;
+      if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
+      if (search !== '') tempSearch = search;
+      if (page > 1) tempPage = page;
+      const result = await getAllUsers({
+        sort,
+        search: tempSearch,
+        filter: tempFilter,
+        page: tempPage,
+        edit: field,
+      });
+      setUser(result);
+    } else {
+      setCurrentSort([]);
+      setSearch('');
+      setFilter('All');
+      const result = await getAllUsers({
+        edit: field,
+      });
+      setUser(result, 'reset-page');
+    }
     if (field === 'created_at') dispatch(setIsAdd(false));
     if (field === 'updated_at') dispatch(setIsEdit(false));
     dispatch(setSubTitle(''));
@@ -73,11 +88,9 @@ export default function User() {
     BlockUI('#root');
     let tempSearch;
     let tempFilter;
-    let tempPage;
     let tempSortDate;
     if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
     if (search !== '') tempSearch = search;
-    if (page > 1) tempPage = page;
     if (sortDate !== '') tempSortDate = sortDate;
     setCurrentSort(sort);
     setRenderTableHeader(header);
@@ -85,10 +98,9 @@ export default function User() {
       sort,
       search: tempSearch,
       filter: tempFilter,
-      page: tempPage,
       edit: tempSortDate,
     });
-    setUser(result);
+    setUser(result, 'reset-page');
     Notiflix.Block.remove('#root');
   };
 
@@ -106,20 +118,17 @@ export default function User() {
     BlockUI('#root');
     let tempSearch;
     let tempSort;
-    let tempPage;
     let tempSortDate;
     if (search !== '') tempSearch = search;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
-    if (page > 1) tempPage = page;
     if (sortDate !== '') tempSortDate = sortDate;
     const result = await getAllUsers({
       sort: tempSort,
       search: tempSearch,
       filter: tempFilter,
-      page: tempPage,
       edit: tempSortDate,
     });
-    setUser(result);
+    setUser(result, 'reset-page');
     Notiflix.Block.remove('#root');
   };
 
@@ -128,31 +137,28 @@ export default function User() {
     BlockUI('#root');
     let tempSort;
     let tempFilter;
-    let tempPage;
     let tempSortDate;
     if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     if (sortDate !== '') tempSortDate = sortDate;
-    if (page > 1) tempPage = page;
     if (search !== '') {
       const result = await getAllUsers({
         sort: tempSort,
         search,
         filter: tempFilter,
-        page: tempPage,
         edit: tempSortDate,
       });
-      setUser(result);
+      setUser(result, 'reset-page');
       Notiflix.Block.remove('#root');
       return;
     }
-    const result = await getAllUsers({ sort: tempSort, filter: tempFilter, page: tempPage, edit: tempSortDate });
-    setUser(result);
+    const result = await getAllUsers({ sort: tempSort, filter: tempFilter, edit: tempSortDate });
+    setUser(result, 'reset-page');
     Notiflix.Block.remove('#root');
   };
 
   const handlePageChange = async (page) => {
-    BlockUI('.main');
+    BlockUI('#root');
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -174,12 +180,14 @@ export default function User() {
       edit: tempSortDate,
     });
     setUser(result, 'page');
-    Notiflix.Block.remove('.main');
+    Notiflix.Block.remove('#root');
   };
 
   const setUser = (result, value) => {
     setData(result.data);
-    if (value !== 'page') setPage(1);
+    if (value !== 'page') {
+      setPage(1);
+    }
     setTotalRecord(result.meta.total);
     setTotalPage(result.meta.last_page);
   };
@@ -205,12 +213,12 @@ export default function User() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
-                <Button variant="danger" type="submit">
+                <Button id="search-user" variant="danger" type="submit">
                   <FaSearch />
                 </Button>
               </InputGroup>
             </Form>
-            <Button onClick={goToCreateNewUser} variant="danger" className="font-weight-bold ms-3">
+            <Button id="create-new-user" onClick={goToCreateNewUser} variant="danger" className="font-weight-bold ms-3">
               Create new user
             </Button>
           </div>
@@ -232,7 +240,7 @@ export default function User() {
             <Skeleton column={6} />
           )}
           {totalPage > 1 && (
-            <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
+            <div className="d-flex justify-content-end align-items-center mt-3">
               <Pagination
                 handlePageChange={handlePageChange}
                 perPage={perPage}

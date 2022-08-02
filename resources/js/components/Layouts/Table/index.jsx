@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table as TableBootstrap } from 'react-bootstrap';
-import { FaSortDown, FaSortUp } from 'react-icons/fa';
+import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -20,10 +20,21 @@ export default function Table(props) {
                 if (element.name !== null && element.name !== 'Username') {
                   if (location.pathname === '/manage_asset') {
                     props.tableSort(element.id);
-                    element.isSortDesc = !element.isSortDesc;
-                    element.isSortAsc = !element.isSortAsc;
+                    tableHeader.map((item) => {
+                      if (item.id == element.id) {
+                        item.isSortDesc = !item.isSortDesc;
+                        item.isSortAsc = !item.isSortAsc;
+                      } else {
+                        // eslint-disable-next-line no-empty
+                        if (item.id == 5) {
+                        } else {
+                          item.isSortDesc = false;
+                          item.isSortAsc = true;
+                        }
+                      }
+                    });
                   } else {
-                    props.handleSort(element.name, element.isSortAsc);
+                    props.handleSort(element.name, element.isSortAsc, element.isSortDesc);
                   }
                 }
               }}
@@ -31,8 +42,25 @@ export default function Table(props) {
             >
               <div className="d-flex align-items-center">
                 <p className="me-2">{element.name}</p>
-                {element.isSortAsc && <FaSortDown className="mb-2" />}
-                {element.isSortDesc && <FaSortUp className="mt-2" />}
+                {element.isSort && (
+                  <>
+                    {!element.isSortAsc && !element.isSortDesc && (
+                      <FaChevronUp id="table-sort-default" className="font-12px text-gray-300" />
+                    )}
+                    {element.isSortAsc && (
+                      <FaChevronUp
+                        id="table-sort-asc"
+                        className={`font-12px ${element.isSortAsc ? 'text-black' : 'text-gray-300'}`}
+                      />
+                    )}
+                    {element.isSortDesc && (
+                      <FaChevronDown
+                        id="table-sort-desc"
+                        className={`font-12px ${element.isSortDesc ? 'text-black' : 'text-gray-300'}`}
+                      />
+                    )}
+                  </>
+                )}
               </div>
             </th>
           ))}

@@ -1,11 +1,19 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/interactive-supports-focus */
 import { useEffect } from 'react';
 import { ListGroup } from 'react-bootstrap';
+import { FaTimes } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
-import { assetAssignmentDetailSelector, assetDetailSelector } from '../../../redux/selectors/asset/asset.selector';
+import {
+  assetAssignmentDetailSelector,
+  assetDetailSelector,
+  assetLoadingDetailSelector,
+} from '../../../redux/selectors/asset/asset.selector';
 import Modal from '../../Layouts/Modal';
 import Table from '../../Layouts/Table';
 
@@ -35,6 +43,7 @@ export default function ShowDetailAsset(props) {
   ];
   const dispatch = useDispatch();
   const checkAssetDetail = useSelector(assetDetailSelector);
+  const assetloadingDetailSelector = useSelector(assetLoadingDetailSelector);
   const detailAsset = checkAssetDetail != undefined && checkAssetDetail[0];
   const id = detailAsset != undefined ? detailAsset.id : '';
   const setStateModal = (value) => {
@@ -43,6 +52,9 @@ export default function ShowDetailAsset(props) {
     }
   };
   useEffect(() => {
+    if (id == '') {
+      return;
+    }
     dispatch(
       assetAction.fetctDetailAssetAssignment({
         'filter[asset_id]': id,
@@ -74,11 +86,18 @@ export default function ShowDetailAsset(props) {
   };
 
   return (
-    <>
+    !assetloadingDetailSelector && (
       <Modal
         show={props.show}
         setStateModal={setStateModal}
-        elementModalTitle={<p>Detailed Asset Information </p>}
+        elementModalTitle={
+          <p className="d-flex align-items-center w-100">
+            <span className="flex-grow-1">Detailed Asset Information</span>
+            <span onClick={() => setStateModal()} className="cursor-pointer">
+              <FaTimes />
+            </span>
+          </p>
+        }
         elementModalBody={
           <>
             <div className="modal-content-asset-detail">
@@ -114,6 +133,12 @@ export default function ShowDetailAsset(props) {
               </ListGroup>
               <ListGroup className="list-group-item-detail">
                 <ListGroup.Item className="show-assset-list-detail">
+                  <div className="show-assset-list-detail-item">Location</div>
+                  <div>{detailAsset != undefined && detailAsset.name}</div>
+                </ListGroup.Item>
+              </ListGroup>
+              <ListGroup className="list-group-item-detail">
+                <ListGroup.Item className="show-assset-list-detail">
                   <div className="show-assset-list-detail-item">Specification</div>
                   <div>{detailAsset != undefined && detailAsset.specification}</div>
                 </ListGroup.Item>
@@ -130,7 +155,7 @@ export default function ShowDetailAsset(props) {
           </>
         }
       />
-    </>
+    )
   );
 }
 

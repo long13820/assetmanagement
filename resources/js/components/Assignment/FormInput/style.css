@@ -1,53 +1,69 @@
-.backgroundCreate form{
-    width: 700px;
+.backgroundCreate form {
+  width: 700px;
   background: var(--bs-white);
   padding: 30px;
-  padding-top: 50px;
   border-radius: var(--6px);
   box-shadow: var(--box-shadow);
-
 }
 
 .backgroundCreate form table tbody tr td {
-    vertical-align: middle;
-  }
-.form-label {
-    margin-top: 5px;
-    font-size: 19px;
+  vertical-align: middle;
 }
 
-.datePicker{
-    display: block;
-    width: 100%;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 2px solid #ced4da;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border-radius: 0.375rem;
-   
+.form-label {
+  margin-top: 5px;
+  font-size: 19px;
 }
+
+.datePicker {
+  display: block;
+  width: 100%;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 2px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.375rem;
+}
+
 .button-search {
-    display: block;
-    padding: 0.375rem 0.75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: #212529;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 2px solid #ced4da;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    border-radius: 0.375rem;
+  display: block;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 2px solid #ced4da;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border-radius: 0.375rem;
 }
+
 .titleName {
-    color: var(--bs-red);
+  color: var(--bs-red);
+}
+
+.textField {
+  background-color: white;
+  border: none;
+}
+
+.textFieldBoth {
+  border: 2px solid #ced4da;
+  border-radius: 0.385rem;
+}
+
+.textField:disabled,
+.textField[readonly] {
+  background-color: white;
+  opacity: 1;
 }
