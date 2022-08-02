@@ -61,7 +61,6 @@ class AssetRepository
                 "asset.installed_date",
                 "asset.state",
                 "location.name"
-
             )
             ->where("location_id", "=", auth()->user()->location_id)
             ->where('asset.id', $id)
