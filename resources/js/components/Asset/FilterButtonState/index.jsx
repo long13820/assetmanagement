@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dropdown, Form } from 'react-bootstrap';
 import { HiFilter } from 'react-icons/hi';
 import PropTypes from 'prop-types';
@@ -19,6 +19,14 @@ export default function FilterButtonState(props) {
   };
 
   var stateCheck = checkAll ? ['All'] : props.currentFilter;
+  useEffect(() => {
+    if (stateCheck == '') {
+      setCheckAll(true);
+      props.setAllState('Available,Not Available,Assigned,Waiting for recycling,Recycled');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateCheck]);
+
   return (
     <Dropdown>
       <Dropdown.Toggle className="filter-button btn-asset d-flex align-items-center justity-content-center">
@@ -84,6 +92,7 @@ export default function FilterButtonState(props) {
 }
 
 FilterButtonState.propTypes = {
-  currentFilter: PropTypes.array,
+  currentFilter: PropTypes.any,
   setCurrentFilter: PropTypes.func,
+  setAllState: PropTypes.any,
 };

@@ -19,7 +19,7 @@ export default function AssignmentTable(props) {
   };
 
   const handleSort = (key, valueAsc, valueDesc) => {
-    const tempSort = JSON.parse(JSON.stringify(props.sort));
+    let tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
 
@@ -68,6 +68,7 @@ export default function AssignmentTable(props) {
     }
 
     if (!valueAsc && valueDesc) {
+      tempSort = [];
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = false;
       tempTableHeader.forEach((_, index) => {

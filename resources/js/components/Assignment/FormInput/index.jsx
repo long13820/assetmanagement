@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { BsSearch } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -9,6 +9,7 @@ import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 import * as yup from 'yup';
 
+import { editAssetById } from '../../../api/Asset/assetAPI';
 import { getAllAssets, handleCreate } from '../../../api/Assignment';
 import { getAllUsers } from '../../../api/User';
 import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
@@ -32,10 +33,11 @@ const schema = yup
   .object({
     asset_name: yup.string().required(),
     user_name: yup.string().required(),
+    note: yup.string(),
     assigned_date: yup
       .date()
-      .required()
-      .min(new Date(Date.now() - 86400000)),
+      .min(new Date(Date.now() - 86400000))
+      .required(),
   })
   .required();
 export default function FormInput(props) {
@@ -49,16 +51,18 @@ export default function FormInput(props) {
   const [asset, setAsset] = useState([]);
   const [totalRecord, setTotalRecord] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(0);
-
   const dispatch = useDispatch();
-
   const handleStateModalAsset = (value) => {
     if (value === 'save') {
       setFlagSave(1);
-      setValue('asset_name', currentAssetName.name);
+      setValue('asset_name', currentAssetName.name, {
+        shouldValidate: true,
+      });
     }
     if (value === 'close' && flagSave === 0) {
-      setValue('asset_name', '');
+      setValue('asset_name', '', {
+        shouldValidate: true,
+      });
     }
     setShowAsset(false);
   };
@@ -66,10 +70,14 @@ export default function FormInput(props) {
   const handleStateModalUser = (value) => {
     if (value === 'save') {
       setFlagSaveUser(1);
-      setValue('user_name', currentUserName.name);
+      setValue('user_name', currentUserName.name, {
+        shouldValidate: true,
+      });
     }
     if (value === 'close' && flagSaveUser === 0) {
-      setValue('user_name', '');
+      setValue('user_name', '', {
+        shouldValidate: true,
+      });
     }
     setShowUser(false);
   };
@@ -79,7 +87,9 @@ export default function FormInput(props) {
     if (flagSave === 0) {
       dispatch(setAssetName(''));
       setCurrentAssetName({});
-      setValue('asset_name', '');
+      setValue('asset_name', '', {
+        shouldValidate: true,
+      });
     }
     handleGetAssets();
   };
@@ -89,7 +99,9 @@ export default function FormInput(props) {
     if (flagSaveUser === 0) {
       dispatch(setUserName(''));
       setCurrentUserName({});
-      setValue('user_name', '');
+      setValue('user_name', '', {
+        shouldValidate: true,
+      });
     }
     handleGetUsers();
   };
@@ -113,20 +125,18 @@ export default function FormInput(props) {
   };
 
   const admin = useSelector((state) => state.app.user);
-
   const {
     register,
     handleSubmit,
     setValue,
-    control,
     formState: { isValid },
   } = useForm({
     mode: 'onChange',
-    TextField: '',
-    resolver: yupResolver(schema),
+    reValidateMode: 'onChange',
     defaultValues: {
-      assigned_date: formatDate(new Date(Date.now()), 'yyyy-MM-DD'),
+      assigned_date: formatDate(new Date(), 'yyyy-MM-DD'),
     },
+    resolver: yupResolver(schema),
   });
 
   const handleCurrentSetAssetName = (name, id, code) => {
@@ -138,7 +148,6 @@ export default function FormInput(props) {
         id,
       };
       setCurrentAssetName({ ...obj });
-      setValue('asset_name', name);
       return;
     }
     if (Object.keys(currentAssetName).length > 0) {
@@ -146,7 +155,6 @@ export default function FormInput(props) {
         dispatch(setAssetName(''));
         setCurrentAssetName({});
         dispatch(setAssetCode(''));
-        setValue('asset_name', '');
         return;
       }
       dispatch(setAssetCode(code));
@@ -156,7 +164,6 @@ export default function FormInput(props) {
         id,
       };
       setCurrentAssetName({ ...obj });
-      setValue('asset_name', name);
       return;
     }
   };
@@ -171,7 +178,6 @@ export default function FormInput(props) {
         code,
       };
       setCurrentUserName({ ...obj });
-      setValue('user_name', name);
       return;
     }
     if (Object.keys(currentUserName).length > 0) {
@@ -179,7 +185,6 @@ export default function FormInput(props) {
         dispatch(setUserName(''));
         dispatch(setStaffCode(''));
         setCurrentUserName({});
-        setValue('user_name', '');
         return;
       }
       dispatch(setStaffCode(code));
@@ -189,20 +194,22 @@ export default function FormInput(props) {
         id,
       };
       setCurrentUserName({ ...obj });
-      setValue('user_name', name);
       return;
     }
   };
 
   const onSubmit = async (data) => {
+    BlockUI('#root');
+    data.assigned_date = formatDate(data.assigned_date, 'yyyy-MM-DD');
     const response = await handleCreate({
       ...data,
       user_id: currentUserName.id,
       asset_id: currentAssetName.id,
       admin_id: admin.id,
     });
-
-    if (response === 201) {
+    const stateField = { state: 'Not Available' };
+    const response_2 = await editAssetById(currentAssetName.id, stateField);
+    if (response === 201 && response_2 === 200) {
       SuccessToast('Create assignment is successfully', 3000);
       props.backtoManageAssignment('created_at');
     } else {
@@ -231,10 +238,14 @@ export default function FormInput(props) {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={() => handleStateModalUser('save')}>
+          <Button variant="danger" onClick={() => handleStateModalUser('save')} className="font-weight-bold">
             Save
           </Button>
-          <Button variant="outline-secondary" onClick={() => handleStateModalUser('close')} className="ms-3">
+          <Button
+            variant="outline-secondary"
+            onClick={() => handleStateModalUser('close')}
+            className="ms-3 font-weight-bold"
+          >
             Cancel
           </Button>
         </Modal.Footer>
@@ -257,10 +268,14 @@ export default function FormInput(props) {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={() => handleStateModalAsset('save')}>
+          <Button variant="danger" onClick={() => handleStateModalAsset('save')} className="font-weight-bold">
             Save
           </Button>
-          <Button variant="outline-secondary" onClick={() => handleStateModalAsset('close')} className="ms-3">
+          <Button
+            variant="outline-secondary"
+            onClick={() => handleStateModalAsset('close')}
+            className="ms-3 font-weight-bold"
+          >
             Cancel
           </Button>
         </Modal.Footer>
@@ -282,7 +297,7 @@ export default function FormInput(props) {
               </Col>
             </Row>
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Group className="mb-3">
             <Row>
               <Col md={3} xs={12}>
                 <Form.Label className="font-weight-bold">Asset</Form.Label>
@@ -297,7 +312,7 @@ export default function FormInput(props) {
               </Col>
             </Row>
           </Form.Group>
-          <Form.Group className="mb-3" controlId="formBasicEmail">
+          <Form.Group className="mb-3">
             <Row>
               <Col md={3} xs={12}>
                 <Form.Label className="font-weight-bold">Assigned Date</Form.Label>
@@ -313,25 +328,14 @@ export default function FormInput(props) {
                 <Form.Label className="font-weight-bold">Note</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <Controller
-                  control={control}
-                  name="note"
-                  render={({ field }) => (
-                    <Form.Control
-                      name="note"
-                      as="textarea"
-                      selected={field.value}
-                      onChange={(date) => field.onChange(date)}
-                    />
-                  )}
-                />
+                <Form.Control as="textarea" {...register('note')} />
               </Col>
             </Row>
           </Form.Group>
           {isValid}
           <div className="d-flex justify-content-end mt-4">
             <Button className="font-weight-bold" variant="danger" disabled={!isValid} type="submit">
-              &nbsp;Save&nbsp;
+              Save
             </Button>
             <Button
               className="font-weight-bold ms-3"
@@ -350,6 +354,12 @@ export default function FormInput(props) {
               (*)&nbsp;<span className="font-weight-bold">Assigned date</span>&nbsp;must be&nbsp;
               <span className="font-weight-bold">current</span>
               &nbsp;or&nbsp;<span className="font-weight-bold">future date</span>
+            </small>
+          </div>
+          <div className="mt-3 text-justify">
+            <small>
+              (*)&nbsp;<span className="font-weight-bold">User, Asset, Assigned date</span>&nbsp;is&nbsp;
+              <span className="font-weight-bold">required</span>
             </small>
           </div>
         </Form>

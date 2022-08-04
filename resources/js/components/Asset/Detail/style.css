@@ -9,5 +9,25 @@
 }
 .show-assset-list-detail-item {
   margin-right: var(--24px);
-  width: 30% !important;
+  width: 20% !important;
+}
+.list-group-item-detail-table {
+  width: 100% !important;
+}
+.modal-dialog-centered-asset .modal-dialog-centered {
+  max-width: 650px !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+.custom-asset-detail-text {
+  word-break: break-word !important;
+}
+.modal-content-asset-detail .table-responsive {
+  max-height: 250px;
+}
+.modal-content-asset-detail .table-responsive tbody {
+  overflow-y: scroll;
+}
+.header-asset-detail-table {
+  border-bottom: 1px solid rgb(104, 100, 100);
 }

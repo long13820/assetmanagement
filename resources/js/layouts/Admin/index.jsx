@@ -9,6 +9,7 @@ import FirstLoginChangePassword from '../../components/Auth/FirstLoginChangePass
 import Drawer from '../../components/Layouts/Drawer';
 import Header from '../../components/Layouts/Header';
 import ListGroup from '../../components/Layouts/ListGroup';
+import ModalNotification from '../../components/Layouts/Modal/ModalPasswordNotification/ModalPasswordNotification';
 import { expiredTokenSelector, userSelector } from '../../redux/selectors';
 
 import './style.css';
@@ -20,6 +21,7 @@ export default function AdminLayout(props) {
   const { slot } = props;
 
   const [show, setShow] = React.useState(true);
+  const [passwordNotification, setPasswordNotification] = React.useState(false);
 
   const user = useSelector(userSelector);
 
@@ -44,8 +46,17 @@ export default function AdminLayout(props) {
         {slot}
       </main>
       {user?.password_change_at === null && (
-        <FirstLoginChangePassword show={show} setStateModal={() => false} closeModal={() => setShow(false)} />
+        <FirstLoginChangePassword
+          show={show}
+          setStateModal={() => false}
+          closeModal={() => setShow(false)}
+          openNotification={() => setPasswordNotification(true)}
+        />
       )}
+      <ModalNotification
+        changePasswordSuccess={passwordNotification}
+        setStateModal={() => setPasswordNotification(false)}
+      />
       {expiredToken && <ExpiredToken show={expiredToken} setStateModal={() => true} />}
     </>
   );

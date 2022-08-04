@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaPen, FaTimesCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
@@ -12,6 +11,7 @@ import { currentPageSelector } from '../../../redux/selectors';
 import {
   assetFilterSelector,
   assetListSelector,
+  assetLoadingAssetFilterSelector,
   assetLoadingSelector,
   assetTotalRecordPageSelector,
 } from '../../../redux/selectors/asset/asset.selector';
@@ -20,11 +20,11 @@ import { BlockUI } from '../../Layouts/Notiflix';
 import Skeleton from '../../Layouts/Skeleton';
 import Table from '../../Layouts/Table';
 import ShowDetailAsset from '../Detail';
-export default function AssetTable(props) {
+
+export default function AssetTable() {
   const [renderTableHeader] = React.useState([...asset_table_header]);
   const current_page = useSelector(currentPageSelector);
   const assetFilterState = useSelector(assetFilterSelector);
-  // console.log('er', assetFilterState['filter[category]']);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(
@@ -41,7 +41,6 @@ export default function AssetTable(props) {
     );
     dispatch(categoryAction.fetchListCategory());
   }, [dispatch, current_page, assetFilterState]);
-
   // Sort
   const initialStateSortAssets = {
     1: 'sort[asset_code]',
@@ -49,7 +48,10 @@ export default function AssetTable(props) {
     3: 'sort[category_name]',
     4: 'sort[state]',
   };
+
   const handleSortState = (sortTitle) => {
+    dispatch(assetAction.setLoadingFilter(true));
+    dispatch(assetAction.setSortHeader(false));
     switch (sortTitle) {
       case 1: {
         const sortOld1 = assetFilterState[initialStateSortAssets[sortTitle]];
@@ -120,35 +122,49 @@ export default function AssetTable(props) {
   const [showDetail, setShowDetailAsset] = useState(false);
 
   const showDetailAsset = (dataId) => {
-    BlockUI('.main');
-    dispatch(assetAction.fetctDetailAsset(dataId));
-    Notiflix.Block.remove('.main');
-
-    setShowDetailAsset(true);
+    BlockUI('#root', 'fixed');
+    setTimeout(function () {
+      dispatch(assetAction.fetctDetailAsset(dataId));
+      Notiflix.Block.remove('#root');
+      setShowDetailAsset(true);
+    }, 200);
   };
-  let navigate = useNavigate();
 
   const handleEditAsset = (e, dataId) => {
-    e.stopPropagation();
-    let path = `/edit-asset/${dataId}`;
-    navigate(path);
-    dispatch(assetAction.setIsEdit(true));
+    // e.stopPropagation();
+    dispatch(
+      assetAction.setIsEdit({
+        isEdit: true,
+        idAsset: dataId,
+      })
+    );
     dispatch(setSubTitle('Edit asset'));
   };
 
   const renderTableBody = () => {
-    return body_sample_data.length > 0 ? (
+    return (
+      body_sample_data.length > 0 &&
       body_sample_data.map((item, index) => {
         return (
-          <tr key={index + 1} onClick={() => showDetailAsset(item.id)}>
+          <tr key={index + 1} onClick={() => showDetailAsset(item.id)} className="cursor-pointer">
             <td>{item.asset_code}</td>
             <td>{item.asset_name}</td>
             <td>{item.category_name}</td>
             <td>
               <p
-                className={`${
-                  item.state === 'Assigned' ? 'bg-red-100 text-red' : 'bg-blue-100 text-blue'
-                } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
+                className={`${(() => {
+                  if (item.state === 'Assigned') {
+                    return 'bg-red-100 text-red';
+                  } else if (item.state === 'Waiting for recycling') {
+                    return 'bg-warning-100 text-warning';
+                  } else if (item.state === 'Recycled') {
+                    return 'bg-infor-100 text-info';
+                  } else if (item.state === 'Available') {
+                    return 'bg-success-100 text-success';
+                  } else {
+                    return 'bg-blue-100 text-blue';
+                  }
+                })()} font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
               >
                 {item.state}
               </p>
@@ -176,21 +192,20 @@ export default function AssetTable(props) {
           </tr>
         );
       })
-    ) : (
-      <tr>
-        <td colSpan={4} className="text-danger text-center font-weight-bold">
-          <NotFoundData />
-        </td>
-      </tr>
     );
   };
   const statusList = useSelector(assetLoadingSelector);
+  const statusFilterLoading = useSelector(assetLoadingAssetFilterSelector);
   return (
     <>
-      {statusList == true ? (
-        <Skeleton column={6} />
-      ) : (
+      {statusFilterLoading == true ? BlockUI('#root', 'fixed') : Notiflix.Block.remove('#root')}
+      {statusList == true && statusFilterLoading == false && <Skeleton column={6} />}
+      {statusFilterLoading == false && statusList == false && body_sample_data.length > 0 ? (
         <Table tableHeader={renderTableHeader} tableBody={renderTableBody()} tableSort={handleSortState} />
+      ) : (
+        <div className="text-danger text-center font-weight-bold">
+          {statusFilterLoading == false && statusList == false && <NotFoundData />}
+        </div>
       )}
 
       <ShowDetailAsset show={showDetail} setStateModal={() => setShowDetailAsset(false)} />

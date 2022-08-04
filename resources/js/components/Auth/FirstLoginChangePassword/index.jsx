@@ -35,7 +35,7 @@ export default function ChangePassword(props) {
     let date_of_birth = formatDate(user.date_of_birth, 'DD/MM/YYYY').split('/');
     date_of_birth = date_of_birth.join('');
     data.old_password = `${user.username}@${date_of_birth}`;
-    const status = await changePassword(data);
+    const status = await changePassword(data, 'no_notification');
     switch (status) {
       case 403:
         break;
@@ -55,6 +55,7 @@ export default function ChangePassword(props) {
           dispatch(setUser(result));
         });
         props.closeModal();
+        props.openNotification();
     }
   };
 
@@ -113,4 +114,5 @@ ChangePassword.propTypes = {
   show: PropTypes.bool.isRequired,
   setStateModal: PropTypes.func.isRequired,
   closeModal: PropTypes.func.isRequired,
+  openNotification: PropTypes.func.isRequired,
 };

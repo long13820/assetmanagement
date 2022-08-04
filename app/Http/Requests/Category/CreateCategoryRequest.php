@@ -2,7 +2,11 @@
 
 namespace App\Http\Requests\Category;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class CreateCategoryRequest extends FormRequest
 {
@@ -25,7 +29,8 @@ class CreateCategoryRequest extends FormRequest
     {
 
         return [
-            "category_name" => "required"
+            "category_name" => "required|unique:categories,category_name",
+            "category_prefix" => "required"
         ];
     }
 
@@ -39,5 +44,18 @@ class CreateCategoryRequest extends FormRequest
         return [
             "required" => ":Attribute is required!",
         ];
+    }
+
+    public function failedValidation(Validator $validator)
+    {
+        $errors = (new ValidationException($validator))->errors();
+        throw new HttpResponseException(response()->json(
+            [
+                'error' => $errors,
+                'status_code' => 409,
+                'messages' => 'Oops... Validate Request',
+            ],
+            Response::HTTP_CONFLICT
+        ));
     }
 }

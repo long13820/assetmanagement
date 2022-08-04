@@ -28,8 +28,8 @@ class CategoryRepository
 
     public function store($request)
     {
-        $request['category_prefix'] = "";
-        $category = $this->query->create($request);
-        return $this->query->find($category["id"]);
+        $category = Category::create($request);
+
+        return $category;
     }
 }

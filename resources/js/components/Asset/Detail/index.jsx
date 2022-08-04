@@ -2,20 +2,14 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/interactive-supports-focus */
 import { useEffect } from 'react';
-import { ListGroup } from 'react-bootstrap';
+import { Modal, Table } from 'react-bootstrap';
 import { FaTimes } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { isEmpty } from 'lodash';
 import PropTypes from 'prop-types';
 
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
-import {
-  assetAssignmentDetailSelector,
-  assetDetailSelector,
-  assetLoadingDetailSelector,
-} from '../../../redux/selectors/asset/asset.selector';
-import Modal from '../../Layouts/Modal';
-import Table from '../../Layouts/Table';
+import { assetAssignmentDetailSelector, assetDetailSelector } from '../../../redux/selectors/asset/asset.selector';
 
 import './style.css';
 export default function ShowDetailAsset(props) {
@@ -43,7 +37,6 @@ export default function ShowDetailAsset(props) {
   ];
   const dispatch = useDispatch();
   const checkAssetDetail = useSelector(assetDetailSelector);
-  const assetloadingDetailSelector = useSelector(assetLoadingDetailSelector);
   const detailAsset = checkAssetDetail != undefined && checkAssetDetail[0];
   const id = detailAsset != undefined ? detailAsset.id : '';
   const setStateModal = (value) => {
@@ -67,7 +60,7 @@ export default function ShowDetailAsset(props) {
       return listAssignments.map((item, index) => {
         return (
           <tr key={index + 1}>
-            <td>{detailAsset != undefined && detailAsset.asset_name}</td>
+            <td>{detailAsset != undefined && detailAsset.installed_date}</td>
             <td>{item.assigned_to}</td>
             <td>{item.assigned_by}</td>
             <td>{item.assigned_date}</td>
@@ -77,7 +70,7 @@ export default function ShowDetailAsset(props) {
     } else {
       return (
         <tr>
-          <td colSpan={4} className="text-danger text-center font-weight-bold">
+          <td colSpan={4} className="text-danger text-center font-weight-bold p-3">
             There is not history !
           </td>
         </tr>
@@ -86,76 +79,110 @@ export default function ShowDetailAsset(props) {
   };
 
   return (
-    !assetloadingDetailSelector && (
+    <>
       <Modal
         show={props.show}
-        setStateModal={setStateModal}
-        elementModalTitle={
-          <p className="d-flex align-items-center w-100">
-            <span className="flex-grow-1">Detailed Asset Information</span>
-            <span onClick={() => setStateModal()} className="cursor-pointer">
-              <FaTimes />
-            </span>
-          </p>
-        }
-        elementModalBody={
-          <>
-            <div className="modal-content-asset-detail">
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Asset Code</div>
-                  <div>{detailAsset != undefined && detailAsset.asset_code}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Asset Name</div>
-                  <div>{detailAsset != undefined && detailAsset.asset_name}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Category</div>
-                  <div>{detailAsset != undefined && detailAsset.category_name}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Installed Date</div>
-                  <div>{detailAsset != undefined && detailAsset.installed_date}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">State</div>
-                  <div>{detailAsset != undefined && detailAsset.state}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Location</div>
-                  <div>{detailAsset != undefined && detailAsset.name}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="show-assset-list-detail">
-                  <div className="show-assset-list-detail-item">Specification</div>
-                  <div>{detailAsset != undefined && detailAsset.specification}</div>
-                </ListGroup.Item>
-              </ListGroup>
-              <ListGroup className="list-group-item-detail">
-                <ListGroup.Item className="">
-                  <div className="show-assset-list-detail-item">History</div>
-                  <div>
-                    <Table tableHeader={headerTableHistory} tableBody={renderTableBodyHistory()} />
-                  </div>
-                </ListGroup.Item>
-              </ListGroup>
-            </div>
-          </>
-        }
-      />
-    )
+        onHide={() => {
+          setStateModal();
+        }}
+        dialogClassName="modal-90w"
+        centered
+        className="modal-dialog-centered-asset"
+      >
+        <Modal.Header closeButton className="w-100">
+          <Modal.Title className="w-100">
+            <h5 className=" d-flex text-danger font-weight-bold ">
+              <p className="d-flex align-items-center w-100">
+                <span className="flex-grow-1">Detailed Asset Information</span>
+                <span onClick={() => setStateModal()} className="cursor-pointer">
+                  <FaTimes />
+                </span>
+              </p>
+            </h5>
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="modal-content-asset-detail">
+            <table align="center" border="0" className="table table-bordered mb-0">
+              <tbody>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Asset Code
+                  </td>
+                  <td width="60%" className="pe-0">
+                    {detailAsset?.asset_code}
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Asset Name
+                  </td>
+                  <td width="60%" className="pe-0">
+                    {detailAsset?.asset_name}
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Category
+                  </td>
+                  <td width="60%" className="pe-0">
+                    {detailAsset?.category_name}
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Installed Date
+                  </td>
+                  <td width="60%" className="pe-0">
+                    {detailAsset?.installed_date}
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    State
+                  </td>
+                  <td width="60%" className="pe-0">
+                    {detailAsset?.state}
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Location
+                  </td>
+                  <td width="60%" className="pe-0">
+                    <p>{detailAsset?.name}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    Specification
+                  </td>
+                  <td width="60%" className="pe-0">
+                    <p className="word-break">{detailAsset?.specification}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td width="40%" className="font-weight-bold ps-0">
+                    History
+                  </td>
+                  <td width="60%" />
+                </tr>
+              </tbody>
+            </table>
+            <Table bordered responsive>
+              <thead>
+                <tr>
+                  {headerTableHistory.map((item) => (
+                    <th key={item.id}>{item.name}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>{renderTableBodyHistory()}</tbody>
+            </Table>
+          </div>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 }
 

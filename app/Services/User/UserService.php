@@ -37,8 +37,6 @@ class UserService
 
         if ($result) {
             return $this->apiResponse([], 'success', 'Create User Successfully');
-        } else {
-            return $this->apiResponse([], 'fail', 'Create User Unsuccessfully');
         }
     }
 
@@ -48,8 +46,6 @@ class UserService
 
         if ($result) {
             return $this->apiResponse($result, 'success', 'Update User Successfully');
-        } else {
-            return $this->apiResponse([], 'fail', 'Update User Unsuccessfully');
         }
     }
 }

@@ -2,17 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { FaAngleDown, FaCalendarAlt } from 'react-icons/fa';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 
 import { get, put } from '../../htttpHelper';
+import { assetAction } from '../../redux/reducer/asset/asset.reducer';
+import { assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
 import { formatDate } from '../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../Layouts/Alerts';
 
 import 'react-datepicker/dist/react-datepicker.css';
+import './style.css';
 
-function EditAsset() {
-  const navigate = useNavigate();
+function EditAsset(props) {
+  const dispatch = useDispatch();
 
   const [installedDate, setInstalledDate] = useState('');
   const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
@@ -25,18 +28,19 @@ function EditAsset() {
     categoryName: '',
     state: '',
   });
-  const dataId = useParams();
-  const id = dataId.id;
+  const dataId = useSelector(assetgetIdSelector);
+  const id = dataId;
 
   useEffect(() => {
     fetchAsset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAsset = () => {
     get(`/assets/${id}`)
       .then((res) => {
-        let installedDate = res.data.data[0].installed_date.split('/').reverse().join('-');
-        let object = {
+        const installedDate = res.data.data[0].installed_date.split('/').reverse().join('-');
+        const object = {
           assetName: res.data.data[0].asset_name,
           specification: res.data.data[0].specification,
           installedDate: installedDate,
@@ -76,7 +80,7 @@ function EditAsset() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorNameAsset('');
     setErrorSpeAsset('');
@@ -98,14 +102,34 @@ function EditAsset() {
     delete inputs.assetName;
     delete inputs.categoryName;
 
-    put(`/assets/${id}`, inputs)
+    await put(`/assets/${id}`, inputs)
       .then(() => {
         SuccessToast('Update asset successfully', 3000);
-        navigate('/manage_asset');
       })
       .catch(() => {
         ErrorToast('Update asset unsuccessfully', 3000);
       });
+
+    dispatch(
+      assetAction.setIsEdit({
+        isEdit: false,
+      })
+    );
+    dispatch(
+      assetAction.setFilter({
+        'filter[state]': 'Available,Not Available,Assigned,Waiting for recycling,Recycled',
+        'filter[category]': undefined,
+        'sort[asset_code]': undefined,
+        'sort[asset_name]': undefined,
+        'sort[category_name]': undefined,
+        'sort[state]': undefined,
+        'sort[updated_at]': 'desc',
+      })
+    );
+    dispatch(assetAction.setSortHeader(true));
+    dispatch(assetAction.setLoadingFilter(true));
+    // eslint-disable-next-line react/prop-types
+    props.filterAll(true);
   };
 
   const openDatePicker = () => {
@@ -114,8 +138,7 @@ function EditAsset() {
 
   return (
     <>
-      <h5 className="text-danger font-weight-bold mb-3">Edit Asset</h5>
-      <div className="edit_form d-flex justify-content-center">
+      <div className="asset_edit_form d-flex justify-content-center">
         <Form onSubmit={handleSubmit}>
           <table align="center" border="0" className="table table-bordered mb-0">
             <tbody>
@@ -126,6 +149,7 @@ function EditAsset() {
                 <td width="70%">
                   <Form.Control
                     name="assetName"
+                    id="edit-asset-name"
                     type="text"
                     required
                     onChange={handleOnChange}
@@ -139,13 +163,12 @@ function EditAsset() {
                   <p className="font-weight-bold">Category</p>
                 </td>
                 <td width="70%">
-                  <div className="boder_search" style={{ background: 'rgb(239 241 245)' }}>
-                    <div className="title_name">{inputs.categoryName}</div>
-                    <FaAngleDown className="angledown" />
+                  <div className="aef-category-input">
+                    <Form.Control id="edit-asset-category" disabled defaultValue={inputs.categoryName} />
+                    <FaAngleDown className="aefci-icon" />
                   </div>
                 </td>
               </tr>
-
               <tr>
                 <td width="30%">
                   <p className="font-weight-bold">Specification</p>
@@ -153,6 +176,7 @@ function EditAsset() {
                 <td width="70%">
                   <Form.Control
                     name="specification"
+                    id="edit-asset-specification"
                     as="textarea"
                     required
                     onChange={handleOnChange}
@@ -161,8 +185,7 @@ function EditAsset() {
                   <span id="error">{errorSpeAsset}</span>
                 </td>
               </tr>
-
-              <tr required controlId="installedDate">
+              <tr required>
                 <td width="30%">
                   <p className="font-weight-bold">Installed Date</p>
                 </td>
@@ -246,24 +269,21 @@ function EditAsset() {
                   />
                 </td>
               </tr>
-
-              <tr>
-                <td width="30%" />
-                <td width="70%">
-                  <Button variant="danger" type="submit" disabled={!preSave()}>
-                    Save
-                  </Button>
-
-                  <Link className="btn btn-outline-secondary" style={{ marginLeft: '40px' }} to="/manage_asset">
-                    Cancel
-                  </Link>
-                </td>
-              </tr>
             </tbody>
           </table>
+          <div className="d-flex justify-content-end mt-3">
+            <Button id="edit-asset-save btn" variant="danger" type="submit" disabled={!preSave()}>
+              Save
+            </Button>
+            <button
+              id="edit-asset-cancel-btn"
+              className="btn btn-outline-secondary ms-3"
+              onClick={() => dispatch(assetAction.setIsEdit(false))}
+            >
+              Cancel
+            </button>
+          </div>
         </Form>
-
-        {/* <ModalNotification title={errorTitle} content={errorMessage} show={showError} setShow={setShowError} /> */}
       </div>
     </>
   );

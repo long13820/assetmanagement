@@ -8,7 +8,7 @@ import Index from './index';
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
+    <BrowserRouter forceRefresh={true}>
       <Index />
     </BrowserRouter>
   </Provider>,

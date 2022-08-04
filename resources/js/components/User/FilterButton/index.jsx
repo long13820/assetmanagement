@@ -27,6 +27,7 @@ export default function FilterButton(props) {
               className="mx-4 font-weight-bold"
               label="All"
               checked={props.currentFilter === 'All'}
+              onChange={() => handleFilter('All')}
             />
           </Dropdown.Item>
           <Dropdown.Item onClick={() => handleFilter('Admin')}>
@@ -36,6 +37,7 @@ export default function FilterButton(props) {
               className="mx-4 my-2 font-weight-bold"
               label="Admin"
               checked={props.currentFilter === 'Admin'}
+              onChange={() => handleFilter('Admin')}
             />
           </Dropdown.Item>
           <Dropdown.Item onClick={() => handleFilter('Staff')}>
@@ -45,6 +47,7 @@ export default function FilterButton(props) {
               className="mx-4 font-weight-bold"
               label="Staff"
               checked={props.currentFilter === 'Staff'}
+              onChange={() => handleFilter('Staff')}
             />
           </Dropdown.Item>
         </Form>

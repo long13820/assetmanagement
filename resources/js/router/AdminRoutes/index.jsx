@@ -13,7 +13,7 @@ import HomePage from '../../pages/Home';
 import LoginPage from '../../pages/Login';
 import UserPage from '../../pages/User';
 import { setExpiredToken, setIsLogin, setUser } from '../../redux/reducer/app/app.reducer';
-import { isLoginSelector, userSelector } from '../../redux/selectors';
+import { isLoginSelector, keyAssignmentSelector, keyUserSelector, userSelector } from '../../redux/selectors';
 import ProtectedRoutes from '../ProtectedRoutes';
 import PublicRoutes from '../PublicRoutes';
 
@@ -21,6 +21,9 @@ export default function AdminRoutes() {
   const dispatch = useDispatch();
   const isAuthenticate = useSelector(isLoginSelector);
   const user = useSelector(userSelector);
+  const keyUser = useSelector(keyUserSelector);
+  const keyAsset = useSelector((state) => state.asset.key);
+  const keyAssignment = useSelector(keyAssignmentSelector);
 
   React.useEffect(() => {
     dispatch(setIsLogin(checkLogin()));
@@ -41,9 +44,9 @@ export default function AdminRoutes() {
       {user?.type === 'Admin' && (
         <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
           <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
-          <Route path="/manage_user" element={<AdminLayout slot={<UserPage />} />} />
-          <Route path="/manage_asset" element={<AdminLayout slot={<Asset />} />} />
-          <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage />} />} />
+          <Route path="/manage_user" element={<AdminLayout slot={<UserPage key={keyUser} />} />} />
+          <Route path="/manage_asset" element={<AdminLayout slot={<Asset key={keyAsset} />} />} />
+          <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage key={keyAssignment} />} />} />
         </Route>
       )}
 

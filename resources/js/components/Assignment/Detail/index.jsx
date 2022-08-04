@@ -53,7 +53,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.specification}</p>
+                  <p className="word-break">{props.detail?.specification}</p>
                 </td>
               </tr>
               <tr>

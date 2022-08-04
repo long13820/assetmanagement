@@ -42,6 +42,7 @@ export default function User() {
   React.useEffect(() => {
     dispatch(setResetState());
     dispatch(setTitle('Manage User'));
+    dispatch(setSubTitle(''));
     handleGetAllUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

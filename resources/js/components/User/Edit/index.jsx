@@ -4,6 +4,8 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { differenceInYears } from 'date-fns';
+import moment from 'moment';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
@@ -51,6 +53,15 @@ function UserEdit(props) {
     control,
     name: 'date_of_birth',
   });
+
+  const joined_date = useWatch({
+    control,
+    name: 'joined_date',
+  });
+
+  const checkValidEighteen = () => {
+    return differenceInYears(new Date(joined_date), new Date(date_of_birth)) >= 18;
+  };
 
   const onSubmit = async (data) => {
     BlockUI('#root', 'fixed');
@@ -112,7 +123,17 @@ function UserEdit(props) {
                 <p className="font-weight-bold">Date of birth</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_date_of_birth" type="date" {...register('date_of_birth')} />
+                <Form.Control
+                  id="user_date_of_birth"
+                  type="date"
+                  {...register('date_of_birth')}
+                  className={`${
+                    moment(date_of_birth, 'YYYY-MM-DD').isValid() &&
+                    ['typeError', 'max', 'date_of_birth'].includes(errors?.date_of_birth?.type)
+                      ? 'border-red'
+                      : ''
+                  }`}
+                />
                 <small className="text-red font-weight-semi">
                   {errors?.date_of_birth?.type === 'typeError' && errors?.date_of_birth?.message}
                   {errors?.date_of_birth?.type === 'max' && errors?.date_of_birth?.message}
@@ -148,11 +169,23 @@ function UserEdit(props) {
                 <p className="font-weight-bold">Joined Date</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_joined_date" type="date" {...register('joined_date')} />
+                <Form.Control
+                  id="user_joined_date"
+                  type="date"
+                  {...register('joined_date')}
+                  className={`${
+                    (moment(joined_date, 'YYYY-MM-DD').isValid() &&
+                      ['typeError', 'min', 'joined_date'].includes(errors?.joined_date?.type)) ||
+                    checkValidEighteen() === false
+                      ? 'border-red'
+                      : ''
+                  }`}
+                />
                 <small className="text-red font-weight-semi">
                   {date_of_birth !== '' && errors?.joined_date?.type === 'min' && errors?.joined_date?.message}
                   {date_of_birth !== '' &&
                     errors?.joined_date?.type === 'joined_date_2' &&
+                    checkValidEighteen() === false &&
                     errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'typeError' && errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'joined_date' && errors?.joined_date?.message}
@@ -188,14 +221,16 @@ function UserEdit(props) {
                 />
               </td>
             </tr>
-            <tr>
-              <td width="30%">
-                <p className="font-weight-bold">Location</p>
-              </td>
-              <td width="70%">
-                <Form.Control defaultValue={userDetail.user_location.name} id="user_location" type="text" disabled />
-              </td>
-            </tr>
+            {userDetail.type === 'Admin' && (
+              <tr>
+                <td width="30%">
+                  <p className="font-weight-bold">Location</p>
+                </td>
+                <td width="70%">
+                  <Form.Control defaultValue={userDetail.user_location.name} id="user_location" type="text" disabled />
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
         <div className="d-flex justify-content-end p-2">

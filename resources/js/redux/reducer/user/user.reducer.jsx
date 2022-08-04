@@ -5,11 +5,15 @@ import { formatDate } from '../../../utils/formatDate';
 export const userReducer = createSlice({
   name: 'user',
   initialState: {
+    key: 0,
     isAdd: false,
     isEdit: false,
     user: {},
   },
   reducers: {
+    setKey: (state, action) => {
+      state.key = action.payload;
+    },
     setResetState: (state) => {
       state.isAdd = false;
       state.isEdit = false;
@@ -30,5 +34,5 @@ export const userReducer = createSlice({
   },
 });
 
-export const { setIsAdd, setIsEdit, setUser, setResetState } = userReducer.actions;
+export const { setIsAdd, setIsEdit, setUser, setResetState, setKey } = userReducer.actions;
 export default userReducer.reducer;

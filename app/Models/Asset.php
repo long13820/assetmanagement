@@ -57,7 +57,7 @@ class Asset extends Model
             ->count();
 
         $assetCode =
-            $categoryPrefix . str_pad($count + 1, 4, 0, STR_PAD_LEFT);
+            $categoryPrefix . str_pad($count + 1, 6, 0, STR_PAD_LEFT);
 
         return Attribute::make(
             set: fn () => $assetCode,
@@ -91,7 +91,12 @@ class Asset extends Model
                 $sortValue = '';
 
                 foreach ($request->query("sort") as $key => $value) {
-                    $sortBy = $key;
+                    if ($key !== "category_name") {
+                        $sortBy = "asset." . $key;
+                    } else {
+                        $sortBy =  $key;
+                    }
+
                     $sortValue = $value;
                 }
 

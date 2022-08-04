@@ -25,3 +25,19 @@
 .bg-gray-100 {
   background-color: var(--bs-gray-100);
 }
+
+.border-red {
+  border-color: var(--bs-red);
+}
+
+.bg-success-100 {
+  background-color: var(--bs-success-100);
+}
+
+.bg-warning-100 {
+  background-color: var(--bs-warning-100);
+}
+
+.bg-infor-100 {
+  background-color: var(--bs-infor-100);
+}

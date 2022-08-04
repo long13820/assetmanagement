@@ -20,6 +20,9 @@ export default function FilterButtonCategory(props) {
     }
   };
   var categoryCheck = checkAll ? [0] : props.currentFilter;
+  if (categoryCheck == '') {
+    setCheckAll(true);
+  }
   const [...listCategory] = useSelector(categoryListSelector);
   return (
     <Dropdown>
@@ -29,11 +32,11 @@ export default function FilterButtonCategory(props) {
           <HiFilter />
         </div>
       </Dropdown.Toggle>
-      <Dropdown.Menu>
+      <Dropdown.Menu style={{ height: '248px', overflowY: 'auto' }}>
         <Form>
           <Form.Check
             type="checkbox"
-            id="checkbox-all"
+            id="checkbox-all-cate"
             className="mx-4 font-weight-bold"
             label="All"
             checked={checkAll ? true : false}

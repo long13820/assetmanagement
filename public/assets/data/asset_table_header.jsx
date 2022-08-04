@@ -33,6 +33,5 @@ export const asset_table_header = [
   },
   {
     id: 5,
-    name: '',
   },
 ];

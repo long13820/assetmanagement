@@ -1,185 +1,220 @@
-.edit_form form {
-    width: 500px;
-    background: var(--bs-white);
-    padding: var(--24px);
-    border-radius: var(--6px);
-    box-shadow: var(--box-shadow);
-  }
+.asset-create-form form {
+  width: 700px;
+  background: var(--bs-white);
+  padding: var(--24px);
+  border-radius: var(--6px);
+  box-shadow: var(--box-shadow);
+}
 
-  .edit_form form table tbody tr td {
-    vertical-align: middle;
-  }
+.asset-create-form form table tbody tr td {
+  vertical-align: middle;
+}
+
 .DropDown {
-    /* position: absolute;
-    overflow: visible; */
-    /* width: 280px;
-    height: 86px; */
-    /* left: 98px;
-    top: 0px; */
-    border: solid 2px rgb(184, 182, 182);
-    border-radius: 5px;
-  }
+  border: solid 2px rgb(184, 182, 182);
+  border-radius: 5px;
+}
 
-  /* .dropdown {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    border: solid 2px rgb(184, 182, 182);
-    border-radius: 5px;
-    border-style: none;
-  } */
+.dropdown-content {
+  display: block;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 260px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  padding: 12px 16px;
+  z-index: 1;
+  border: solid 2px rgb(184, 182, 182);
+  border-radius: 5px;
+}
 
-  .dropdown-content {
-    display: block;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 260px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    padding: 12px 16px;
-    z-index: 1;
-    border: solid 2px rgb(184, 182, 182);
-    border-radius: 5px;
-  }
-
-  /* .dropdown:hover .dropdown-content {
+/* .dropdown:hover .dropdown-content {
     display: block;
   } */
-  .category_area {
-    display: flex;
-  }
-  .category_input {
-    width: 100%;
-  }
-  .boder_search {
-    position: relative;
-    width: 100%;
-    height: 32px;
-    border-radius: 5px;
-    border: #ced4da solid 1px;
-    line-height: 1.5;
-    cursor: pointer;
-    padding: 5px;
-  }
-  .angledown {
-    position: absolute;
-    right: 6px;
-    top: 6px;
-    font-size: 20px;
-  }
-  .check {
-    margin-right: 10px;
-    color: #dc3545;
-    cursor: pointer;
-  }
-  .times {
-    margin-right: 15px;
-    cursor: pointer;
-  }
-  .list_below ul li {
-    padding: 3px 0px;
-    background: rgb(240, 237, 233);
-    text-decoration: none;
-    list-style: none;
-    padding-left: 5px;
-  }
-  .category_item:hover {
-    background: #dc3545;
-    width:100%;
-  }
-  .list_below {
-    position: relative;
-    width: 100%;
-    z-index: 1;
-  }
-  #list {
-    padding-left: 0px;
-    position: absolute;
-    border: solid 2px rgb(226, 217, 217);
-    border-radius: 5px;
-    width: 100%;
+.category_area {
+  display: flex;
+}
 
+.category_input {
+  width: 100%;
+}
 
-  }
-  .add_user {
-    display: flex;
-    justify-content: space-between;
-    cursor: text;
+.boder_search {
+  position: relative;
+  width: 100%;
+  height: 32px;
+  border-radius: 5px;
+  border: #ced4da solid 1px;
+  line-height: 1.5;
+  cursor: pointer;
+  padding: 5px;
+}
 
-  }
-  .add_cate {
-    display: flex;
-    cursor: text;
-  }
-  .add_new{
-    font-style: italic;
-  }
-  #end_li:hover {
-    background: rgb(240, 237, 233);
-  }
-  .left input {
-    text-decoration: none;
-    width: 150px;
-    border: black solid 1px;
-    font-style: italic;
+.angledown {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  font-size: 20px;
+}
 
-  }
+.check {
+  margin-right: 10px;
+  color: #dc3545;
+  cursor: pointer;
+}
 
-  .right {
-        margin-left: 40px;
-  }
-  .right-prefix input{
-    text-decoration: none;
-    width: 40px;
-    border: black solid 1px;
-    font-style: italic;
-  }
+.times {
+  margin-right: 15px;
+  cursor: pointer;
+}
 
-  #error {
-    display: block;
-    color: red;
-    margin: 5px 0 0 0;
-  }
+.list_below ul li {
+  padding: 3px 0px;
+  background: rgb(240, 237, 233);
+  text-decoration: none;
+  list-style: none;
+  padding-left: 5px;
+}
 
-  #link {
-    display: block;
-    color: red;
-    margin: 5px 0 0 0;
-  }
+.category_item:hover {
+  background: #dc3545;
+  width: 100%;
+}
 
-  #input_add {
-    padding-left: 5px;
-  }
+.list_below {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+}
 
-  .datepicker{
-    position: relative;
-    width: 100%;
-  }
+#list {
+  padding-left: 0px;
+  position: absolute;
+  border: solid 2px rgb(226, 217, 217);
+  border-radius: 5px;
+  width: 100%;
+}
 
-  .icon-date{
-    position: absolute;
-    bottom: 13px;
-    right: 15px;
-    cursor: pointer;
-    color: rgb(88, 87, 87);
-  }
+.add_user {
+  display: flex;
+  justify-content: space-between;
+  cursor: text;
+}
 
-  .category_item {
-    display: flex;
-    justify-content: space-between;
-  }
+.add_cate {
+  display: flex;
+  cursor: text;
+}
 
-  .name_area{
-    display: flex;
-    padding: 0px 8px;
-    width: 80%;
-    cursor: pointer;
-  }
+.add_new {
+  font-style: italic;
+}
 
-  .textarea-input {
-    font-size: 1.4rem;
-  }
-.title_name{
-    display: flex;
-    padding: 0px 8px;
-    width: 80%;
+#end_li:hover {
+  background: rgb(240, 237, 233);
+}
+
+.left input {
+  text-decoration: none;
+  width: 150px;
+  border: black solid 1px;
+  font-style: italic;
+}
+
+.right {
+  margin-left: 40px;
+}
+
+.right-prefix input {
+  text-decoration: none;
+  width: 40px;
+  border: black solid 1px;
+  font-style: italic;
+}
+
+#error {
+  display: block;
+  color: red;
+  margin: 5px 0 0 0;
+}
+
+#link {
+  display: block;
+  color: red;
+  margin: 5px 0 0 0;
+}
+
+#input_add {
+  padding-left: 5px;
+}
+
+.datepicker {
+  position: relative;
+  width: 100%;
+}
+
+.icon-date {
+  position: absolute;
+  bottom: 13px;
+  right: 15px;
+  cursor: pointer;
+  color: rgb(88, 87, 87);
+}
+
+.category_item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.name_area {
+  display: flex;
+  padding: 0px 8px;
+  width: 80%;
+  cursor: pointer;
+}
+
+.textarea-input {
+  font-size: 1.4rem;
+}
+
+.title_name {
+  display: flex;
+  padding: 0px 8px;
+  width: 80%;
+}
+
+#categories-list .cl-toggle {
+  width: 100%;
+  background-color: var(--bs-white);
+  border: 2px solid var(--bootstrap-border-color);
+  position: relative;
+  height: 42px;
+  color: var(--bs-black);
+  text-align: left;
+}
+
+#categories-list .cl-toggle::after {
+  content: none;
+}
+
+#categories-list .cl-menu {
+  width: 100%;
+  border-width: var(--2px);
+  background-color: #f5f5f5;
+  padding-bottom: 0;
+}
+
+#categories-list .cl-menu .cl-add-new-category {
+  padding: var(--8px) var(--16px) var(--8px) var(--16px);
+  background-color: #dce1ea;
+  border-top: 2px solid var(--bootstrap-border-color);
+}
+
+#categories-list .cl-menu .dropdown-item.active,
+.dropdown-item:active {
+  background-color: var(--bs-danger);
+}
+
+#categories-list .cl-menu .clm-layout {
+  height: 170px;
+  overflow-y: auto;
 }

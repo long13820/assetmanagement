@@ -94,7 +94,7 @@ export const getAllAssignments = async ({ sort, filter, search, page, edit, filt
   }
 
   if (filterDate) {
-    queryString.push(`filter[assigned_date]=${formatDate(filter, 'YYYYMMDD')}`);
+    queryString.push(`filter[assigned_date]=${formatDate(filterDate, 'YYYYMMDD')}`);
   }
 
   if (search) {

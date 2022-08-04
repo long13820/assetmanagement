@@ -11,8 +11,12 @@ export const assignmentReducer = createSlice({
     user: [],
     isAdd: false,
     isSelect: true,
+    key: 0,
   },
   reducers: {
+    setKey: (state, action) => {
+      state.key = action.payload;
+    },
     setAsset: (state, action) => {
       state.asset = { ...action.payload };
     },
@@ -40,6 +44,15 @@ export const assignmentReducer = createSlice({
   },
 });
 
-export const { setAsset, setUser, setIsAdd, setIsSelect, setAssetName, setUserName, setStaffCode, setAssetCode } =
-  assignmentReducer.actions;
+export const {
+  setAsset,
+  setUser,
+  setIsAdd,
+  setIsSelect,
+  setAssetName,
+  setUserName,
+  setStaffCode,
+  setAssetCode,
+  setKey,
+} = assignmentReducer.actions;
 export default assignmentReducer.reducer;

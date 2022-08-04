@@ -2,25 +2,40 @@ import { useEffect, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { isEmpty } from 'lodash';
 
 import FilterButtonCategory from '../../components/Asset/FilterButtonCategory';
 import FilterButtonState from '../../components/Asset/FilterButtonState';
 import AssetTable from '../../components/Asset/Table';
+import AssetCreate from '../../components/AssetCreate';
+import AssetEdit from '../../components/AssetEdit';
 import PaginationUI from '../../components/Layouts/PaginateRedux';
 import { setCurrentPage, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
-import { assetFilterSelector, assetListSelector } from '../../redux/selectors/asset/asset.selector';
+import {
+  assetFilterSelector,
+  assetIsAddSelector,
+  assetIsEditSelector,
+  assetTotalRecordPageSelector,
+} from '../../redux/selectors/asset/asset.selector';
 
 import './style.css';
 export default function Asset() {
   const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setTitle('Manage Asset'));
+    dispatch(setSubTitle(''));
+  }, [dispatch]);
+
   const handlePageChange = (page) => {
     dispatch(setCurrentPage(page));
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
   };
   const filterSelectorState = useSelector(assetFilterSelector);
-
+  const isAdd = useSelector(assetIsAddSelector);
+  const isEdit = useSelector(assetIsEditSelector);
   const [filterState, setFilterState] = useState(['Available', 'Not Available', 'Assigned']);
   const [checkFilterStateCurrent, setcheckFilterStateCurrent] = useState([]);
   const [checkAllState, setcheckAll] = useState(false);
@@ -53,6 +68,22 @@ export default function Asset() {
         per_page: 20,
       })
     );
+    dispatch(setCurrentPage(1));
+
+    // dispatch(assetAction.setSortHeader(false));
+    dispatch(assetAction.setLoadingFilter(true));
+  };
+  const handleCheckAllState = (value) => {
+    dispatch(
+      assetAction.setFilter({
+        ...filterSelectorState,
+        'filter[state]': value,
+        per_page: 20,
+      })
+    );
+    dispatch(setCurrentPage(1));
+    // dispatch(assetAction.setSortHeader(false));
+    dispatch(assetAction.setLoadingFilter(true));
   };
   // Filter Category
   const [filterCategory, setFilterCategory] = useState([0]);
@@ -78,21 +109,20 @@ export default function Asset() {
       setFilterCategoryCurrent(newCheckFilterCategory);
       setFilterCategory(newCheckFilterCategory);
     }
-    const allFilter = '1,2,3,4';
+    const allFilter = undefined;
     const result = checkAll == true ? allFilter : newCheckFilterCategory.toString();
     dispatch(
       assetAction.setFilter({
         ...filterSelectorState,
         'filter[category]': result ? result : undefined,
+        page: 1,
         per_page: 20,
       })
     );
+    dispatch(setCurrentPage(1));
+    // dispatch(assetAction.setSortHeader(false));
+    dispatch(assetAction.setLoadingFilter(true));
   };
-
-  useEffect(() => {
-    dispatch(setTitle('Manage Asset'));
-    dispatch(setSubTitle(''));
-  }, [dispatch]);
 
   // Search
   const [inputValueSearchAsset, setInputValueSearchAsset] = useState('');
@@ -104,62 +134,76 @@ export default function Asset() {
         search: inputValueSearchAsset,
       })
     );
+    dispatch(setCurrentPage(1));
+    // dispatch(assetAction.setSortHeader(false));
+    dispatch(assetAction.setLoadingFilter(true));
   };
-  let navigate = useNavigate();
+
   const routeChange = () => {
-    let path = `/asset`;
-    navigate(path);
     dispatch(assetAction.setIsAdd(true));
     dispatch(setSubTitle('Create new asset'));
   };
-
-  const listState = useSelector(assetListSelector);
+  const fillterAllItem = (checkEdit) => {
+    if (checkEdit) {
+      setFilterState('Available,Not Available,Assigned,Waiting for recycling,Recycled');
+    }
+  };
+  const listState = useSelector(assetTotalRecordPageSelector);
   return (
     <section>
-      <h5 className="text-danger font-weight-bold mb-5">Asset List</h5>
-      <div className="mb-3 d-flex align-items-center justify-content-between">
-        <div className="d-flex">
-          <FilterButtonState
-            currentFilter={filterState}
-            setCurrentFilter={handleFilterState}
-            checkAllState={checkAllState}
-          />
-          <div className="ms-3">
-            <FilterButtonCategory
-              currentFilter={filterCategory}
-              setCurrentFilter={handleFilterCategory}
-              setAllCategory={checkAllCategory}
-            />
-          </div>
-        </div>
-        <div className="d-flex">
-          <Form onSubmit={(e) => handleSearchAsset(e)}>
-            <InputGroup>
-              <Form.Control
-                placeholder="Asset Code or Asset Name"
-                aria-describedby="basic-addon2"
-                value={inputValueSearchAsset}
-                onChange={(e) => setInputValueSearchAsset(e.target.value)}
+      {!isEdit && !isAdd && <h5 className="text-danger font-weight-bold mb-3">Asset List</h5>}
+      {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit asset</h5>}
+      {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create new asset</h5>}
+      {!isEdit && !isAdd && (
+        <>
+          <div className="mb-3 d-flex align-items-center justify-content-between">
+            <div className="d-flex">
+              <FilterButtonState
+                currentFilter={filterState}
+                setCurrentFilter={handleFilterState}
+                checkAllState={checkAllState}
+                setAllState={handleCheckAllState}
               />
-              <Button variant="danger" type="submit">
-                <FaSearch />
+              <div className="ms-3">
+                <FilterButtonCategory
+                  currentFilter={filterCategory}
+                  setCurrentFilter={handleFilterCategory}
+                  setAllCategory={checkAllCategory}
+                />
+              </div>
+            </div>
+            <div className="d-flex">
+              <Form onSubmit={(e) => handleSearchAsset(e)}>
+                <InputGroup>
+                  <Form.Control
+                    placeholder="Asset Code or Asset Name"
+                    aria-describedby="basic-addon2"
+                    value={inputValueSearchAsset}
+                    onChange={(e) => setInputValueSearchAsset(e.target.value)}
+                  />
+                  <Button variant="danger" type="submit">
+                    <FaSearch />
+                  </Button>
+                </InputGroup>
+              </Form>
+              <Button
+                onClick={routeChange}
+                variant="danger"
+                id="button-addon2"
+                className="font-weight-bold ms-3 btn btn-danger"
+              >
+                Create new asset
               </Button>
-            </InputGroup>
-          </Form>
-          <Button
-            onClick={routeChange}
-            variant="danger"
-            id="button-addon2"
-            className="font-weight-bold ms-3 btn btn-danger"
-          >
-            Create new asset
-          </Button>
-        </div>
-      </div>
-      <AssetTable />
-      <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
-        {!isEmpty(listState) && <PaginationUI handlePageChange={handlePageChange} />}
-      </div>
+            </div>
+          </div>
+          <AssetTable />
+          <div className="d-flex justify-content-end align-items-center mt-3">
+            {listState > 20 && <PaginationUI handlePageChange={handlePageChange} />}
+          </div>
+        </>
+      )}
+      {isAdd && <AssetCreate filterAll={fillterAllItem} />}
+      {isEdit && <AssetEdit filterAll={fillterAllItem} />}
     </section>
   );
 }

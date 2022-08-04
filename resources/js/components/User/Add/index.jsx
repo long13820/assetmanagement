@@ -4,6 +4,8 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { differenceInYears } from 'date-fns';
+import moment from 'moment';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
@@ -67,6 +69,17 @@ function UserAdd(props) {
     name: 'date_of_birth',
   });
 
+  const joined_date = useWatch({
+    control,
+    name: 'joined_date',
+  });
+
+  const checkValidEighteen = () => {
+    return date_of_birth !== '' && joined_date !== ''
+      ? differenceInYears(new Date(joined_date), new Date(date_of_birth)) >= 18
+      : true;
+  };
+
   const onSubmit = async (data) => {
     BlockUI('#root', 'fixed');
     if (data.date_of_birth) data.date_of_birth = formatDate(data.date_of_birth, 'YYYY-MM-DD');
@@ -96,7 +109,13 @@ function UserAdd(props) {
                 <p className="font-weight-bold">First Name</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_first_name" type="text" {...register('first_name')} maxLength="128" />
+                <Form.Control
+                  id="user_first_name"
+                  type="text"
+                  {...register('first_name')}
+                  maxLength="128"
+                  className={`${first_name.length > 0 && errors?.first_name?.type === 'matches' ? 'border-red' : ''}`}
+                />
                 <div className="d-flex justify-content-between">
                   <small className="text-red font-weight-semi">
                     {first_name.length > 0 && errors?.first_name?.type === 'matches' && errors?.first_name?.message}
@@ -110,7 +129,13 @@ function UserAdd(props) {
                 <p className="font-weight-bold">Last Name</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_last_name" type="text" {...register('last_name')} maxLength="128" />
+                <Form.Control
+                  id="user_last_name"
+                  type="text"
+                  {...register('last_name')}
+                  maxLength="128"
+                  className={`${last_name.length > 0 && errors?.last_name?.type === 'matches' ? 'border-red' : ''}`}
+                />
                 <div className="d-flex justify-content-between">
                   <small className="text-red font-weight-semi">
                     {last_name.length > 0 && errors?.last_name?.type === 'matches' && errors?.last_name?.message}
@@ -124,7 +149,17 @@ function UserAdd(props) {
                 <p className="font-weight-bold">Date of birth</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_date_of_birth" type="date" {...register('date_of_birth')} />
+                <Form.Control
+                  id="user_date_of_birth"
+                  type="date"
+                  {...register('date_of_birth')}
+                  className={`${
+                    moment(date_of_birth, 'YYYY-MM-DD').isValid() &&
+                    ['max', 'date_of_birth', 'typeError'].includes(errors?.date_of_birth?.type)
+                      ? 'border-red'
+                      : ''
+                  }`}
+                />
                 <small className="text-red font-weight-semi">
                   {errors?.date_of_birth?.type === 'typeError' && errors?.date_of_birth?.message}
                   {errors?.date_of_birth?.type === 'max' && errors?.date_of_birth?.message}
@@ -160,11 +195,23 @@ function UserAdd(props) {
                 <p className="font-weight-bold">Joined Date</p>
               </td>
               <td width="70%">
-                <Form.Control id="user_joined_date" type="date" {...register('joined_date')} />
+                <Form.Control
+                  id="user_joined_date"
+                  type="date"
+                  {...register('joined_date')}
+                  className={`${
+                    (moment(joined_date, 'YYYY-MM-DD').isValid() &&
+                      ['typeError', 'min', 'joined_date'].includes(errors?.joined_date?.type)) ||
+                    checkValidEighteen() === false
+                      ? 'border-red'
+                      : ''
+                  }`}
+                />
                 <small className="text-red font-weight-semi">
                   {date_of_birth !== '' && errors?.joined_date?.type === 'min' && errors?.joined_date?.message}
                   {date_of_birth !== '' &&
                     errors?.joined_date?.type === 'joined_date_2' &&
+                    checkValidEighteen() === false &&
                     errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'typeError' && errors?.joined_date?.message}
                   {errors?.joined_date?.type === 'joined_date' && errors?.joined_date?.message}

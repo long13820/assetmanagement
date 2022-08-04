@@ -4,6 +4,7 @@ export const assetReduccer = createSlice({
   initialState: {
     loading: false,
     loadingDetail: false,
+    loadingFilter: false,
     isListAssetSuccess: false,
     isDetailAssetSuccess: false,
     isdetailAsset: false,
@@ -14,23 +15,37 @@ export const assetReduccer = createSlice({
     loadingDetailAssignment: false,
     isAdd: false,
     isEdit: false,
+    key: 0,
+    isSortHeader: false,
+    idAsset: '',
     filter: {
       'filter[state]': 'Available,Not Available,Assigned',
       'filter[category]': undefined,
-      // 'sort[asset_code]': 'asc',
-      // 'sort[asset_name]': 'asc',
-      // 'sort[category_name]': 'asc',
-      // 'sort[state]': 'asc',
+      'sort[asset_code]': 'asc',
+      'sort[asset_name]': undefined,
+      'sort[category_name]': undefined,
+      'sort[state]': undefined,
+      'sort[updated_at]': undefined,
     },
     message: '',
     totalRecordPage: 0,
   },
   reducers: {
+    setKey: (state, action) => {
+      state.key = action.payload;
+    },
     setIsAdd: (state, action) => {
       state.isAdd = action.payload;
     },
     setIsEdit: (state, action) => {
-      state.isEdit = action.payload;
+      state.isEdit = action.payload.isEdit;
+      state.idAsset = action.payload.idAsset;
+    },
+    setSortHeader: (state, action) => {
+      state.isSortHeader = action.payload;
+    },
+    setLoadingFilter: (state, action) => {
+      state.loadingFilter = action.payload;
     },
     fetchListAsset(state) {
       state.loading = true;
@@ -42,6 +57,7 @@ export const assetReduccer = createSlice({
       state.listAsset = action.payload.data.data;
       state.message = action.payload.data.message;
       state.totalRecordPage = action.payload.data.meta.total;
+      state.loadingFilter = false;
     },
     fetchListAssetError(state, action) {
       state.loading = false;

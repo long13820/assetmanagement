@@ -25,14 +25,12 @@ export const addSchema = yup
   .object({
     first_name: yup
       .string()
-      .required()
       .matches(/^[a-zA-Z\s]+$/, 'Invalid first name format')
       .max(128)
       .trim()
       .required(),
     last_name: yup
       .string()
-      .required()
       .matches(/^[a-zA-Z\s]+$/, 'Invalid last name format')
       .max(128)
       .trim()

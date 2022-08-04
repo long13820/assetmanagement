@@ -13,6 +13,7 @@
   --2px: 0.125rem;
   --4px: 0.25rem;
   --6px: 0.375rem;
+  --8px: 0.5rem;
   --12px: 0.75rem;
   --14px: 0.875rem;
   --16px: 1rem;
@@ -29,9 +30,13 @@
   --bs-blue: #004dff;
   --bs-blue-100: #ccdbff;
   --bs-red-100: #f9d2e4;
+  --bs-success-100: #d4f7e7;
+  --bs-warning-100: #fff2cc;
+  --bs-infor-100: #cff5fc;
   --bs-gray-100: #f5f6f8;
   --bs-gray-200: #f5f8fa;
   --bs-gray-300: #b5b0b5;
+  --bootstrap-border-color: #ced4da;
 
   --box-shadow: 0px 0px 20px rgb(1 41 112 / 10%);
 }
