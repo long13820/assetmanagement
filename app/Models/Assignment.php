@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Assignment extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'assignment';
     /**
@@ -24,12 +25,15 @@ class Assignment extends Model
         'admin_id',
         'assigned_date',
         'state',
+        'returned_date',
+        'returned_id',
         'note'
+
     ];
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, "user_id");
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function asset(): BelongsTo
@@ -56,6 +60,10 @@ class Assignment extends Model
             ->when($request->has('filter.asset_id'), function ($query) use ($request) {
                 $list = explode(',', $request->query('filter')['asset_id']);
                 $query->where('asset_id', $list);
+            })
+            ->when($request->has('filter.returned_date'), function ($query) use ($request) {
+                $list = explode(',', $request->query('filter')['returned_date']);
+                $query->whereDate('returned_date', $list);
             });
     }
 
@@ -93,15 +101,21 @@ class Assignment extends Model
                 if ($sortBy === "asset_code" || $sortBy === "asset_name") {
                     $query
                         ->with('asset')
-                        ->orderBy(Asset::select($sortBy)->whereColumn('id', 'assignment.asset_id'), $sortValue);
+                        ->orderBy(Asset::query()
+                            ->select($sortBy)
+                            ->whereColumn('id', 'assignment.asset_id'), $sortValue);
                 } elseif ($sortBy === "assigned_to") {
                     $query
                         ->with('user')
-                        ->orderBy(User::select('username')->whereColumn('id', 'assignment.user_id'), $sortValue);
+                        ->orderBy(User::query()
+                            ->select('username')
+                            ->whereColumn('id', 'assignment.user_id'), $sortValue);
                 } elseif ($sortBy === "assigned_by") {
                     $query
                         ->with('admin')
-                        ->orderBy(User::select('username')->whereColumn('id', 'assignment.admin_id'), $sortValue);
+                        ->orderBy(User::query()
+                        ->select('username')
+                            ->whereColumn('id', 'assignment.admin_id'), $sortValue);
                 } else {
                     $query->orderBy($sortBy, $sortValue);
                 }

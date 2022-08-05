@@ -11,6 +11,7 @@ import Asset from '../../pages/Asset';
 import AssignmentPage from '../../pages/Assignment';
 import HomePage from '../../pages/Home';
 import LoginPage from '../../pages/Login';
+import RequestsPage from '../../pages/Requests';
 import UserPage from '../../pages/User';
 import { setExpiredToken, setIsLogin, setUser } from '../../redux/reducer/app/app.reducer';
 import { isLoginSelector, keyAssignmentSelector, keyUserSelector, userSelector } from '../../redux/selectors';
@@ -47,6 +48,7 @@ export default function AdminRoutes() {
           <Route path="/manage_user" element={<AdminLayout slot={<UserPage key={keyUser} />} />} />
           <Route path="/manage_asset" element={<AdminLayout slot={<Asset key={keyAsset} />} />} />
           <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage key={keyAssignment} />} />} />
+          <Route path="/requests_for_returning" element={<AdminLayout slot={<RequestsPage />} />} />
         </Route>
       )}
 

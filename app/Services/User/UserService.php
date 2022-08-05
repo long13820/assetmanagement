@@ -48,4 +48,14 @@ class UserService
             return $this->apiResponse($result, 'success', 'Update User Successfully');
         }
     }
+
+    public function delete($id)
+    {
+        return $this->userRepository->delete($id);
+    }
+
+    public function checkAssignment($id)
+    {
+        return $this->userRepository->checkAssignmentExits($id);
+    }
 }

@@ -3,15 +3,21 @@ import { FaPen, FaTimesCircle, FaUndoAlt } from 'react-icons/fa';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
-import { getAssignmentById } from '../../../api/Assignment';
+import { editAssetById } from '../../../api/Asset/assetAPI';
+import { deleteAssignment, getAssignmentById } from '../../../api/Assignment';
 import { formatDate } from '../../../utils/formatDate';
+import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import { BlockUI } from '../../Layouts/Notiflix';
 import Table from '../../Layouts/Table';
 import AssignmentDetail from '../Detail';
+import ModalDelete from '../ModalDelete/ModalDelete';
 
 export default function AssignmentTable(props) {
   const [showDetail, setShowDetail] = React.useState(false);
   const [detail, setDetail] = React.useState({});
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [confirmIdDelete, setConfirmIdDelete] = React.useState(-1);
+  const [confirmIdAsset, setConfirmIdAsset] = React.useState(-1);
 
   const handleEditAssignment = (e, id) => {
     e.stopPropagation();
@@ -93,6 +99,31 @@ export default function AssignmentTable(props) {
       Notiflix.Block.remove('#root');
     }
   };
+  const handleSoftDeleteAssigment = async (id, assetId) => {
+    BlockUI('#root', 'fixed');
+    const stateField = { state: 'Available' };
+    const response = await deleteAssignment(id);
+    const responseTwo = await editAssetById(assetId, stateField);
+    if (response === 200 && responseTwo === 200) {
+      SuccessToast('Delete assignment is successfully', 3000);
+      props.backtoManageAssignment();
+      setStateModalDelete();
+    } else {
+      ErrorToast('Delete assignment is unsuccessfully', 3000);
+      Notiflix.Block.remove('#root');
+    }
+  };
+  const handleShowConfirm = (e, id, assetId) => {
+    e.stopPropagation();
+    setConfirmIdDelete(id);
+    setConfirmIdAsset(assetId);
+    setConfirmDelete(true);
+  };
+  const setStateModalDelete = () => {
+    setConfirmIdDelete(-1);
+    setConfirmIdAsset(-1);
+    setConfirmDelete(false);
+  };
 
   const renderTableBody = () => {
     return props.data.map((item) => {
@@ -107,16 +138,28 @@ export default function AssignmentTable(props) {
           <td>{item.state}</td>
           <td>
             <div className="d-flex">
-              <button
-                onClick={(e) => {
-                  handleEditAssignment(e, item.id);
-                }}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
-              >
+              <button className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none">
                 <FaPen className="text-black font-20px" />
               </button>
-              <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
-                <FaTimesCircle className="text-danger font-20px" />
+
+              <span>
+                {item.state === 'Waiting for acceptance' || item.state === 'Declined' ? (
+                  <>
+                    <button
+                      onClick={(e) => handleShowConfirm(e, item.id, item.asset_id)}
+                      className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                    >
+                      <FaTimesCircle className="text-danger font-20px" />
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    disabled
+                    className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none opacity-25"
+                  >
+                    <FaTimesCircle className="text-danger font-20px" />
+                  </button>
+                )}
               </span>
               <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
                 <FaUndoAlt className="text-primary font-20px" />
@@ -134,6 +177,13 @@ export default function AssignmentTable(props) {
       {Object.keys(detail).length > 0 && (
         <AssignmentDetail show={showDetail} detail={detail} setStateModal={() => setShowDetail(false)} />
       )}
+      <ModalDelete
+        show={confirmDelete}
+        id={confirmIdDelete}
+        assetId={confirmIdAsset}
+        setStateModalDelete={() => setStateModalDelete()}
+        handleSoftDeleteAssigment={handleSoftDeleteAssigment}
+      />
     </>
   );
 }
@@ -143,4 +193,5 @@ AssignmentTable.propTypes = {
   handleSort: PropTypes.func,
   renderTableHeader: PropTypes.any,
   sort: PropTypes.any,
+  backtoManageAssignment: PropTypes.func,
 };

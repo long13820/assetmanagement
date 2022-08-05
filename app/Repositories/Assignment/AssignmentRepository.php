@@ -14,6 +14,7 @@ class AssignmentRepository
         $data = Assignment::filter($request)
             ->sort($request)
             ->search($request)
+            ->where("admin_id", '=', auth()->id())
             ->paginate($this->paginate);
 
         return AssignmentResource::collection($data)->response()->getData();
@@ -46,7 +47,44 @@ class AssignmentRepository
     {
         $data = Assignment::query()
             ->find($id);
-
         return AssignmentResource::make($data);
+    }
+
+    public function handleUpdateAssignment($request, $id)
+    {
+        $assignment = Assignment::query()->where('id', '=', $id)->first();
+        $assignment->update($request->all());
+        return $assignment;
+    }
+
+    public function getAllAssignment($request)
+    {
+        $data = Assignment::query()
+            ->join('asset', 'asset.id', '=', 'assignment.asset_id')
+            ->join('categories', 'asset.category_id', '=', 'categories.id')
+            ->select("assignment.*", "categories.category_name")
+            ->sort($request)
+            ->filter($request)
+            ->where("user_id", "=", auth()->user()->id)
+            ->paginate($this->paginate);
+
+        return AssignmentResource::collection($data)->response()->getData();
+    }
+
+    public function getReturnRequestId($idAdmin)
+    {
+        $data = Assignment::query()
+            ->where('assignment.admin_id', $idAdmin)
+            ->whereNotNull('assignment.returned_id')
+            ->orderBy('assignment.returned_id', 'desc')
+            ->first();
+        return $data;
+    }
+
+    public function deleteAssignment($request, $id)
+    {
+        $assignment = Assignment::query()->where('id', '=', $id)->first();
+        $assignment->delete($request->all());
+        return $assignment;
     }
 }

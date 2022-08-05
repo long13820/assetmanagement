@@ -38,6 +38,27 @@ class EditAssetTest extends TestCase
         $response->assertStatus(200);
     }
 
+    public function test_edit_asset_failed()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        Asset::factory()->create([
+            "asset_code" => "LA0001",
+            "asset_name" => "Laptop HP Probook 450 G10",
+            "installed_date" => "2000-01-01",
+            "state" => "Available",
+            "specification" => "sfsdfsdfdsfsdsf",
+            "category_id" => 1,
+            "location_id" => 1,
+        ]);
+        $assets = [
+            "installed_date" => "01-01-2000",
+
+        ];
+        $response =  $this->json("PUT", "/api/assets/1", $assets);
+        $response->assertStatus(422);
+    }
+
+
     public function test_get_asset_by_id()
     {
         Sanctum::actingAs(User::factory()->create(), ["*"]);

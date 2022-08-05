@@ -6,6 +6,6 @@ export const BlockUI = (element, position) => {
     fontFamily: 'Mulish',
     svgColor: '#d6001c',
     position: position ? position : 'absolute',
-    zindex: position ? 1031 : 1000,
+    zindex: position ? 1060 : 1000,
   });
 };

@@ -51,3 +51,8 @@ input::-ms-clear {
 .modal-content {
   border: none;
 }
+
+.modal-backdrop,
+.modal {
+  --bs-backdrop-zindex: 1030;
+}

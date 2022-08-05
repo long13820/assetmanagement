@@ -74,11 +74,12 @@ class AssignmentController extends Controller
      *
      * @param Request $request
      * @param int $id
-     * @return void
+     * @return : JsonResponse
      */
-    public function update(Request $request, int $id): void
+    public function update(Request $request, int $id): JsonResponse
     {
         //
+        return $this->assignmentService->updateAssignment($request, $id);
     }
 
     /**
@@ -87,8 +88,23 @@ class AssignmentController extends Controller
      * @param int $id
      * @return void
      */
-    public function destroy($id): void
+    public function destroy(Request $request, $id): JsonResponse
     {
-        //
+        return $this->assignmentService->deleteAssignment($request, $id);
+    }
+    public function showById(Request $request)
+    {
+        return $this->assignmentService->showById($request);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function showReturnRequestId(int $id): JsonResponse
+    {
+        return $this->assignmentService->getReturnRequestId($id);
     }
 }

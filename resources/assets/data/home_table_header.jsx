@@ -2,7 +2,7 @@ export const home_table_header = [
   {
     id: 1,
     name: 'Asset Code',
-    isSortAsc: true,
+    isSortAsc: false,
     isSortDesc: false,
     isSort: true,
     cursor: true,
@@ -10,7 +10,7 @@ export const home_table_header = [
   {
     id: 2,
     name: 'Asset Name',
-    isSortAsc: true,
+    isSortAsc: false,
     isSortDesc: false,
     isSort: true,
     cursor: true,
@@ -18,7 +18,7 @@ export const home_table_header = [
   {
     id: 3,
     name: 'Category',
-    isSortAsc: true,
+    isSortAsc: false,
     isSortDesc: false,
     isSort: true,
     cursor: true,
@@ -26,7 +26,7 @@ export const home_table_header = [
   {
     id: 4,
     name: 'Assigned Date',
-    isSortAsc: true,
+    isSortAsc: false,
     isSortDesc: false,
     isSort: true,
     cursor: true,
@@ -34,7 +34,7 @@ export const home_table_header = [
   {
     id: 5,
     name: 'State',
-    isSortAsc: true,
+    isSortAsc: false,
     isSortDesc: false,
     isSort: true,
     cursor: true,

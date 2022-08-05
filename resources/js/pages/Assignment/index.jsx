@@ -261,12 +261,13 @@ export default function Assignment() {
         <>
           {!loading ? (
             <>
-              {data.length > 0 ? (
+              {data?.length > 0 ? (
                 <AssignmentTable
                   data={data}
                   sort={sort}
                   renderTableHeader={renderTableHeader}
                   handleSort={handleSort}
+                  backtoManageAssignment={backToManageAssignment}
                 />
               ) : (
                 <NotFoundData />

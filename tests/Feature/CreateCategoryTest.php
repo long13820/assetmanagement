@@ -29,6 +29,18 @@ class CreateCategoryTest extends TestCase
             ->assertJson(['data' => $category]);
     }
 
+    public function test_create_category_fail()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $category = [
+            'category_name' => "",
+            'category_prefix' => "MM",
+        ];
+
+        $this->json('POST', '/api/categories', $category)
+            ->assertStatus(409);
+    }
+
    /** @test */
    public function test_get_all_categories()
    {

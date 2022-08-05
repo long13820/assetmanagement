@@ -52,7 +52,6 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        //
     }
 
     public function update(EditUserRequest $request, $id): JsonResponse
@@ -62,6 +61,11 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        //
+        return $this->userService->delete($id);
+    }
+
+    public function checkAssignment($id)
+    {
+        return $this->userService->checkAssignment($id);
     }
 }

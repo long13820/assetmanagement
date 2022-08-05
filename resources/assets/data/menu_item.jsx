@@ -33,7 +33,7 @@ export const menu_item = [
     id: 5,
     name: 'Request for Returning',
     active: false,
-    link: '/request_for_returning',
+    link: '/requests_for_returning',
     icon: <FaUndoAlt />,
   },
   {

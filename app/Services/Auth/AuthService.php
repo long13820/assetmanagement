@@ -25,10 +25,6 @@ class AuthService
             return response()->json([
                 "data" => $result,
             ], 200);
-        } elseif ($result['status'] == 403) {
-            return response()->json([
-                "data" => $result
-            ], 403);
         }
         return response()->json([
             "data" => $result
@@ -55,8 +51,6 @@ class AuthService
         if ($result['status'] === 200) {
             return $this->apiResponse([], 'success', $result['message'], $result['status']);
         }
-
-        return $this->apiResponse([], 'fail', 'Logout unsuccessfully', 400);
     }
 
     public function getMe(): JsonResponse

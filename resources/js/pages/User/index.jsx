@@ -17,6 +17,7 @@ import UserTable from '../../components/User/Table';
 import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { setIsAdd, setIsEdit, setResetState } from '../../redux/reducer/user/user.reducer';
 import { isAddSelector, isEditSelector } from '../../redux/selectors';
+
 export default function User() {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
@@ -51,6 +52,26 @@ export default function User() {
     const result = await getAllUsers({ sort });
     setLoading(false);
     setUser(result);
+  };
+
+  const forceReload = async () => {
+    let tempSearch;
+    let tempFilter;
+    let tempPage;
+    let tempSortDate;
+    if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
+    if (search !== '') tempSearch = search;
+    if (page > 1) tempPage = page;
+    if (sortDate !== '') tempSortDate = sortDate;
+    const result = await getAllUsers({
+      sort,
+      search: tempSearch,
+      filter: tempFilter,
+      page: tempPage,
+      edit: tempSortDate,
+    });
+    setUser(result, 'page');
+    Notiflix.Block.remove('#root');
   };
 
   const backToManageUser = async (field, action) => {
@@ -231,8 +252,14 @@ export default function User() {
         <>
           {!loading ? (
             <>
-              {data.length > 0 ? (
-                <UserTable data={data} sort={sort} renderTableHeader={renderTableHeader} handleSort={handleSort} />
+              {data?.length > 0 ? (
+                <UserTable
+                  data={data}
+                  sort={sort}
+                  renderTableHeader={renderTableHeader}
+                  handleSort={handleSort}
+                  forceReload={forceReload}
+                />
               ) : (
                 <NotFoundData />
               )}

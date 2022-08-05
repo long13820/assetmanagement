@@ -60,4 +60,33 @@ class GetAssignmentsTest extends TestCase
             $response->assertJsonStructure(["status", "data"]);
         }
     }
+    public function test_getting_assignments_by_search()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json(
+            "GET",
+            "/api/assignments?size=5&search[assignedTo]=adminhm"
+        );
+        $response->assertStatus(500);
+    }
+
+    public function test_assignments_by_search_assetName()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json(
+            "GET",
+            "/api/assignments?search=Laptop"
+        );
+        $response->assertStatus(500);
+    }
+
+    public function test_assignments_by_search_username()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json(
+            "GET",
+            "/api/assignments?search=phuongtd"
+        );
+        $response->assertStatus(500);
+    }
 }

@@ -1,0 +1,22 @@
+.custom-filter-returned-date {
+  background-color: var(--bs-white);
+  color: var(--bs-black);
+  border-radius: var(--6px);
+  border: var(--2px) solid #ced4da;
+}
+
+.custom-filter-returned-date:hover,
+.custom-filter-returned-date:focus {
+  background-color: var(--bs-white);
+  color: var(--bs-black);
+  border-color: #ced4da;
+}
+
+.custom-filter-returned-date .cfrd-icon {
+  border-left: var(--2px) solid #ced4da;
+  padding-left: var(--12px);
+}
+
+.custom-filter-returned-date .cfrd-title {
+  padding-right: var(--12px);
+}

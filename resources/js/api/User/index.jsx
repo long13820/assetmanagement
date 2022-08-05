@@ -66,3 +66,15 @@ export const addUser = async (body) => {
   if (response.status === 'success') return 200;
   if (response.status !== 'success') return 404;
 };
+
+export const checkDisabledUser = async (id) => {
+  const url = `/check_assignment/${id}`;
+  const response = await axiosClient.put(url, {}, configHeadersAuthenticate());
+  return response.message === 'User can be disabled';
+};
+
+export const disableUser = async (id) => {
+  const url = `/users/${id}`;
+  const response = await axiosClient.delete(url, configHeadersAuthenticate());
+  return response.status === true && response.message === 'User disabled';
+};

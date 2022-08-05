@@ -123,3 +123,59 @@ export const getAssignmentById = async (id) => {
   if (response.status === 'success') return response.data;
   if (response.status !== 'success') return {};
 };
+
+export const editAssignmentById = async (id, body) => {
+  const url = `/assignments/${id}`;
+  const response = await axiosClient.put(url, body, configHeadersAuthenticate());
+  if (response.status === 'success') return 200;
+  if (response.status !== 'success') return 404;
+};
+
+export const getAllAssignmentsById = async ({ sort, page } = {}) => {
+  const url = `/assignmentsById`;
+  const queryString = [];
+
+  if (sort && sort.length > 0) {
+    sort.forEach((item) => {
+      queryString.push(`sort[${titleToSlug(item.key)}]=${item.value}`);
+    });
+  }
+
+  if (page) {
+    queryString.push(`page=${page}`);
+  }
+
+  const final_url = concatQueryString(queryString, url);
+
+  const response = await axiosClient.get(final_url, configHeadersAuthenticate());
+
+  if (response.status === 'success') return response.data;
+  if (response.status !== 'success') return [];
+};
+
+export const deleteAssignment = async (id) => {
+  const url = `/assignments/${id}`;
+  const response = await axiosClient.delete(url, configHeadersAuthenticate());
+  if (response.status === 'success') return 200;
+  if (response.status !== 'success') return 404;
+};
+
+export const getReturnRequestById = async (id) => {
+  const url = `/showReturnRequestId/${id}`;
+  const response = await axiosClient.get(url, configHeadersAuthenticate());
+  if (response.status === 'success') return response.data;
+  if (response.status !== 'success') return {};
+};
+
+export const acceptAssignment = async (id) => {
+  const url = `/assignments/${id}`;
+  const response = await axiosClient.put(
+    url,
+    {
+      state: 'Accepted',
+    },
+    configHeadersAuthenticate()
+  );
+  if (response.status === 'success') return 200;
+  if (response.status !== 'success') return 400;
+};

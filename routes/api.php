@@ -4,6 +4,7 @@ use App\Http\Controllers\AssetController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,4 +34,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/assets', AssetController::class);
     Route::resource('/categories', CategoryController::class);
     Route::resource('/assignments', AssignmentController::class);
+    Route::get('/assignmentsById', [AssignmentController::class,'showById']);
+    Route::resource('/requests', RequestController::class);
+    Route::put('/check_assignment/{id}', [UserController::class,'checkAssignment']);
+    Route::get('/showReturnRequestId/{id}', [AssignmentController::class, 'showReturnRequestId']);
 });

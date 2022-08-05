@@ -1,13 +1,18 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import React from 'react';
-import { FaPen, FaTimesCircle } from 'react-icons/fa';
+import { Button } from 'react-bootstrap';
+import { FaPen, FaTimes, FaTimesCircle } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
-import { getUserById } from '../../../api/User';
+import { checkDisabledUser, disableUser, getUserById } from '../../../api/User';
 import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { setIsEdit, setUser } from '../../../redux/reducer/user/user.reducer';
 import { formatDate } from '../../../utils/formatDate';
+import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
 import Table from '../../Layouts/Table';
 import UserDetail from '../Detail';
@@ -15,6 +20,9 @@ import UserDetail from '../Detail';
 export default function UserTable(props) {
   const [showDetail, setShowDetail] = React.useState(false);
   const [detail, setDetail] = React.useState({});
+  const [cannotDisable, setCanNotDisable] = React.useState(false);
+  const [canDisable, setCanDisable] = React.useState(false);
+  const [idDisable, setIdDisable] = React.useState(-1);
   const dispatch = useDispatch();
 
   const handleEditUser = async (e, id) => {
@@ -28,6 +36,36 @@ export default function UserTable(props) {
       dispatch(setSubTitle('Edit user'));
     } else {
       Notiflix.Block.remove('#root');
+    }
+  };
+
+  const handleCheckDisabledUser = async (e, id) => {
+    e.stopPropagation();
+    BlockUI('#root', 'fixed');
+    const result = await checkDisabledUser(id);
+    if (result === false) {
+      setCanNotDisable(true);
+      Notiflix.Block.remove('#root');
+      return;
+    }
+    if (result === true) {
+      setCanDisable(true);
+      setIdDisable(id);
+      Notiflix.Block.remove('#root');
+      return;
+    }
+  };
+
+  const handleDisableUser = async () => {
+    BlockUI('#root', 'fixed');
+    const result = await disableUser(idDisable);
+    if (result === true) {
+      SuccessToast('Disabled user successfully', 3000);
+      setCanDisable(false);
+      setIdDisable(-1);
+      props.forceReload();
+    } else {
+      ErrorToast('Disabled user unsuccessfully', 3000);
     }
   };
 
@@ -118,9 +156,15 @@ export default function UserTable(props) {
               >
                 <FaPen className="font-20px" />
               </button>
-              <span className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center">
+              <button
+                id="disabled-user"
+                onClick={(e) => {
+                  handleCheckDisabledUser(e, item.id);
+                }}
+                className="br-6px p-2 ms-3 text-danger bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+              >
                 <FaTimesCircle className="text-danger font-20px" />
-              </span>
+              </button>
             </div>
           </td>
         </tr>
@@ -134,6 +178,60 @@ export default function UserTable(props) {
       {Object.keys(detail).length > 0 && (
         <UserDetail show={showDetail} detail={detail} setStateModal={() => setShowDetail(false)} />
       )}
+      <Modal
+        show={canDisable}
+        backdrop="static"
+        setStateModal={() => {
+          setCanDisable(false);
+          setIdDisable(-1);
+        }}
+        elementModalTitle={<p>Are you sure?</p>}
+        elementModalBody={
+          <>
+            <div className="mb-3 font-weight-semi">Do you want to disable this user?</div>
+            <div className="d-flex align-items-center justify-content-start">
+              <Button
+                id="disable-btn"
+                variant="danger"
+                className="font-weight-bold"
+                onClick={() => handleDisableUser()}
+              >
+                Disable
+              </Button>
+              <Button
+                id="cancel-btn"
+                variant="outline-secondary"
+                className="ms-3 font-weight-bold"
+                onClick={() => {
+                  setCanDisable(false);
+                  setIdDisable(-1);
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </>
+        }
+      />
+      <Modal
+        show={cannotDisable}
+        backdrop="true"
+        setStateModal={() => setCanNotDisable(false)}
+        elementModalTitle={
+          <p className="d-flex align-items-center w-100">
+            <span className="flex-grow-1">Can not disabled user</span>
+            <span onClick={() => setCanNotDisable(false)} className="cursor-pointer">
+              <FaTimes />
+            </span>
+          </p>
+        }
+        elementModalBody={
+          <>
+            <div className="mb-3 font-weight-semi">There are valid assignments belonging to this user.</div>
+            <div className="font-weight-semi">Please close all assignments before disabling user.</div>
+          </>
+        }
+      />
     </>
   );
 }
@@ -141,6 +239,7 @@ export default function UserTable(props) {
 UserTable.propTypes = {
   data: PropTypes.any.isRequired,
   handleSort: PropTypes.func,
+  forceReload: PropTypes.func,
   renderTableHeader: PropTypes.any,
   sort: PropTypes.any,
 };

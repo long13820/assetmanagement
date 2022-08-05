@@ -61,4 +61,52 @@ class UserRepository
         $user->update($request->all());
         return $user;
     }
+
+    public function delete($id)
+    {
+        $user = User::find($id);
+        if ($user) {
+            if ($user->assignment()->exists()) {
+                return response()->json(
+                    [
+                        "success" => false,
+                        "message" =>
+                            "There are valid assignments belonging to this user.",
+                    ],
+                    400
+                );
+            }
+            $user->delete();
+            return response()->json(
+                [
+                    "status" => true,
+                    "message" => "User disabled",
+                ],
+                200
+            );
+        }
+    }
+
+    public function checkAssignmentExits($id)
+    {
+        $user = User::find($id);
+        if ($user->assignment()->exists()) {
+            return response()->json(
+                [
+                    "success" => true,
+                    "message" =>
+                        "There are valid assignments belonging to this user.",
+                ],
+                200
+            );
+        } else {
+            return response()->json(
+                [
+                    "success" => true,
+                    "message" => "User can be disabled"
+                ],
+                200
+            );
+        }
+    }
 }

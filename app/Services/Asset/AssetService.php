@@ -44,11 +44,4 @@ class AssetService
             return $this->apiResponse([], 'fail', 'Update Asset Unsuccessfully');
         }
     }
-
-    public function getAssetById($id): JsonResponse
-    {
-        $result = $this->assetRepository->getAssetById($id);
-
-        return $this->apiResponse($result, 'success', 'Get User Information Success');
-    }
 }
