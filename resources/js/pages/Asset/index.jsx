@@ -39,9 +39,11 @@ export default function Asset() {
   const [filterState, setFilterState] = useState(['Available', 'Not Available', 'Assigned']);
   const [checkFilterStateCurrent, setcheckFilterStateCurrent] = useState([]);
   const [checkAllState, setcheckAll] = useState(false);
+  const [checkSearch, setCheckSearch] = useState(false);
   const handleFilterState = async (value) => {
     const currentIndex = checkFilterStateCurrent.indexOf(value);
     const newCheckFilterState = [...checkFilterStateCurrent];
+
     let checkAll = false;
     if (currentIndex === -1) {
       newCheckFilterState.push(value);
@@ -72,6 +74,7 @@ export default function Asset() {
 
     // dispatch(assetAction.setSortHeader(false));
     dispatch(assetAction.setLoadingFilter(true));
+    setCheckSearch(true);
   };
   const handleCheckAllState = (value) => {
     dispatch(
@@ -84,6 +87,7 @@ export default function Asset() {
     dispatch(setCurrentPage(1));
     // dispatch(assetAction.setSortHeader(false));
     dispatch(assetAction.setLoadingFilter(true));
+    setCheckSearch(true);
   };
   // Filter Category
   const [filterCategory, setFilterCategory] = useState([0]);
@@ -122,23 +126,35 @@ export default function Asset() {
     dispatch(setCurrentPage(1));
     // dispatch(assetAction.setSortHeader(false));
     dispatch(assetAction.setLoadingFilter(true));
+    setCheckSearch(true);
   };
 
   // Search
   const [inputValueSearchAsset, setInputValueSearchAsset] = useState('');
-  const handleSearchAsset = (e) => {
+  const handleSearchAsset = async (e) => {
     e.preventDefault();
-    dispatch(
-      assetAction.fetchListAsset({
-        ...filterSelectorState,
-        search: inputValueSearchAsset,
-      })
-    );
     dispatch(setCurrentPage(1));
     // dispatch(assetAction.setSortHeader(false));
     dispatch(assetAction.setLoadingFilter(true));
+    setCheckSearch(true);
   };
-
+  const handleSortActive = (value) => {
+    if (value) {
+      setInputValueSearchAsset('');
+    }
+  };
+  useEffect(() => {
+    if (checkSearch == true) {
+      dispatch(
+        assetAction.fetchListAsset({
+          ...filterSelectorState,
+          search: inputValueSearchAsset,
+        })
+      );
+      setCheckSearch(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkSearch]);
   const routeChange = () => {
     dispatch(assetAction.setIsAdd(true));
     dispatch(setSubTitle('Create new asset'));
@@ -196,7 +212,7 @@ export default function Asset() {
               </Button>
             </div>
           </div>
-          <AssetTable />
+          <AssetTable sortActive={handleSortActive} />
           <div className="d-flex justify-content-end align-items-center mt-3">
             {listState > 20 && <PaginationUI handlePageChange={handlePageChange} />}
           </div>

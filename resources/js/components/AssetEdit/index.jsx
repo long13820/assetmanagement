@@ -1,122 +1,63 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { FaAngleDown, FaCalendarAlt } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
-import moment from 'moment';
+import { yupResolver } from '@hookform/resolvers/yup';
+import Notiflix from 'notiflix';
+import PropTypes from 'prop-types';
 
-import { get, put } from '../../htttpHelper';
+import { editSchema } from '../../adapter/AssetAdapter';
+import { editAsset } from '../../api/Asset/assetAPI';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
-import { assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
+import { assetEditData, assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
 import { formatDate } from '../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../Layouts/Alerts';
+import { BlockUI } from '../Layouts/Notiflix';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './style.css';
 
 function EditAsset(props) {
   const dispatch = useDispatch();
-
-  const [installedDate, setInstalledDate] = useState('');
-  const [isOpenDatePicker, setIsOpenDatePicker] = useState(false);
-  const [errorNameAsset, setErrorNameAsset] = useState('');
-  const [errorSpeAsset, setErrorSpeAsset] = useState('');
-  const [inputs, setInputs] = useState({
-    assetName: '',
-    specification: '',
-    installedDate: '',
-    categoryName: '',
-    state: '',
-  });
+  const [categoryName, setCategoryName] = useState('');
   const dataId = useSelector(assetgetIdSelector);
+  const editData = useSelector(assetEditData);
   const id = dataId;
 
-  useEffect(() => {
-    fetchAsset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  React.useEffect(() => {
+    if (editData) {
+      setCategoryName(editData.category_name);
+    }
   }, []);
 
-  const fetchAsset = () => {
-    get(`/assets/${id}`)
-      .then((res) => {
-        const installedDate = res.data.data[0].installed_date.split('/').reverse().join('-');
-        const object = {
-          assetName: res.data.data[0].asset_name,
-          specification: res.data.data[0].specification,
-          installedDate: installedDate,
-          categoryName: res.data.data[0].category_name,
-          state: res.data.data[0].state,
-        };
-        setInstalledDate(installedDate);
-        setInputs(object);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { isValid, isDirty, errors },
+  } = useForm({
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    resolver: yupResolver(editSchema),
+    defaultValues: {
+      asset_name: editData?.asset_name,
+      specification: editData?.specification,
+      state: editData?.state,
+      installed_date: new Date(editData?.installed_date),
+    },
+  });
 
-  const preSave = () => {
-    let check = true;
-
-    if (inputs.assetName === '') {
-      check = false;
-    }
-    if (inputs.specification === '') {
-      check = false;
-    }
-    if (inputs.installedDate === '') {
-      check = false;
-    }
-    if (inputs.state === '') {
-      check = false;
-    }
-    return check;
-  };
-
-  const handleOnChange = (e) => {
-    setInputs((prevState) => ({
-      ...prevState,
-      [e.target.name]: e.target.value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrorNameAsset('');
-    setErrorSpeAsset('');
-    let check = true;
-    if (check === false) {
-      return;
-    }
-
-    inputs.installedDate = formatDate(installedDate, 'YYYY-MM-DD');
-
-    inputs['asset_name'] = inputs['assetName'];
-    inputs.category_name = inputs.categoryName;
-
-    if (inputs.installedDate) {
-      inputs['installed_date'] = inputs['installedDate'];
-      delete inputs.installedDate;
-    }
-
-    delete inputs.assetName;
-    delete inputs.categoryName;
-
-    await put(`/assets/${id}`, inputs)
-      .then(() => {
-        SuccessToast('Update asset successfully', 3000);
-      })
-      .catch(() => {
-        ErrorToast('Update asset unsuccessfully', 3000);
-      });
-
+  const backToManageAssetDispatch = () => {
     dispatch(
       assetAction.setIsEdit({
         isEdit: false,
       })
     );
     dispatch(
-      assetAction.setFilter({
+      assetAction.fetchListAsset({
         'filter[state]': 'Available,Not Available,Assigned,Waiting for recycling,Recycled',
         'filter[category]': undefined,
         'sort[asset_code]': undefined,
@@ -128,164 +69,147 @@ function EditAsset(props) {
     );
     dispatch(assetAction.setSortHeader(true));
     dispatch(assetAction.setLoadingFilter(true));
-    // eslint-disable-next-line react/prop-types
     props.filterAll(true);
   };
 
-  const openDatePicker = () => {
-    setIsOpenDatePicker(!isOpenDatePicker);
+  const onSubmit = async (data) => {
+    BlockUI('#root');
+    data.installed_date = formatDate(data.installed_date, 'YYYY-MM-DD');
+    const result = await editAsset(data, id);
+    if (result === 200) {
+      SuccessToast('Update asset successfully', 3000);
+      backToManageAssetDispatch();
+    } else {
+      ErrorToast('Update asset unsuccessfully', 3000);
+    }
+    Notiflix.Block.remove('#root');
   };
 
-  return (
-    <>
-      <div className="asset_edit_form d-flex justify-content-center">
-        <Form onSubmit={handleSubmit}>
-          <table align="center" border="0" className="table table-bordered mb-0">
-            <tbody>
-              <tr>
-                <td width="30%">
-                  <p className="font-weight-bold">Name</p>
-                </td>
-                <td width="70%">
-                  <Form.Control
-                    name="assetName"
-                    id="edit-asset-name"
-                    type="text"
-                    required
-                    onChange={handleOnChange}
-                    value={inputs.assetName}
-                  />
-                  <span id="error">{errorNameAsset}</span>
-                </td>
-              </tr>
-              <tr>
-                <td width="30%">
-                  <p className="font-weight-bold">Category</p>
-                </td>
-                <td width="70%">
-                  <div className="aef-category-input">
-                    <Form.Control id="edit-asset-category" disabled defaultValue={inputs.categoryName} />
-                    <FaAngleDown className="aefci-icon" />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td width="30%">
-                  <p className="font-weight-bold">Specification</p>
-                </td>
-                <td width="70%">
-                  <Form.Control
-                    name="specification"
-                    id="edit-asset-specification"
-                    as="textarea"
-                    required
-                    onChange={handleOnChange}
-                    value={inputs.specification}
-                  />
-                  <span id="error">{errorSpeAsset}</span>
-                </td>
-              </tr>
-              <tr required>
-                <td width="30%">
-                  <p className="font-weight-bold">Installed Date</p>
-                </td>
-                <td width="70%">
-                  <div className="datepicker">
-                    <DatePicker
-                      className="form-control"
-                      dateFormat="dd/MM/yyyy"
-                      showMonthDropdown
-                      showYearDropdown
-                      scrollableYearDropdown
-                      yearDropdownItemNumber={50}
-                      onKeyDown={(e) => e.preventDefault()}
-                      selected={installedDate && new Date(installedDate)}
-                      onChange={(date) => setInstalledDate(moment(date).format('YYYY-MM-DD'))}
-                      placeholderText="dd/MM/yyyy"
-                      onClickOutside={openDatePicker}
-                      onSelect={openDatePicker}
-                      onFocus={openDatePicker}
-                      open={isOpenDatePicker}
-                    />
-                    <FaCalendarAlt className="icon-date" onClick={openDatePicker} />
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td width="30%">
-                  <p className="font-weight-bold">State</p>
-                </td>
+  const asset_name = useWatch({
+    control,
+    name: 'asset_name',
+  });
 
-                <td width="70%">
-                  <Form.Check
-                    type="radio"
-                    label="Available"
-                    name="state"
-                    id="available"
-                    required
-                    value="Available"
-                    onChange={handleOnChange}
-                    checked={inputs.state === 'Available'}
+  return (
+    <div className="asset_edit_form d-flex justify-content-center">
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <table align="center" border="0" className="table table-bordered mb-0">
+          <tbody>
+            <tr>
+              <td width="30%">
+                <p className="font-weight-bold">Name</p>
+              </td>
+              <td width="70%">
+                <Form.Control id="edit-asset-name" type="text" maxLength={50} {...register('asset_name')} />
+                <div className="d-flex justify-content-between">
+                  <small className="text-red font-weight-semi">
+                    {asset_name?.length > 0 && errors?.asset_name?.type === 'matches' && errors?.asset_name?.message}
+                  </small>
+                  <small className="font-weight-bold">{asset_name === undefined ? 0 : asset_name.length}/50</small>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="30%">
+                <p className="font-weight-bold">Category</p>
+              </td>
+              <td width="70%">
+                <div className="aef-category-input">
+                  <Form.Control id="edit-asset-category" disabled defaultValue={categoryName} />
+                  <FaAngleDown className="aefci-icon" />
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="30%">
+                <p className="font-weight-bold">Specification</p>
+              </td>
+              <td width="70%">
+                <Form.Control id="edit-asset-specification" as="textarea" {...register('specification')} />
+              </td>
+            </tr>
+            <tr required>
+              <td width="30%">
+                <p className="font-weight-bold">Installed Date</p>
+              </td>
+              <td width="70%">
+                <div className="datepicker">
+                  <Controller
+                    name="installed_date"
+                    {...register('installed_date')}
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <>
+                        <DatePicker
+                          className="form-control"
+                          selected={value}
+                          onChange={onChange}
+                          dateFormat="dd/MM/yyyy"
+                          showMonthDropdown
+                          showYearDropdown
+                          scrollableYearDropdown
+                          yearDropdownItemNumber={50}
+                          placeholderText="dd/mm/yyyy"
+                          maxDate={new Date()}
+                        />
+                        <FaCalendarAlt className="icon-date" />
+                      </>
+                    )}
                   />
-                  <Form.Check
-                    type="radio"
-                    label="Not available"
-                    name="state"
-                    id="notavailable"
-                    required
-                    value="Not Available"
-                    onChange={handleOnChange}
-                    checked={inputs.state === 'Not Available'}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Waiting for recycling"
-                    name="state"
-                    id="wait"
-                    required
-                    value="Waiting for recycling"
-                    onChange={handleOnChange}
-                    checked={inputs.state === 'Waiting for recycling'}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Recycled"
-                    name="state"
-                    id="recycled"
-                    required
-                    value="Recycled"
-                    onChange={handleOnChange}
-                    checked={inputs.state === 'Recycled'}
-                  />
-                  <Form.Check
-                    type="radio"
-                    label="Assigned"
-                    name="state"
-                    id="assigned"
-                    required
-                    value="Assigned"
-                    onChange={handleOnChange}
-                    checked={inputs.state === 'Assigned'}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div className="d-flex justify-content-end mt-3">
-            <Button id="edit-asset-save btn" variant="danger" type="submit" disabled={!preSave()}>
-              Save
-            </Button>
-            <button
-              id="edit-asset-cancel-btn"
-              className="btn btn-outline-secondary ms-3"
-              onClick={() => dispatch(assetAction.setIsEdit(false))}
-            >
-              Cancel
-            </button>
-          </div>
-        </Form>
-      </div>
-    </>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td width="30%">
+                <p className="font-weight-bold">State</p>
+              </td>
+              <td width="70%">
+                <Form.Check type="radio" label="Available" id="available" value="Available" {...register('state')} />
+                <Form.Check
+                  type="radio"
+                  label="Not available"
+                  id="notavailable"
+                  value="Not Available"
+                  {...register('state')}
+                />
+                <Form.Check
+                  type="radio"
+                  label="Waiting for recycling"
+                  id="wait"
+                  value="Waiting for recycling"
+                  {...register('state')}
+                />
+                <Form.Check type="radio" label="Recycled" id="recycled" value="Recycled" {...register('state')} />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div className="d-flex justify-content-end mt-3">
+          <Button
+            id="edit-asset-save"
+            variant="danger"
+            className="font-weight-bold me-3"
+            type="submit"
+            disabled={!isDirty || !isValid}
+          >
+            Save
+          </Button>
+          <Button
+            id="edit-asset-cancel-btn"
+            variant="outline-secondary"
+            className="font-weight-bold"
+            onClick={() => dispatch(assetAction.setIsEdit(false))}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Form>
+    </div>
   );
 }
+
+EditAsset.propTypes = {
+  filterAll: PropTypes.func,
+};
+
 export default EditAsset;

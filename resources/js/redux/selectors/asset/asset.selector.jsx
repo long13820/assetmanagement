@@ -4,6 +4,7 @@ export const assetMessageSelector = (state) => state.asset.message;
 export const assetTotalRecordPageSelector = (state) => state.asset.totalRecordPage;
 export const assetFilterSelector = (state) => state.asset.filter;
 export const assetKeySelector = (state) => state.asset.key;
+export const assetEditData = (state) => state.asset.editData;
 // Show detail Asset
 export const assetLoadingDetailSelector = (state) => state.asset.loadingDetail;
 export const assetDetailSelector = (state) => state.asset.detailAsset;

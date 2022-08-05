@@ -110,7 +110,7 @@ export default function ShowDetailAsset(props) {
                     Asset Code
                   </td>
                   <td width="60%" className="pe-0">
-                    {detailAsset?.asset_code}
+                    <p className="word-break">{detailAsset?.asset_code}</p>
                   </td>
                 </tr>
                 <tr>
@@ -118,7 +118,7 @@ export default function ShowDetailAsset(props) {
                     Asset Name
                   </td>
                   <td width="60%" className="pe-0">
-                    {detailAsset?.asset_name}
+                    <p className="word-break">{detailAsset?.asset_name}</p>
                   </td>
                 </tr>
                 <tr>
@@ -126,7 +126,7 @@ export default function ShowDetailAsset(props) {
                     Category
                   </td>
                   <td width="60%" className="pe-0">
-                    {detailAsset?.category_name}
+                    <p className="word-break">{detailAsset?.category_name}</p>
                   </td>
                 </tr>
                 <tr>
@@ -134,7 +134,7 @@ export default function ShowDetailAsset(props) {
                     Installed Date
                   </td>
                   <td width="60%" className="pe-0">
-                    {detailAsset?.installed_date}
+                    <p className="word-break">{detailAsset?.installed_date}</p>
                   </td>
                 </tr>
                 <tr>
@@ -142,7 +142,7 @@ export default function ShowDetailAsset(props) {
                     State
                   </td>
                   <td width="60%" className="pe-0">
-                    {detailAsset?.state}
+                    <p className="word-break">{detailAsset?.state}</p>
                   </td>
                 </tr>
                 <tr>
@@ -150,7 +150,7 @@ export default function ShowDetailAsset(props) {
                     Location
                   </td>
                   <td width="60%" className="pe-0">
-                    <p>{detailAsset?.name}</p>
+                    <p className="word-break">{detailAsset?.name}</p>
                   </td>
                 </tr>
                 <tr>

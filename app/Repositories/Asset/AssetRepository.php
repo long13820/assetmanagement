@@ -71,13 +71,4 @@ class AssetRepository
         $asset->update($request->all());
         return $asset;
     }
-
-    public function getAssetById($id): AssetResource
-    {
-        $data = Asset::query()
-            ->join("location", "user.location_id", "=", "location.id")
-            ->find($id);
-
-        return $data;
-    }
 }

@@ -151,7 +151,8 @@ class User extends AuthenticateTable
                 $search = $request->query('search');
                 $query
                     ->where("full_name", "ILIKE", "%{$search}%")
-                    ->orWhere("staff_code", "ILIKE", "%{$search}%");
+                    ->orWhere("staff_code", "ILIKE", "%{$search}%")
+                    ->orWhere("username", "ILIKE", "%{$search}");
             });
     }
 }

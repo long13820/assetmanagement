@@ -30,7 +30,7 @@ class CreateCategoryRequest extends FormRequest
 
         return [
             "category_name" => "required|unique:categories,category_name",
-            "category_prefix" => "required"
+            "category_prefix" => "required|unique:categories,category_prefix"
         ];
     }
 

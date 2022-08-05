@@ -29,8 +29,12 @@ export const assetReduccer = createSlice({
     },
     message: '',
     totalRecordPage: 0,
+    editData: {},
   },
   reducers: {
+    setEditData: (state, action) => {
+      state.editData = action.payload;
+    },
     setKey: (state, action) => {
       state.key = action.payload;
     },

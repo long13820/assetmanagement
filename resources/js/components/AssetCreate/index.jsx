@@ -5,7 +5,7 @@
 import React from 'react';
 import { Button, Dropdown, Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { FaAngleDown, FaCalendarAlt, FaCheck, FaTimes } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -13,8 +13,7 @@ import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { addSchema } from '../../adapter/AssetAdapter';
-import { createAsset, getAllCategories } from '../../api/Asset/assetAPI';
-import { post } from '../../htttpHelper';
+import { createAsset, createNewCategory, getAllCategories } from '../../api/Asset/assetAPI';
 import { setSubTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { userSelector } from '../../redux/selectors';
@@ -33,7 +32,7 @@ export default function AssetCreate() {
     handleSubmit,
     control,
     setValue,
-    formState: { isValid },
+    formState: { isValid, errors },
   } = useForm({
     mode: 'onChange',
     reValidateMode: 'onChange',
@@ -50,6 +49,8 @@ export default function AssetCreate() {
   const [menu, setMenu] = React.useState(false);
   const [errorAddCategory, setErrorAddCategory] = React.useState('');
   const [categories, setCategories] = React.useState([]);
+  const [errorNameExist, setErrorNameExist] = React.useState('');
+  const [errorPrefixExist, setErrorPrefixExist] = React.useState('');
 
   const [inputAddCategory, setInputAddCategory] = React.useState({
     category_prefix: '',
@@ -69,7 +70,7 @@ export default function AssetCreate() {
     let check = true;
 
     if (inputAddCategory.category_name.replace(/\s/g, '') === '' && inputAddCategory.category_prefix === '') {
-      setErrorAddCategory('Please input two input ');
+      setErrorAddCategory('Please input two input');
       check = false;
     } else if (inputAddCategory.category_name.replace(/\s/g, '') === '') {
       setErrorAddCategory('Please input category name');
@@ -78,7 +79,7 @@ export default function AssetCreate() {
       setErrorAddCategory('Please input category prefix');
       check = false;
     }
-    if (inputAddCategory.category_prefix.length > 5 || inputAddCategory.category_prefix.length < 2) {
+    if (inputAddCategory.category_prefix.length > 5) {
       return false;
     }
 
@@ -128,10 +129,12 @@ export default function AssetCreate() {
       category_prefix: '',
     });
     setErrorAddCategory('');
+    setErrorPrefixExist('');
+    setErrorNameExist('');
     setShow(false);
   };
 
-  const addNewCategory = () => {
+  const addNewCategory = async () => {
     BlockUI('#root');
     if (!preAddCate()) {
       Notiflix.Block.remove('#root');
@@ -142,39 +145,56 @@ export default function AssetCreate() {
     inputAddCategory.category_name = inputAddCategory.category_name.replace(/\s+/g, ' ').trim();
 
     setErrorAddCategory('');
+    setErrorPrefixExist('');
+    setErrorNameExist('');
 
-    post('/categories', inputAddCategory)
-      .then((res) => {
-        Notiflix.Block.remove('#root');
-        setCategories([
-          ...categories,
-          {
-            category_name: res.data.data.category_name,
-            category_prefix: res.data.data.category_prefix,
-            id: res.data.data.id,
-          },
-        ]);
-        setErrorAddCategory('');
-        setShow(false);
-        setInputAddCategory({
-          category_name: '',
-          category_prefix: '',
-        });
-      })
-      .catch((error) => {
-        Notiflix.Block.remove('#root');
-        if (error.response.status === 409) {
-          setErrorAddCategory('Category is already exists. Please enter a different category');
-        } else {
-          setErrorAddCategory('Prefix is already exists. Please enter a different prefix');
-        }
+    const result = await createNewCategory(inputAddCategory);
+    Notiflix.Block.remove('#root');
+    if (result.error?.category_name && result.error?.category_prefix) {
+      setErrorNameExist('Category is already exists. Please enter a different category');
+      setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
+      return;
+    }
+
+    if (result.error?.category_name && !result.error?.category_prefix) {
+      setErrorNameExist('Category is already exists. Please enter a different category');
+      setErrorPrefixExist('');
+      return;
+    }
+
+    if (!result.error?.category_name && result.error?.category_prefix) {
+      setErrorNameExist('');
+      setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
+      return;
+    }
+
+    if (result.category_name && result.category_prefix && result.id) {
+      setCategories([
+        ...categories,
+        {
+          category_name: result.category_name,
+          category_prefix: result.category_prefix,
+          id: result.id,
+        },
+      ]);
+      setShow(false);
+      setInputAddCategory({
+        category_name: '',
+        category_prefix: '',
       });
+      SuccessToast('Add new category successfully', 3000);
+    }
   };
 
   const backtoManagerAsset = () => {
     dispatch(assetAction.setIsAdd(false));
     dispatch(setSubTitle(''));
   };
+
+  const asset_name = useWatch({
+    control,
+    name: 'asset_name',
+  });
 
   return (
     <div className="asset-create-form d-flex justify-content-center">
@@ -186,7 +206,13 @@ export default function AssetCreate() {
                 <p className="font-weight-bold">Name</p>
               </td>
               <td width="70%">
-                <Form.Control id="form-asset-name" type="text" {...register('asset_name')} />
+                <Form.Control id="form-asset-name" type="text" maxLength={50} {...register('asset_name')} />
+                <div className="d-flex justify-content-between">
+                  <small className="text-red font-weight-semi">
+                    {asset_name?.length > 0 && errors?.asset_name?.type === 'matches' && errors?.asset_name?.message}
+                  </small>
+                  <small className="font-weight-bold">{asset_name === undefined ? 0 : asset_name.length}/50</small>
+                </div>
               </td>
             </tr>
             <tr>
@@ -263,7 +289,7 @@ export default function AssetCreate() {
                                 placeholder="BM"
                                 type="text"
                                 maxLength={5}
-                                minLength={2}
+                                minLength={1}
                                 value={inputAddCategory.category_prefix}
                                 name="category_prefix"
                                 onChange={handleOnChangeAdd}
@@ -282,7 +308,21 @@ export default function AssetCreate() {
                               />
                             </div>
                           </div>
-                          <small className="font-weight-semi text-danger">{errorAddCategory}</small>
+                          {errorAddCategory !== '' && (
+                            <div>
+                              <small className="font-weight-semi text-danger">{errorAddCategory}</small>
+                            </div>
+                          )}
+                          {errorNameExist !== '' && (
+                            <div>
+                              <small className="font-weight-semi text-danger">{errorNameExist}</small>
+                            </div>
+                          )}
+                          {errorPrefixExist !== '' && (
+                            <div>
+                              <small className="font-weight-semi text-danger">{errorPrefixExist}</small>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

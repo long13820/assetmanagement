@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
+import { getAssetById } from '../../../api/Asset/assetAPI';
 import { setSubTitle, setTotalRecord } from '../../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
 import { categoryAction } from '../../../redux/reducer/category/category.reducer';
@@ -21,7 +22,7 @@ import Skeleton from '../../Layouts/Skeleton';
 import Table from '../../Layouts/Table';
 import ShowDetailAsset from '../Detail';
 
-export default function AssetTable() {
+export default function AssetTable(props) {
   const [renderTableHeader] = React.useState([...asset_table_header]);
   const current_page = useSelector(currentPageSelector);
   const assetFilterState = useSelector(assetFilterSelector);
@@ -50,6 +51,8 @@ export default function AssetTable() {
   };
 
   const handleSortState = (sortTitle) => {
+    // eslint-disable-next-line react/prop-types
+    props.sortActive(true);
     dispatch(assetAction.setLoadingFilter(true));
     dispatch(assetAction.setSortHeader(false));
     switch (sortTitle) {
@@ -130,15 +133,21 @@ export default function AssetTable() {
     }, 200);
   };
 
-  const handleEditAsset = (e, dataId) => {
-    // e.stopPropagation();
-    dispatch(
-      assetAction.setIsEdit({
-        isEdit: true,
-        idAsset: dataId,
-      })
-    );
-    dispatch(setSubTitle('Edit asset'));
+  const handleEditAsset = async (e, dataId) => {
+    e.stopPropagation();
+    BlockUI('#root', 'fixed');
+    const result = await getAssetById(dataId);
+    if (Object.keys(result).length > 0) {
+      dispatch(assetAction.setEditData(result));
+      dispatch(
+        assetAction.setIsEdit({
+          isEdit: true,
+          idAsset: dataId,
+        })
+      );
+      dispatch(setSubTitle('Edit asset'));
+    }
+    Notiflix.Block.remove('#root');
   };
 
   const renderTableBody = () => {

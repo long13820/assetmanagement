@@ -70,8 +70,26 @@ export const getAllCategories = async () => {
   if (response.status !== 'success') return [];
 };
 
+export const getAssetById = async (id) => {
+  const url = `/assets/${id}`;
+  const response = await axiosClient.get(url, configHeadersAuthenticate());
+  return response.status === 'success' ? response.data[0] : {};
+};
+
 export const createAsset = async (body) => {
   const url = '/assets';
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
   return response.success === true ? 200 : 400;
+};
+
+export const editAsset = async (body, id) => {
+  const url = `/assets/${id}`;
+  const response = await axiosClient.put(url, body, configHeadersAuthenticate());
+  return response.status === 'success' ? 200 : 400;
+};
+
+export const createNewCategory = async (body) => {
+  const url = '/categories';
+  const response = await axiosClient.post(url, body, configHeadersAuthenticate());
+  return response.status === 409 ? response.data : response.data;
 };

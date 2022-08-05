@@ -33,7 +33,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.asset_code}</p>
+                  <p className="word-break">{props.detail?.asset_code}</p>
                 </td>
               </tr>
               <tr>
@@ -43,7 +43,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.asset_name}</p>
+                  <p className="word-break">{props.detail?.asset_name}</p>
                 </td>
               </tr>
               <tr>
@@ -63,7 +63,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.assigned_to}</p>
+                  <p className="word-break">{props.detail?.assigned_to}</p>
                 </td>
               </tr>
               <tr>
@@ -73,7 +73,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.assigned_by}</p>
+                  <p className="word-break">{props.detail?.assigned_by}</p>
                 </td>
               </tr>
               <tr>
@@ -83,7 +83,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{formatDate(props.detail?.assigned_date, 'DD/MM/YYYY')}</p>
+                  <p className="word-break">{formatDate(props.detail?.assigned_date, 'DD/MM/YYYY')}</p>
                 </td>
               </tr>
               <tr>
@@ -93,7 +93,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{capitalizeFirstLetter(props.detail?.state)}</p>
+                  <p className="word-break">{capitalizeFirstLetter(props.detail?.state)}</p>
                 </td>
               </tr>
               <tr>
@@ -103,7 +103,7 @@ export default function AssignmentDetail(props) {
                   </p>
                 </td>
                 <td className="pe-0">
-                  <p>{props.detail?.note}</p>
+                  <p className="word-break">{props.detail?.note}</p>
                 </td>
               </tr>
             </tbody>
