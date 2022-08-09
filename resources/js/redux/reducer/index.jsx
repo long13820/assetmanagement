@@ -5,6 +5,8 @@ import assetReduccer from './asset/asset.reducer';
 import assignmentReducer from './assignment/assignment.reducer';
 import authReducer from './auth/auth.reducer';
 import categoryReduccer from './category/category.reducer';
+import homeReducer from './home/home.reducer';
+import requestReducer from './request/request.reducer';
 import userReducer from './user/user.reducer';
 
 const rootReducer = combineReducers({
@@ -14,6 +16,8 @@ const rootReducer = combineReducers({
   asset: assetReduccer,
   category: categoryReduccer,
   assignment: assignmentReducer,
+  home: homeReducer,
+  request: requestReducer,
 });
 
 export default rootReducer;

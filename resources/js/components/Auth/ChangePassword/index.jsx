@@ -13,7 +13,7 @@ import './style.css';
 export default function ChangePassword(props) {
   const [typeOldPassword, setShowOldPassword] = React.useState('password');
   const [typeNewPassword, setShowNewPassword] = React.useState('password');
-  const [backdrop, setBackdrop] = React.useState(true);
+  const [backdrop, setBackdrop] = React.useState('static');
   const [changePasswordSuccess, setChangePasswordSuccess] = React.useState(false);
 
   const {
@@ -41,7 +41,7 @@ export default function ChangePassword(props) {
           },
           { shouldFocus: true }
         );
-        setBackdrop(true);
+        setBackdrop('static');
         break;
       case 422:
         setError(
@@ -53,10 +53,10 @@ export default function ChangePassword(props) {
           },
           { shouldFocus: true }
         );
-        setBackdrop(true);
+        setBackdrop('static');
         break;
       case 200:
-        setBackdrop(true);
+        setBackdrop('static');
         setChangePasswordSuccess(true);
         setStateModal('keep');
     }

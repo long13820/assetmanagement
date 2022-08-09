@@ -1,36 +1,34 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
-import { editAssignmentById, getReturnRequestById } from '../../../api/Assignment';
-import { formatDate } from '../../../utils/formatDate';
+import { editAssignmentById } from '../../../api/Assignment';
+import { userSelector } from '../../../redux/selectors';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
 
 import './style.css';
 function UserCreateRequest(props) {
+  const userDetail = useSelector(userSelector);
+
   const handleCreateRequestUser = async () => {
-    const resultAssigmentReturnId = await getReturnRequestById(props.assignedByIdAdmin);
     const id = props.idCreateRequestUser;
     BlockUI('#root', 'fixed');
-    const date = new Date();
-    const currentDate = formatDate(date, 'YYYY-MM-DD');
-    const countReturnId = resultAssigmentReturnId == undefined ? 1 : parseInt(resultAssigmentReturnId.returned_id) + 1;
     const state = {
       state: 'Waiting for returning',
-      returned_date: currentDate,
-      returned_id: countReturnId,
+      requested_id: userDetail.id,
     };
     const result = await editAssignmentById(id, state);
     if (result === 200) {
-      SuccessToast('Create request user successfully', 3000);
+      SuccessToast('The request for returning is created successfully', 3000);
       Notiflix.Block.remove('#root');
       props.forceReload();
       props.setModalCreateRequestUser();
     } else {
-      ErrorToast('Create request user unsuccessfully', 3000);
+      ErrorToast('The request for returning is created unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
       props.setModalCreateRequestUser();
     }
@@ -45,13 +43,13 @@ function UserCreateRequest(props) {
         }}
         elementModalTitle={<p className="font-weight-bold">Are you sure?</p>}
         elementModalBody={
-          <div className="p-3">
+          <div>
             <div>
               <h6>Do you want to create a returning request for this asset? </h6>
             </div>
             <div className="d-flex align-items-center justify-content-start mt-3">
               <Button
-                id="yes-btn"
+                id="request-yes-btn"
                 variant="danger"
                 className="font-weight-bold"
                 onClick={() => handleCreateRequestUser()}
@@ -59,7 +57,7 @@ function UserCreateRequest(props) {
                 Yes
               </Button>
               <Button
-                id="no-btn"
+                id="request-no-btn"
                 variant="outline-secondary"
                 className="ms-3 font-weight-bold"
                 onClick={() => props.setModalCreateRequestUser()}

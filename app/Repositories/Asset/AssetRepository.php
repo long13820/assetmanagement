@@ -2,8 +2,14 @@
 
 namespace App\Repositories\Asset;
 
-use App\Http\Resources\AssetResource;
+use App\Http\Resources\Asset\AssetResource;
+use App\Http\Resources\Asset\DetailAssetResource;
 use App\Models\Asset;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class AssetRepository
 {
@@ -38,8 +44,8 @@ class AssetRepository
     public function store($request)
     {
         $request['asset_code'] = "";
-        $asset = Asset::create($request);
-        return Asset::find($asset["id"]);
+        $asset = Asset::query()->create($request);
+        return Asset::query()->find($asset["id"]);
     }
 
     public function showDetail($id)
@@ -62,7 +68,8 @@ class AssetRepository
             ->join('categories', 'asset.category_id', '=', 'categories.id')
             ->join('location', 'asset.location_id', '=', 'location.id')
             ->get();
-        return $data;
+
+        return DetailAssetResource::collection($data);
     }
 
     public function handleUpdateAsset($request, $id)
@@ -70,5 +77,62 @@ class AssetRepository
         $asset = Asset::query()->where('id', '=', $id)->first();
         $asset->update($request->all());
         return $asset;
+    }
+
+    public function delete($id): JsonResponse
+    {
+        $asset = Asset::query()->find($id);
+
+        if ($asset) {
+            if ($asset->assignment()->exists()) {
+                return response()->json(
+                    [
+                        "success" => false,
+                        "message" => "There are valid assignments belonging to this asset.Please change state"
+                    ],
+                    400
+                );
+            }
+            $asset->delete();
+            return response()->json(
+                [
+                    "success" => true,
+                    "message" => "User is deleted"
+                ],
+                200
+            );
+        }
+    }
+
+    public function checkAsset($id): JsonResponse
+    {
+        $asset = Asset::query()->find($id);
+
+        if ($asset) {
+            if ($asset->assignment()->exists()) {
+                return response()->json(
+                    [
+                        "success" => false,
+                        "message" => "There are valid assignments belonging to this asset. Please change state"
+                    ],
+                    400
+                );
+            }
+            return response()->json(
+                [
+                    "success" => true,
+                    "message" => "User can deleted"
+                ],
+                200
+            );
+        } else {
+            return response()->json(
+                [
+                    "success" => false,
+                    "message" => "Asset not exists",
+                ],
+                400
+            );
+        }
     }
 }

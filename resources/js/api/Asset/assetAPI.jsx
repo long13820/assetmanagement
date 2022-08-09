@@ -93,3 +93,15 @@ export const createNewCategory = async (body) => {
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
   return response.status === 409 ? response.data : response.data;
 };
+
+export const deleteAssetById = async (id) => {
+  const url = `/assets/${id}`;
+  const response = await axiosClient.delete(url, configHeadersAuthenticate());
+  return response.success === true ? 200 : 400;
+};
+
+export const checkAssetById = async (id) => {
+  const url = `/check_asset/${id}`;
+  const response = await axiosClient.put(url, {}, configHeadersAuthenticate());
+  return response.success === true ? 200 : 400;
+};

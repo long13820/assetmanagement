@@ -27,8 +27,8 @@ class Assignment extends Model
         'state',
         'returned_date',
         'returned_id',
-        'note'
-
+        'note',
+        'requested_id'
     ];
 
     public function user(): BelongsTo
@@ -44,6 +44,11 @@ class Assignment extends Model
     public function admin(): BelongsTo
     {
         return $this->belongsTo(User::class, "admin_id");
+    }
+
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(User::class, "requested_id");
     }
 
     public function scopeFilter($query, $request)
@@ -116,7 +121,7 @@ class Assignment extends Model
                         ->orderBy(User::query()
                         ->select('username')
                             ->whereColumn('id', 'assignment.admin_id'), $sortValue);
-                } else {
+                } elseif ($sortBy !== "id") {
                     $query->orderBy($sortBy, $sortValue);
                 }
             });

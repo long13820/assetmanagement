@@ -19,7 +19,12 @@ export default function Requests() {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...requests_table_header]);
-  const [sort, setCurrentSort] = React.useState([]);
+  const [sort, setCurrentSort] = React.useState([
+    {
+      key: 'updated_at',
+      value: 'desc',
+    },
+  ]);
   const [filter, setFilter] = React.useState('All');
   const [filterDate, setFilterDate] = React.useState('');
   const [search, setSearch] = React.useState('');
@@ -37,8 +42,21 @@ export default function Requests() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const forceReload = async () => {
+    let tempSort;
+    let tempPage;
+    if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
+    if (page > 1) tempPage = page;
+    const result = await getAllRequests({
+      sort: tempSort,
+      page: tempPage,
+    });
+    setRequests(result);
+    Notiflix.Block.remove('#root');
+  };
+
   const handleGetAllRequests = async () => {
-    const result = await getAllRequests();
+    const result = await getAllRequests({ sort });
     setLoading(false);
     setRequests(result);
   };
@@ -48,7 +66,7 @@ export default function Requests() {
     let tempSearch;
     let tempFilter;
     let tempFilterDate;
-    if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
+    if (filter === 'Completed' || filter === 'Waiting for returning') tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (filterDate !== '') tempFilterDate = filterDate;
     setCurrentSort(sort);
@@ -103,7 +121,7 @@ export default function Requests() {
     let tempSearch;
     let tempSort;
     let tempFilter;
-    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (filter === 'Completed' || filter === 'Waiting for returning') tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     const result = await getAllRequests({
@@ -122,7 +140,7 @@ export default function Requests() {
     let tempSort;
     let tempFilter;
     let tempFilterDate;
-    if (filter === 'Admin' || filter === 'Staff') tempFilter = filter;
+    if (filter === 'Completed' || filter === 'Waiting for returning') tempFilter = filter;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     if (filterDate !== '') tempFilterDate = filterDate;
     if (search !== '') {
@@ -186,7 +204,12 @@ export default function Requests() {
             <FilterReturnedDate setCurrentFilter={handleCurrentFilterDate} date={filterDate} />
           </div>
           {filterDate !== '' && (
-            <Button variant="danger" className="font-weight-bold ms-3" onClick={() => handleCurrentFilterDate('')}>
+            <Button
+              id="reset-date"
+              variant="danger"
+              className="font-weight-bold ms-3"
+              onClick={() => handleCurrentFilterDate('')}
+            >
               Reset date
             </Button>
           )}
@@ -210,7 +233,13 @@ export default function Requests() {
       {!loading ? (
         <>
           {data?.length > 0 ? (
-            <RequestsTable data={data} sort={sort} renderTableHeader={renderTableHeader} handleSort={handleSort} />
+            <RequestsTable
+              data={data}
+              sort={sort}
+              renderTableHeader={renderTableHeader}
+              handleSort={handleSort}
+              forceReload={forceReload}
+            />
           ) : (
             <NotFoundData />
           )}

@@ -35,12 +35,14 @@ class Asset extends Model
 
     public function assignment(): HasMany
     {
-        return $this->hasMany(Assignment::class);
+        return $this->hasMany(Assignment::class)->with(['user', 'admin']);
     }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);
     }
+
     public function getCategoryPrefix($id)
     {
         return Category::query()

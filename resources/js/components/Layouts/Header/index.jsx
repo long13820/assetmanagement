@@ -12,9 +12,13 @@ import {
   setIsAdd as setIsAddAssignment,
   setKey as setKeyAssignment,
 } from '../../../redux/reducer/assignment/assignment.reducer';
+import { setHomeKey } from '../../../redux/reducer/home/home.reducer';
+import { setRequestKey } from '../../../redux/reducer/request/request.reducer';
 import { setIsAdd, setIsEdit, setKey } from '../../../redux/reducer/user/user.reducer';
 import {
   keyAssignmentSelector,
+  keyHomeSelector,
+  keyRequestSelector,
   keyUserSelector,
   subTitleSelector,
   titleSelector,
@@ -30,6 +34,8 @@ export default function Header() {
   const title = useSelector(titleSelector);
   const subTitle = useSelector(subTitleSelector);
   const keyUser = useSelector(keyUserSelector);
+  const keyHome = useSelector(keyHomeSelector);
+  const keyRequest = useSelector(keyRequestSelector);
   const keyAsset = useSelector((state) => state.asset.key);
   const keyAssignment = useSelector(keyAssignmentSelector);
 
@@ -93,6 +99,12 @@ export default function Header() {
         })
       );
       dispatch(assetAction.setSortHeader(true));
+    }
+    if (title === 'Home') {
+      dispatch(setHomeKey(keyHome + 1));
+    }
+    if (title === 'Request for Returning') {
+      dispatch(setRequestKey(keyRequest + 1));
     }
   };
 

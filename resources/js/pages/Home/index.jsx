@@ -18,7 +18,12 @@ export default function Home() {
   const [page, setPage] = React.useState(1);
   const [data, setData] = React.useState([]);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...home_table_header]);
-  const [sort, setCurrentSort] = React.useState([]);
+  const [sort, setCurrentSort] = React.useState([
+    {
+      key: 'created_at',
+      value: 'desc',
+    },
+  ]);
   const [totalRecord, setTotalRecord] = React.useState(0);
   const [perPage] = React.useState(20);
   const [totalPage, setTotalPage] = React.useState(0);
@@ -44,7 +49,7 @@ export default function Home() {
   };
 
   const handleGetAllMyAssignments = async () => {
-    const result = await getAllAssignmentsById();
+    const result = await getAllAssignmentsById({ sort });
     setLoading(false);
     setAssignmentUser(result);
   };

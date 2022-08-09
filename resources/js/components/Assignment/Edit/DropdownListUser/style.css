@@ -1,0 +1,22 @@
+.textField {
+    background-color: white;
+    border: none;
+  }
+  
+  .textFieldBoth {
+    border: 2px solid #ced4da;
+    border-radius: 0.385rem;
+  }
+  
+  .textField:disabled,
+  .textField[readonly] {
+    background-color: white;
+    opacity: 1;
+  }
+  .textSearch {
+    padding: 17px;
+  }
+  .dropdownScroll {
+    max-height: 150px;
+    overflow-y: scroll;
+  }

@@ -44,4 +44,14 @@ class AssetService
             return $this->apiResponse([], 'fail', 'Update Asset Unsuccessfully');
         }
     }
+
+    public function delete($id): JsonResponse
+    {
+        return $this->assetRepository->delete($id);
+    }
+
+    public function checkAsset($id): JsonResponse
+    {
+        return $this->assetRepository->checkAsset($id);
+    }
 }

@@ -84,4 +84,16 @@ class CreateAssignmentTest extends TestCase
         ]);
         $response->assertStatus(422);
     }
+
+    public function test_CreateAssignmentFailed()
+    {
+        $response = $this->post("api/assignments", [
+            "user_id" => "",
+            "asset_id" => "",
+            "admin_id" => "",
+            "assigned_date" => "",
+         
+        ]);
+        $response->assertStatus(422);
+    }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Requests;
 
-use App\Http\Resources\RequestResource;
+use App\Http\Resources\Request\RequestCollection;
 use App\Models\Assignment;
 
 class RequestsRepository
@@ -20,6 +20,24 @@ class RequestsRepository
             ->search($request)
             ->paginate($this->paginate);
 
-        return RequestResource::collection($data)->response()->getData();
+        if ($request->has('sort.id')) {
+            $list = new RequestCollection($data);
+            $dataCollection = collect($list);
+
+            foreach ($request->query("sort") as $value) {
+                if ($value === 'asc') {
+                    return [
+                        'data' => $dataCollection['data']->sortBy('no')->values()->all(),
+                        'meta' => $dataCollection['meta'],
+                    ];
+                } elseif ($value === 'desc') {
+                    return [
+                        'data' => $dataCollection['data']->sortByDesc('no')->values()->all(),
+                        'meta' => $dataCollection['meta'],
+                    ];
+                }
+            }
+        }
+        return new RequestCollection($data);
     }
 }

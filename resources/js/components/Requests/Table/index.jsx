@@ -1,21 +1,52 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 import { FaCheck, FaTimes } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 
+import { editAssignmentById } from '../../../api/Assignment';
 import { formatDate } from '../../../utils/formatDate';
+import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Modal from '../../Layouts/Modal';
+import { BlockUI } from '../../Layouts/Notiflix';
 import Table from '../../Layouts/Table';
+import ModalCompleteRequest from '../ModalCompleteRequest';
 
 export default function RequestsTable(props) {
+  const [assignmentId, setAssignmentId] = React.useState(-1);
+  const [modalCancelRequest, setModalCancelRequest] = React.useState(false);
+
+  function handleCancelClick(e, id) {
+    e.stopPropagation();
+    setModalCancelRequest(true);
+    setAssignmentId(id);
+  }
+
+  const changeStateToCancelRequestOfReturning = async () => {
+    BlockUI('#root', 'fixed');
+    const state = {
+      state: 'Accepted',
+    };
+
+    const result = await editAssignmentById(assignmentId, state);
+    if (result === 200) {
+      SuccessToast('Cancel returning request successfully', 3000);
+      setModalCancelRequest(false);
+      setAssignmentId(-1);
+      // eslint-disable-next-line react/prop-types
+      props.forceReload();
+    } else {
+      ErrorToast('Cancel returning request unsuccessfully', 3000);
+    }
+  };
+
   const handleSort = (key, valueAsc, valueDesc) => {
-    const tempSort = [];
+    const tempSort = JSON.parse(JSON.stringify(props.sort));
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
-
     if (!valueAsc && !valueDesc) {
-      if (key === 'No.') key = 'returned_id';
+      if (key === 'No.') key = 'id';
       if (key === 'Requested by') key = 'Assigned to';
       if (key === 'Accepted by') key = 'Assigned by';
-      tempSort.push({ key: '', value: '' });
       tempSort[0].key = key;
       tempSort[0].value = 'asc';
       tempTableHeader[findIndexHeader].isSortAsc = true;
@@ -29,10 +60,9 @@ export default function RequestsTable(props) {
     }
 
     if (valueAsc && !valueDesc) {
-      if (key === 'No.') key = 'returned_id';
+      if (key === 'No.') key = 'id';
       if (key === 'Requested by') key = 'Assigned to';
       if (key === 'Accepted by') key = 'Assigned by';
-      tempSort.push({ key: '', value: '' });
       tempSort[0].key = key;
       tempSort[0].value = 'desc';
       tempTableHeader[findIndexHeader].isSortAsc = false;
@@ -46,6 +76,8 @@ export default function RequestsTable(props) {
     }
 
     if (!valueAsc && valueDesc) {
+      tempSort[0].key = 'updated_at';
+      tempSort[0].value = 'desc';
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = false;
       tempTableHeader.forEach((_, index) => {
@@ -58,18 +90,27 @@ export default function RequestsTable(props) {
 
     props.handleSort(tempSort, tempTableHeader);
   };
+  const [showModalCompleteRequest, setModalComplelteRequest] = React.useState(false);
+  const [idRequest, setRequest] = React.useState('');
+  const [idAsset, setIdAsset] = React.useState('');
+  const handleCompleteRequestClick = async (e, id, id_asset) => {
+    e.stopPropagation();
+    setModalComplelteRequest(true);
+    setRequest(id);
+    setIdAsset(id_asset);
+  };
 
   const renderTableBody = () => {
     return props.data.map((item) => {
       return (
         <tr key={item.id}>
-          <td>{item.returned_id}</td>
+          <td>{item.no}</td>
           <td>{item.asset_code}</td>
           <td>{item.asset_name}</td>
           <td>{item.requested_by}</td>
           <td>{formatDate(item.assigned_date, 'DD/MM/YYYY')}</td>
           <td>{item.accepted_by}</td>
-          <td>{formatDate(item.returned_date, 'DD/MM/YYYY')}</td>
+          <td>{item.state === 'Completed' ? formatDate(item.returned_date, 'DD/MM/YYYY') : undefined}</td>
           <td>
             <p
               className={`${
@@ -82,16 +123,24 @@ export default function RequestsTable(props) {
           <td>
             <div className="d-flex">
               <button
-                id="home-accept-btn"
+                id="request-accept-btn"
                 className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                disabled={item.state === 'Completed'}
+                onClick={(e) => {
+                  handleCompleteRequestClick(e, item.id, item.asset_id);
+                }}
               >
-                <FaCheck className={`text-danger font-20px ${item.state === 'Completed' ? 'opacity-25' : ''}`} />
+                <FaCheck className={`text-danger font-20px ${item.state === 'Completed' ? 'opacity-50' : ''}`} />
               </button>
               <button
-                id="home-decline-btn"
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3"
+                id="request-cancel-btn"
+                disabled={item.state !== 'Waiting for returning'}
+                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ms-3"
+                onClick={(e) => {
+                  handleCancelClick(e, item.id);
+                }}
               >
-                <FaTimes className={`text-black font-20px ${item.state === 'Completed' ? 'opacity-25' : ''}`} />
+                <FaTimes className={`text-black font-20px ${item.state === 'Completed' ? 'opacity-50' : ''}`} />
               </button>
             </div>
           </td>
@@ -100,7 +149,59 @@ export default function RequestsTable(props) {
     });
   };
 
-  return <Table tableHeader={props.renderTableHeader} tableBody={renderTableBody()} handleSort={handleSort} />;
+  return (
+    <>
+      <Table tableHeader={props.renderTableHeader} tableBody={renderTableBody()} handleSort={handleSort} />
+      <ModalCompleteRequest
+        show={showModalCompleteRequest}
+        setModalCompleteRequest={() => {
+          setModalComplelteRequest(false);
+          setRequest('');
+          setIdAsset('');
+        }}
+        idRequest={idRequest}
+        idAsset={idAsset}
+        forceReload={() => props.forceReload()}
+      />
+      <Modal
+        show={modalCancelRequest}
+        setStateModal={() => {
+          setModalCancelRequest(false);
+          setAssignmentId(-1);
+        }}
+        backdrop="static"
+        elementModalTitle={<p>Are you sure?</p>}
+        elementModalBody={
+          <>
+            <div className="mb-3">
+              <h6>Do you want to cancel this returning request?</h6>
+            </div>
+            <div className="d-flex align-items-center justify-content-start">
+              <Button
+                onClick={() => changeStateToCancelRequestOfReturning()}
+                id="yes-btn"
+                variant="danger"
+                className="font-weight-bold"
+              >
+                Yes
+              </Button>
+              <Button
+                id="no-btn"
+                variant="outline-secondary"
+                className="ms-3 font-weight-bold"
+                onClick={() => {
+                  setModalCancelRequest(false);
+                  setAssignmentId(-1);
+                }}
+              >
+                No
+              </Button>
+            </div>
+          </>
+        }
+      />
+    </>
+  );
 }
 
 RequestsTable.propTypes = {
@@ -108,4 +209,5 @@ RequestsTable.propTypes = {
   handleSort: PropTypes.func,
   renderTableHeader: PropTypes.any,
   sort: PropTypes.any,
+  forceReload: PropTypes.func,
 };

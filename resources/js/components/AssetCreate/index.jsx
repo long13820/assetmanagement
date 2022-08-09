@@ -109,7 +109,7 @@ export default function AssetCreate() {
       dispatch(setSubTitle(''));
       dispatch(
         assetAction.fetchListAsset({
-          'filter[state]': 'Available,Not Available,Assigned,Waiting for recycling,Recycled',
+          'filter[state]': 'Available,Not Available,Assigned',
           'filter[category]': undefined,
           'sort[asset_code]': undefined,
           'sort[asset_name]': undefined,

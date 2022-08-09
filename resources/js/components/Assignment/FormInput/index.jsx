@@ -207,7 +207,7 @@ export default function FormInput(props) {
       asset_id: currentAssetName.id,
       admin_id: admin.id,
     });
-    const stateField = { state: 'Not Available' };
+    const stateField = { state: 'Assigned' };
     const response_2 = await editAssetById(currentAssetName.id, stateField);
     if (response === 201 && response_2 === 200) {
       SuccessToast('Create assignment is successfully', 3000);
@@ -318,7 +318,7 @@ export default function FormInput(props) {
                 <Form.Label className="font-weight-bold">Assigned Date</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <Form.Control type="date" {...register('assigned_date')} />
+                <Form.Control type="date" min={new Date().toISOString().split('T')[0]} {...register('assigned_date')} />
               </Col>
             </Row>
           </Form.Group>

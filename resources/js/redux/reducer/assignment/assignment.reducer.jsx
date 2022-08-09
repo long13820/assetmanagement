@@ -3,15 +3,19 @@ import { createSlice } from '@reduxjs/toolkit';
 export const assignmentReducer = createSlice({
   name: 'assignment',
   initialState: {
+    assignment: {},
     asset: {},
     assetName: '',
     userName: '',
     staffCode: '',
     assetCode: '',
-    user: [],
+    user: {},
     isAdd: false,
     isSelect: true,
     key: 0,
+    isEdit: false,
+    assetId: 0,
+    userId: 0,
   },
   reducers: {
     setKey: (state, action) => {
@@ -20,11 +24,14 @@ export const assignmentReducer = createSlice({
     setAsset: (state, action) => {
       state.asset = { ...action.payload };
     },
+    setAssignment: (state, action) => {
+      state.assignment = { ...action.payload };
+    },
     setAssetName: (state, action) => {
       state.assetName = action.payload;
     },
     setUser: (state, action) => {
-      state.user = action.payload;
+      state.user = { ...action.payload };
     },
     setIsAdd: (state, action) => {
       state.isAdd = action.payload;
@@ -41,6 +48,15 @@ export const assignmentReducer = createSlice({
     setAssetCode: (state, action) => {
       state.assetCode = action.payload;
     },
+    setIsEdit: (state, action) => {
+      state.isEdit = action.payload;
+    },
+    setUserId: (state, action) => {
+      state.userId = action.payload;
+    },
+    setAssetId: (state, action) => {
+      state.assetId = action.payload;
+    },
   },
 });
 
@@ -54,5 +70,9 @@ export const {
   setStaffCode,
   setAssetCode,
   setKey,
+  setIsEdit,
+  setAssignment,
+  setUserId,
+  setAssetId,
 } = assignmentReducer.actions;
 export default assignmentReducer.reducer;

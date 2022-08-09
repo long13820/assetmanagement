@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Assignment;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class AssignmentResource extends JsonResource
@@ -9,14 +10,16 @@ class AssignmentResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
+     * @param  Request  $request
+     * @return array
      */
-    public function toArray($request)
+    public function toArray($request): array
     {
         return [
             "id" => $this->id,
             "asset_id" => $this->asset_id,
+            "user_id" => $this->user_id,
+            "full_name" => $this->user->full_name,
             "asset_code" => $this->asset->asset_code,
             "asset_name" => $this->asset->asset_name,
             "specification" => $this->asset->specification,

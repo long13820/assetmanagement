@@ -2,8 +2,12 @@
 
 namespace App\Repositories\User;
 
-use App\Http\Resources\UserResource;
+use App\Http\Resources\User\UserResource;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
 
 class UserRepository
 {
@@ -32,22 +36,17 @@ class UserRepository
         return UserResource::collection($data)->response()->getData();
     }
 
-    public function userProfile($request)
-    {
-        return $request->user();
-    }
-
     public function store($request)
     {
         $request['full_name'] = "";
         $request['staff_code'] = "";
         $request['username'] = "";
         $request["password"] = "";
-        $user = User::create($request);
-        return User::find($user["id"]);
+        $user = User::query()->create($request);
+        return User::query()->find($user["id"]);
     }
 
-    public function getUserById($id): UserResource
+    public function getUserById($id)
     {
         $data = User::query()
             ->find($id);
@@ -64,7 +63,7 @@ class UserRepository
 
     public function delete($id)
     {
-        $user = User::find($id);
+        $user = User::query()->find($id);
         if ($user) {
             if ($user->assignment()->exists()) {
                 return response()->json(
@@ -89,7 +88,7 @@ class UserRepository
 
     public function checkAssignmentExits($id)
     {
-        $user = User::find($id);
+        $user = User::query()->find($id);
         if ($user->assignment()->exists()) {
             return response()->json(
                 [

@@ -89,4 +89,23 @@ class GetAssignmentsTest extends TestCase
         );
         $response->assertStatus(500);
     }
+
+    public function test_getting_assignments_sort_by_id_asc()
+    {
+       
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json("GET", "/api/assignments?&sort[id]=asc");
+        $response->assertStatus(200);
+        $response->assertJsonStructure(["data"]);
+        
+    }
+
+    public function test_getting_assignments_sort_by_id_desc()
+    {
+       
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json("GET", "/api/assignments?&sort[id]=desc");
+        $response->assertStatus(200);
+        $response->assertJsonStructure(["data"]);
+    }
 }

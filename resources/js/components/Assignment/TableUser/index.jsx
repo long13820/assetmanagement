@@ -63,13 +63,20 @@ export default function AssignmentUserTable(props) {
   const renderTableBody = () => {
     return props.data.map((item) => {
       return (
-        <tr key={item.id} className="cursor-pointer">
+        <tr
+          key={item.id}
+          className="cursor-pointer"
+          onClick={() => handleSelectUser(item.full_name, item.id, item.staff_code)}
+        >
           <td>
             <input
               type="checkbox"
               className="form-check-input"
               checked={userName === item.full_name && staffCode === item.staff_code}
-              onChange={() => handleSelectUser(item.full_name, item.id, item.staff_code)}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleSelectUser(item.full_name, item.id, item.staff_code);
+              }}
             />
             <span className="checkmark" />
           </td>

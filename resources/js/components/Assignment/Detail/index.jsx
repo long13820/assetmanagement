@@ -12,7 +12,7 @@ export default function AssignmentDetail(props) {
   return (
     <Modal
       show={props.show}
-      backdrop={true}
+      backdrop="static"
       setStateModal={() => props.setStateModal()}
       elementModalTitle={
         <p className="d-flex align-items-center w-100">
@@ -27,82 +27,82 @@ export default function AssignmentDetail(props) {
           <table align="center" border="0" className="table table-bordered mb-0">
             <tbody>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Asset Code</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.asset_code}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Asset Name</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.asset_name}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Specification</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.specification}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Assigned to</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.assigned_to}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Assigned by</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.assigned_by}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Assigned Date</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{formatDate(props.detail?.assigned_date, 'DD/MM/YYYY')}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>State</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{capitalizeFirstLetter(props.detail?.state)}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Note</strong>
                   </p>
                 </td>
-                <td className="pe-0">
+                <td width="70%" className="pe-0">
                   <p className="word-break">{props.detail?.note}</p>
                 </td>
               </tr>

@@ -165,6 +165,10 @@ export default function Asset() {
     }
   };
   const listState = useSelector(assetTotalRecordPageSelector);
+  const backtoManageAsset = () => {
+    dispatch(assetAction.setIsEdit(false));
+    dispatch(setSubTitle(''));
+  };
   return (
     <section>
       {!isEdit && !isAdd && <h5 className="text-danger font-weight-bold mb-3">Asset List</h5>}
@@ -212,7 +216,7 @@ export default function Asset() {
               </Button>
             </div>
           </div>
-          <AssetTable sortActive={handleSortActive} />
+          <AssetTable sortActive={handleSortActive} backtoManageAsset={backtoManageAsset} />
           <div className="d-flex justify-content-end align-items-center mt-3">
             {listState > 20 && <PaginationUI handlePageChange={handlePageChange} />}
           </div>

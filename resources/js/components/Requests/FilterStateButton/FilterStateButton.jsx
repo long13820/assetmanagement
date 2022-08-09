@@ -33,20 +33,20 @@ export default function FilterStateButton(props) {
               onChange={() => handleFilter('All')}
             />
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => handleFilter('Admin')}>
+          <Dropdown.Item onClick={() => handleFilter('Completed')}>
             <Form.Check
               type="checkbox"
-              id="checkbox-admin"
+              id="checkbox-completed"
               className="mx-4 my-2 font-weight-bold"
               label="Completed"
               checked={props.currentFilter === 'Completed'}
               onChange={() => handleFilter('Completed')}
             />
           </Dropdown.Item>
-          <Dropdown.Item onClick={() => handleFilter('Staff')}>
+          <Dropdown.Item onClick={() => handleFilter('Waiting for returning')}>
             <Form.Check
               type="checkbox"
-              id="checkbox-staff"
+              id="checkbox-waiting for returning"
               className="mx-4 font-weight-bold"
               label="Waiting for returning"
               checked={props.currentFilter === 'Waiting for returning'}

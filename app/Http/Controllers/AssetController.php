@@ -23,7 +23,7 @@ class AssetController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         return $this->assetService->getAllAsset($request);
     }
@@ -33,7 +33,7 @@ class AssetController extends Controller
         //
     }
 
-    public function store(CreateAssetRequest $request): JsonResponse
+    public function store(CreateAssetRequest $request)
     {
         $validated = $request->validated();
         $asset = $this->assetService->store($validated);
@@ -44,13 +44,29 @@ class AssetController extends Controller
         ]);
     }
 
-    public function show($id): JsonResponse
+    public function show($id)
     {
         return $this->assetService->showDetail($id);
     }
 
-    public function update(EditAssetRequest $request, $id): JsonResponse
+    public function update(EditAssetRequest $request, $id)
     {
         return $this->assetService->updateAsset($request, $id);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id)
+    {
+        return $this->assetService->delete($id);
+    }
+
+    public function checkAsset($id)
+    {
+        return $this->assetService->checkAsset($id);
     }
 }

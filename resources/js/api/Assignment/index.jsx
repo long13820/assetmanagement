@@ -179,3 +179,23 @@ export const acceptAssignment = async (id) => {
   if (response.status === 'success') return 200;
   if (response.status !== 'success') return 400;
 };
+
+export const declineAssignment = async (id) => {
+  const url = `/assignments/${id}`;
+  const response = await axiosClient.put(
+    url,
+    {
+      state: 'Declined',
+    },
+    configHeadersAuthenticate()
+  );
+  if (response.status === 'success') return 200;
+  if (response.status !== 'success') return 400;
+};
+
+export const completeRequestById = async (id, body) => {
+  const url = `/assignments/${id}`;
+  const response = await axiosClient.put(url, body, configHeadersAuthenticate());
+  if (response.status === 'success') return 200;
+  if (response.status !== 'success') return 404;
+};

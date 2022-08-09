@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
@@ -6,6 +7,7 @@ import Notiflix from 'notiflix';
 
 import { assignment_table_header } from '../../../assets/data/assignment_table_header';
 import { getAllAssignments } from '../../api/Assignment';
+import AssignmentEditForm from '../../components/Assignment/Edit';
 import FilterButton from '../../components/Assignment/FilterButton';
 import FilterDate from '../../components/Assignment/FilterDate';
 import FormInput from '../../components/Assignment/FormInput';
@@ -15,7 +17,7 @@ import { BlockUI } from '../../components/Layouts/Notiflix';
 import Pagination from '../../components/Layouts/Pagination';
 import Skeleton from '../../components/Layouts/Skeleton';
 import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
-import { setIsAdd } from '../../redux/reducer/assignment/assignment.reducer';
+import { setIsAdd, setIsEdit } from '../../redux/reducer/assignment/assignment.reducer';
 
 export default function Assignment() {
   const [loading, setLoading] = React.useState(true);
@@ -30,6 +32,7 @@ export default function Assignment() {
   const [perPage] = React.useState(18);
   const [totalPage, setTotalPage] = React.useState(0);
   const isAdd = useSelector((state) => state.assignment.isAdd);
+  const isEdit = useSelector((state) => state.assignment.isEdit);
   const [sortDate, setSortDate] = React.useState('');
 
   React.useEffect(() => {
@@ -37,7 +40,21 @@ export default function Assignment() {
     dispatch(setTitle('Manage Assignment'));
     dispatch(setSubTitle(''));
     handleGetAllAssignments();
+    dispatch(setIsEdit(false));
   }, []);
+
+  const forceReload = async () => {
+    let tempSort;
+    let tempPage;
+    if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
+    if (page > 1) tempPage = page;
+    const result = await getAllAssignments({
+      sort: tempSort,
+      page: tempPage,
+    });
+    setAssignment(result);
+    Notiflix.Block.remove('#root');
+  };
 
   const handleGetAllAssignments = async () => {
     const result = await getAllAssignments();
@@ -51,7 +68,13 @@ export default function Assignment() {
     let tempFilter;
     let tempSortDate;
     let tempFilterDate;
-    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (
+      filter === 'Accepted' ||
+      filter === 'Waiting for acceptance' ||
+      filter === 'Waiting for returning' ||
+      filter === 'Declined'
+    )
+      tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (sortDate !== '') tempSortDate = sortDate;
     if (filterDate !== '') tempFilterDate = filterDate;
@@ -81,7 +104,13 @@ export default function Assignment() {
     let tempSort;
     let tempSortDate;
     let tempFilter;
-    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (
+      filter === 'Accepted' ||
+      filter === 'Waiting for acceptance' ||
+      filter === 'Waiting for returning' ||
+      filter === 'Declined'
+    )
+      tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     if (sortDate !== '') tempSortDate = sortDate;
@@ -98,14 +127,20 @@ export default function Assignment() {
 
   const handleCurrentFilter = async (value) => {
     let tempFilter;
-    if ((value === filter && value === 'Accepted') || (value === filter && value === 'Waiting for acceptance')) {
+    if (
+      (value === filter && value === 'Accepted') ||
+      (value === filter && value === 'Waiting for acceptance') ||
+      (value === filter && value === 'Waiting for returning') ||
+      (value === filter && value === 'Declined')
+    ) {
       setFilter('All');
     } else if (value === filter && value === 'All') {
       setFilter('All');
       return;
     } else {
       setFilter(value);
-      if (value === 'Accepted' || value === 'Waiting for acceptance') tempFilter = value;
+      if (['Accepted', 'Waiting for acceptance', 'Declined', 'Waiting for returning'].includes(value))
+        tempFilter = value;
     }
     BlockUI('#root');
     let tempSearch;
@@ -128,9 +163,14 @@ export default function Assignment() {
   };
 
   const dispatch = useDispatch();
-  const goToCreateNewAssignment = () => {
-    dispatch(setIsAdd(true));
-    dispatch(setSubTitle('Create Assignment'));
+  const goToCreateNewAssignment = (e) => {
+    e.stopPropagation();
+    setTimeout(() => {
+      Notiflix.Block.remove('#root');
+      dispatch(setIsAdd(true));
+      dispatch(setSubTitle('Create Assignment'));
+    }, 500);
+    BlockUI('#root', 'fixed');
   };
 
   const backToManageAssignment = async (field) => {
@@ -138,7 +178,13 @@ export default function Assignment() {
     let tempFilter;
     let tempPage;
     let tempFilterDate;
-    if (filter === 'Accepted' || filter === 'Waiting for Acceptance') tempFilter = filter;
+    if (
+      filter === 'Accepted' ||
+      filter === 'Waiting for acceptance' ||
+      filter === 'Waiting for returning' ||
+      filter === 'Declined'
+    )
+      tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (page > 1) tempPage = page;
     setSortDate(field);
@@ -153,6 +199,7 @@ export default function Assignment() {
     });
     setAssignment(result);
     if (field === 'created_at') dispatch(setIsAdd(false));
+    if (field === 'updated_at') dispatch(setIsEdit(false));
     Notiflix.Block.remove('#root');
   };
 
@@ -163,7 +210,13 @@ export default function Assignment() {
     let tempFilter;
     let tempSortDate;
     let tempFilterDate;
-    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (
+      filter === 'Accepted' ||
+      filter === 'Waiting for acceptance' ||
+      filter === 'Waiting for returning' ||
+      filter === 'Declined'
+    )
+      tempFilter = filter;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
     if (sortDate !== '') tempSortDate = sortDate;
     if (filterDate !== '') tempFilterDate = filterDate;
@@ -201,7 +254,13 @@ export default function Assignment() {
     let tempSearch;
     let tempSortDate;
     if (sort.length > 0) tempSort = JSON.parse(JSON.stringify(sort));
-    if (filter === 'Accepted' || filter === 'Waiting for acceptance') tempFilter = filter;
+    if (
+      filter === 'Accepted' ||
+      filter === 'Waiting for acceptance' ||
+      filter === 'Waiting for returning' ||
+      filter === 'Declined'
+    )
+      tempFilter = filter;
     if (search !== '') tempSearch = search;
     if (sortDate !== '') tempSortDate = sortDate;
     if (filterDate !== '') tempFilterDate = filterDate;
@@ -226,9 +285,10 @@ export default function Assignment() {
 
   return (
     <section>
-      {!isAdd && <h5 className="text-danger font-weight-bold mb-3">Assignment List</h5>}
+      {!isAdd && !isEdit && <h5 className="text-danger font-weight-bold mb-3">Assignment List</h5>}
       {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create Assignment</h5>}
-      {!isAdd ? (
+      {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit Assignment</h5>}
+      {!isAdd && !isEdit ? (
         <div className="mb-3 d-flex align-items-center justify-content-between">
           <div className="d-flex">
             <FilterButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
@@ -257,13 +317,14 @@ export default function Assignment() {
       ) : (
         ''
       )}
-      {!isAdd ? (
+      {!isAdd && !isEdit ? (
         <>
           {!loading ? (
             <>
               {data?.length > 0 ? (
                 <AssignmentTable
                   data={data}
+                  forceReload={forceReload}
                   sort={sort}
                   renderTableHeader={renderTableHeader}
                   handleSort={handleSort}
@@ -288,7 +349,10 @@ export default function Assignment() {
           )}
         </>
       ) : (
-        <>{isAdd && <FormInput backtoManageAssignment={backToManageAssignment} />}</>
+        <>
+          {isEdit && <AssignmentEditForm backtoManageAssignment={backToManageAssignment} />}
+          {isAdd && <FormInput backtoManageAssignment={backToManageAssignment} />}
+        </>
       )}
     </section>
   );

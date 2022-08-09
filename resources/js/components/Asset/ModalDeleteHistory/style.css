@@ -1,0 +1,13 @@
+.button {
+  color: var(--bs-blue);
+  text-decoration: underline;
+}
+
+.x-btn {
+  color: red;
+  font-size: 1.5rem;
+}
+
+.padding-modal {
+  padding-left: 20px;
+}

@@ -2,8 +2,10 @@
 
 namespace App\Repositories\Assignment;
 
-use App\Http\Resources\AssignmentResource;
+use App\Http\Resources\Assignment\AssignmentCollection;
+use App\Http\Resources\Assignment\AssignmentResource;
 use App\Models\Assignment;
+use Carbon\Carbon;
 
 class AssignmentRepository
 {
@@ -11,13 +13,35 @@ class AssignmentRepository
 
     public function index($request)
     {
-        $data = Assignment::filter($request)
+        $data = Assignment::query()
+            ->filter($request)
             ->sort($request)
             ->search($request)
-            ->where("admin_id", '=', auth()->id())
+            ->where([
+                ["admin_id", '=', auth()->id()],
+                ["state", '!=', 'Completed']
+            ])
             ->paginate($this->paginate);
 
-        return AssignmentResource::collection($data)->response()->getData();
+        if ($request->has('sort.id')) {
+            $list = new AssignmentCollection($data);
+            $dataCollection = collect($list);
+
+            foreach ($request->query("sort") as $value) {
+                if ($value === 'asc') {
+                    return [
+                        'data' => $dataCollection['data']->sortBy('no')->values()->all(),
+                        'meta' => $dataCollection['meta'],
+                    ];
+                } elseif ($value === 'desc') {
+                    return [
+                        'data' => $dataCollection['data']->sortByDesc('no')->values()->all(),
+                        'meta' => $dataCollection['meta'],
+                    ];
+                }
+            }
+        }
+        return new AssignmentCollection($data);
     }
 
     public function store($request)
@@ -43,7 +67,7 @@ class AssignmentRepository
         return $result;
     }
 
-    public function show($id): AssignmentResource
+    public function show($id)
     {
         $data = Assignment::query()
             ->find($id);
@@ -65,7 +89,11 @@ class AssignmentRepository
             ->select("assignment.*", "categories.category_name")
             ->sort($request)
             ->filter($request)
-            ->where("user_id", "=", auth()->user()->id)
+            ->where([
+                ["user_id", "=", auth()->user()->id],
+                ["assigned_date", '<=', Carbon::now('Asia/Ho_Chi_Minh')->toDateString()]
+            ])
+            ->whereIn('assignment.state', array("Waiting for acceptance", "Accepted", "Waiting for returning"))
             ->paginate($this->paginate);
 
         return AssignmentResource::collection($data)->response()->getData();

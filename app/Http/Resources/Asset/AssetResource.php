@@ -1,21 +1,20 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Asset;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use JsonSerializable;
 
 class AssetResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
      *
-     * @param Request $request
-     * @return array|Arrayable|JsonSerializable
+     * @param  Request  $request
+     * @return array
      */
-    public function toArray($request): array|JsonSerializable|Arrayable
+    public function toArray($request)
     {
         return [
             "id" => $this->id,

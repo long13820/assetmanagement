@@ -42,7 +42,7 @@ class AssignmentController extends Controller
      * @param StoreAssignmentRequest $request
      * @return JsonResponse
      */
-    public function store(StoreAssignmentRequest $request): JsonResponse
+    public function store(StoreAssignmentRequest $request)
     {
         return $this->assignmentService->store($request);
     }
@@ -53,7 +53,7 @@ class AssignmentController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id)
     {
         return $this->assignmentService->show($id);
     }
@@ -74,9 +74,9 @@ class AssignmentController extends Controller
      *
      * @param Request $request
      * @param int $id
-     * @return : JsonResponse
+     * @return JsonResponse : JsonResponse
      */
-    public function update(Request $request, int $id): JsonResponse
+    public function update(Request $request, int $id)
     {
         //
         return $this->assignmentService->updateAssignment($request, $id);
@@ -86,9 +86,9 @@ class AssignmentController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return void
+     * @return JsonResponse
      */
-    public function destroy(Request $request, $id): JsonResponse
+    public function destroy(Request $request, $id)
     {
         return $this->assignmentService->deleteAssignment($request, $id);
     }
@@ -103,7 +103,7 @@ class AssignmentController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function showReturnRequestId(int $id): JsonResponse
+    public function showReturnRequestId(int $id)
     {
         return $this->assignmentService->getReturnRequestId($id);
     }

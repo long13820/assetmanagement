@@ -17,14 +17,14 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function getAllUser($request): JsonResponse
+    public function getAllUser($request)
     {
         $result = $this->userRepository->getAllUser($request);
 
         return $this->apiResponse($result, 'success', 'Get All User Success');
     }
 
-    public function getUserById($id): JsonResponse
+    public function getUserById($id)
     {
         $result = $this->userRepository->getUserById($id);
 
@@ -40,7 +40,7 @@ class UserService
         }
     }
 
-    public function updateUser($request, $id): JsonResponse
+    public function updateUser($request, $id)
     {
         $result = $this->userRepository->handleUpdateUser($request, $id);
 

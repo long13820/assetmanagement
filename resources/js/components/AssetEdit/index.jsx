@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 
 import { editSchema } from '../../adapter/AssetAdapter';
 import { editAsset } from '../../api/Asset/assetAPI';
+import { setSubTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { assetEditData, assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
 import { formatDate } from '../../utils/formatDate';
@@ -56,9 +57,10 @@ function EditAsset(props) {
         isEdit: false,
       })
     );
+    dispatch(setSubTitle(''));
     dispatch(
       assetAction.fetchListAsset({
-        'filter[state]': 'Available,Not Available,Assigned,Waiting for recycling,Recycled',
+        'filter[state]': 'Available,Not Available,Assigned',
         'filter[category]': undefined,
         'sort[asset_code]': undefined,
         'sort[asset_name]': undefined,
@@ -69,7 +71,7 @@ function EditAsset(props) {
     );
     dispatch(assetAction.setSortHeader(true));
     dispatch(assetAction.setLoadingFilter(true));
-    props.filterAll(true);
+    props.filterAll(false);
   };
 
   const onSubmit = async (data) => {
@@ -198,7 +200,10 @@ function EditAsset(props) {
             id="edit-asset-cancel-btn"
             variant="outline-secondary"
             className="font-weight-bold"
-            onClick={() => dispatch(assetAction.setIsEdit(false))}
+            onClick={() => {
+              dispatch(assetAction.setIsEdit(false));
+              dispatch(setSubTitle(''));
+            }}
           >
             Cancel
           </Button>

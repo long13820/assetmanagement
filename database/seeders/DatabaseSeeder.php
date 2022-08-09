@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             UserSeeder::class,
             AssetSeeder::class,
-            AssignmentSeeder::class
+            AssignmentSeeder::class,
+            RequestForReturningStateSeeder::class,
+            RequestForReturningSeeder::class
         ]);
     }
 }

@@ -319,7 +319,7 @@ function UserAdd(props) {
       </Form>
       <Modal
         show={confirmCancel}
-        backdrop="true"
+        backdrop="static"
         setStateModal={() => setConfirmCancel(false)}
         elementModalTitle={<p>Notification</p>}
         elementModalBody={

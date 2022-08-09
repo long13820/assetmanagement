@@ -12,12 +12,12 @@ export default function UserDetail(props) {
   return (
     <Modal
       show={props.show}
-      backdrop={true}
+      backdrop="static"
       setStateModal={() => props.setStateModal()}
       elementModalTitle={
         <p className="d-flex align-items-center w-100">
           <span className="flex-grow-1">Detailed User Information</span>
-          <span onClick={() => props.setStateModal()} className="cursor-pointer">
+          <span id="user-detail-close-btn" onClick={() => props.setStateModal()} className="cursor-pointer">
             <FaTimes />
           </span>
         </p>

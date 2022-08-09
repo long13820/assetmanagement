@@ -70,14 +70,21 @@ export default function AssignmentAssetTable(props) {
   const renderTableBody = () => {
     return props.data.map((item) => {
       return (
-        <tr key={item.id} className="cursor-pointer">
+        <tr
+          key={item.id}
+          className="cursor-pointer"
+          onClick={() => handleSelectAsset(item.asset_name, item.id, item.asset_code)}
+        >
           <td>
             <input
               type="checkbox"
               label={item.asset_name}
               className="form-check-input"
               checked={assetName === item.asset_name && assetCode === item.asset_code}
-              onChange={() => handleSelectAsset(item.asset_name, item.id, item.asset_code)}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleSelectAsset(item.asset_name, item.id, item.asset_code);
+              }}
             />
             <span className="checkmark" />
           </td>

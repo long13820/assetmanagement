@@ -4,7 +4,6 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\Category;
-use App\Models\Location;
 use App\Models\User;
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\LocationSeeder;
@@ -92,7 +91,6 @@ class AssetTest extends TestCase
             "category_id" => 1,
             "location_id" => 1,
         ]);
-
         $response = $this->actingAs(User::find(1))
             ->withSession(['foo' => 'bar'])
             ->get('/api/assets/1');

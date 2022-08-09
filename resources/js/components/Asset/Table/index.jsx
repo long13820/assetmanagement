@@ -1,10 +1,12 @@
+/* eslint-disable react/prop-types */
 import React, { useEffect, useState } from 'react';
 import { FaPen, FaTimesCircle } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
+import PropTypes from 'prop-types';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
-import { getAssetById } from '../../../api/Asset/assetAPI';
+import { checkAssetById, deleteAssetById, getAssetById } from '../../../api/Asset/assetAPI';
 import { setSubTitle, setTotalRecord } from '../../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
 import { categoryAction } from '../../../redux/reducer/category/category.reducer';
@@ -16,16 +18,22 @@ import {
   assetLoadingSelector,
   assetTotalRecordPageSelector,
 } from '../../../redux/selectors/asset/asset.selector';
+import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import NotFoundData from '../../Layouts/NotFoundData';
 import { BlockUI } from '../../Layouts/Notiflix';
 import Skeleton from '../../Layouts/Skeleton';
 import Table from '../../Layouts/Table';
 import ShowDetailAsset from '../Detail';
+import ModalDelete from '../ModalDelete';
+import ModalDeleteHistory from '../ModalDeleteHistory';
 
 export default function AssetTable(props) {
   const [renderTableHeader] = React.useState([...asset_table_header]);
   const current_page = useSelector(currentPageSelector);
   const assetFilterState = useSelector(assetFilterSelector);
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
+  const [confirmIdDelete, setConfirmIdDelete] = React.useState(-1);
+  const [confirmDeleteWrong, setConfirmDeleteWrong] = React.useState(false);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(
@@ -181,21 +189,20 @@ export default function AssetTable(props) {
             <td>
               <div className="d-flex">
                 <button
-                  className={` ${
-                    item.state === 'Assigned' ? 'opacity-25' : ''
-                  } br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none`}
+                  className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
                   onClick={item.state === 'Assigned' ? undefined : (e) => handleEditAsset(e, item.id)}
+                  disabled={item.state === 'Assigned'}
                 >
-                  <FaPen className={`text-black font-20px `} />
+                  <FaPen className={`text-black font-20px ${item.state === 'Assigned' ? 'opacity-50' : ''}`} />
                 </button>
 
-                <span
-                  className={`${
-                    item.state === 'Assigned' ? 'opacity-25' : ''
-                  } br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center`}
+                <button
+                  className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                  onClick={item.state === 'Assigned' ? undefined : (e) => handleDeleteAsset(e, item.id)}
+                  disabled={item.state === 'Assigned'}
                 >
-                  <FaTimesCircle className="text-danger font-20px " />
-                </span>
+                  <FaTimesCircle className={`text-danger font-20px ${item.state === 'Assigned' ? 'opacity-50' : ''}`} />
+                </button>
               </div>
             </td>
           </tr>
@@ -205,6 +212,69 @@ export default function AssetTable(props) {
   };
   const statusList = useSelector(assetLoadingSelector);
   const statusFilterLoading = useSelector(assetLoadingAssetFilterSelector);
+
+  const handleDeleteAsset = async (e, id) => {
+    e.stopPropagation();
+    setConfirmIdDelete(id);
+    BlockUI('#root', 'fixed');
+    const result = await checkAssetById(id);
+    if (result === 200) {
+      Notiflix.Block.remove('#root');
+      setConfirmDelete(true);
+    } else {
+      Notiflix.Block.remove('#root');
+      setConfirmDeleteWrong(true);
+    }
+  };
+  const setStateModalDelete = () => {
+    setConfirmIdDelete(-1);
+    setConfirmDelete(false);
+  };
+
+  const setStateModalDeleteWrong = () => {
+    setConfirmIdDelete(-1);
+    setConfirmDeleteWrong(false);
+  };
+  const handleSoftDeleteAsset = async (id) => {
+    BlockUI('#root', 'fixed');
+    const response = await deleteAssetById(id);
+    if (response === 200) {
+      SuccessToast('Delete asset is successfully', 3000);
+      dispatch(
+        assetAction.fetchListAsset({
+          'filter[state]': 'Available,Not Available,Assigned,Waiting for recycling,Recycled',
+          'filter[category]': undefined,
+          'sort[asset_code]': undefined,
+          'sort[asset_name]': undefined,
+          'sort[category_name]': undefined,
+          'sort[state]': undefined,
+          'sort[updated_at]': 'desc',
+        })
+      );
+      props.backtoManageAsset();
+      setStateModalDelete();
+    } else {
+      ErrorToast('Delete asset is unsuccessfully', 3000);
+      Notiflix.Block.remove('#root');
+    }
+  };
+  const handleSoftDeleteAssetWrong = async (e, dataId) => {
+    e.stopPropagation();
+    BlockUI('#root', 'fixed');
+    const result = await getAssetById(dataId);
+    if (Object.keys(result).length > 0) {
+      dispatch(assetAction.setEditData(result));
+      dispatch(
+        assetAction.setIsEdit({
+          isEdit: true,
+          idAsset: dataId,
+        })
+      );
+      dispatch(setSubTitle('Edit asset'));
+    }
+    Notiflix.Block.remove('#root');
+  };
+
   return (
     <>
       {statusFilterLoading == true ? BlockUI('#root', 'fixed') : Notiflix.Block.remove('#root')}
@@ -216,8 +286,22 @@ export default function AssetTable(props) {
           {statusFilterLoading == false && statusList == false && <NotFoundData />}
         </div>
       )}
-
+      <ModalDelete
+        show={confirmDelete}
+        id={confirmIdDelete}
+        setStateModalDelete={() => setStateModalDelete()}
+        handleSoftDeleteAsset={handleSoftDeleteAsset}
+      />
+      <ModalDeleteHistory
+        show={confirmDeleteWrong}
+        id={confirmIdDelete}
+        setStateModalDeleteWrong={() => setStateModalDeleteWrong()}
+        handleSoftDeleteAssetWrong={handleSoftDeleteAssetWrong}
+      />
       <ShowDetailAsset show={showDetail} setStateModal={() => setShowDetailAsset(false)} />
     </>
   );
 }
+AssetTable.propTypes = {
+  backtoManageAsset: PropTypes.func,
+};

@@ -45,6 +45,7 @@ export const assetReduccer = createSlice({
       state.isEdit = action.payload.isEdit;
       state.idAsset = action.payload.idAsset;
     },
+
     setSortHeader: (state, action) => {
       state.isSortHeader = action.payload;
     },

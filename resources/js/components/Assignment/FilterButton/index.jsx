@@ -24,7 +24,7 @@ export default function FilterButton(props) {
             <Form.Check
               type="checkbox"
               id="checkbox-all"
-              className="mx-4 font-weight-bold"
+              className="mx-4 mb-2 font-weight-bold"
               label="All"
               checked={props.currentFilter === 'All'}
             />
@@ -32,19 +32,37 @@ export default function FilterButton(props) {
           <Dropdown.Item onClick={() => handleFilter('Accepted')}>
             <Form.Check
               type="checkbox"
-              id="checkbox-admin"
-              className="mx-4 my-2 font-weight-bold"
+              id="checkbox-accepted"
+              className="mx-4 mb-2 font-weight-bold"
               label="Accepted"
               checked={props.currentFilter === 'Accepted'}
+            />
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => handleFilter('Declined')}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-declined"
+              className="mx-4 mb-2 font-weight-bold"
+              label="Declined"
+              checked={props.currentFilter === 'Declined'}
             />
           </Dropdown.Item>
           <Dropdown.Item onClick={() => handleFilter('Waiting for acceptance')}>
             <Form.Check
               type="checkbox"
-              id="checkbox-staff"
-              className="mx-4 font-weight-bold"
+              id="checkbox-waiting-for-acceptance"
+              className="mx-4 mb-2 font-weight-bold"
               label="Waiting for acceptance"
               checked={props.currentFilter === 'Waiting for acceptance'}
+            />
+          </Dropdown.Item>
+          <Dropdown.Item onClick={() => handleFilter('Waiting for returning')}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-waiting-for-returning"
+              className="mx-4 font-weight-bold"
+              label="Waiting for returning"
+              checked={props.currentFilter === 'Waiting for returning'}
             />
           </Dropdown.Item>
         </Form>

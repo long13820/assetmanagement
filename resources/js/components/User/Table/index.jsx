@@ -60,12 +60,12 @@ export default function UserTable(props) {
     BlockUI('#root', 'fixed');
     const result = await disableUser(idDisable);
     if (result === true) {
-      SuccessToast('Disabled user successfully', 3000);
+      SuccessToast('The user is disabled successfully', 3000);
       setCanDisable(false);
       setIdDisable(-1);
       props.forceReload();
     } else {
-      ErrorToast('Disabled user unsuccessfully', 3000);
+      ErrorToast('The user is disabled unsuccessfully', 3000);
     }
   };
 
@@ -215,19 +215,19 @@ export default function UserTable(props) {
       />
       <Modal
         show={cannotDisable}
-        backdrop="true"
+        backdrop="static"
         setStateModal={() => setCanNotDisable(false)}
         elementModalTitle={
           <p className="d-flex align-items-center w-100">
             <span className="flex-grow-1">Can not disabled user</span>
-            <span onClick={() => setCanNotDisable(false)} className="cursor-pointer">
+            <span id="user-disabled-close-btn" onClick={() => setCanNotDisable(false)} className="cursor-pointer">
               <FaTimes />
             </span>
           </p>
         }
         elementModalBody={
           <>
-            <div className="mb-3 font-weight-semi">There are valid assignments belonging to this user.</div>
+            <div className="font-weight-semi">There are valid assignments belonging to this user.</div>
             <div className="font-weight-semi">Please close all assignments before disabling user.</div>
           </>
         }

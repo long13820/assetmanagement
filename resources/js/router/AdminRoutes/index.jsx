@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Route, Routes } from 'react-router-dom';
 
 import { checkLogin, handleGetMe } from '../../adapter/AppAdapter';
-import AssetCreate from '../../components/AssetCreate';
-import AssetEdit from '../../components/AssetEdit';
 import AdminLayout from '../../layouts/Admin';
 import LoginLayout from '../../layouts/Login';
 import Asset from '../../pages/Asset';
@@ -14,7 +12,14 @@ import LoginPage from '../../pages/Login';
 import RequestsPage from '../../pages/Requests';
 import UserPage from '../../pages/User';
 import { setExpiredToken, setIsLogin, setUser } from '../../redux/reducer/app/app.reducer';
-import { isLoginSelector, keyAssignmentSelector, keyUserSelector, userSelector } from '../../redux/selectors';
+import {
+  isLoginSelector,
+  keyAssignmentSelector,
+  keyHomeSelector,
+  keyRequestSelector,
+  keyUserSelector,
+  userSelector,
+} from '../../redux/selectors';
 import ProtectedRoutes from '../ProtectedRoutes';
 import PublicRoutes from '../PublicRoutes';
 
@@ -22,9 +27,11 @@ export default function AdminRoutes() {
   const dispatch = useDispatch();
   const isAuthenticate = useSelector(isLoginSelector);
   const user = useSelector(userSelector);
+  const keyHome = useSelector(keyHomeSelector);
   const keyUser = useSelector(keyUserSelector);
   const keyAsset = useSelector((state) => state.asset.key);
   const keyAssignment = useSelector(keyAssignmentSelector);
+  const keyRequest = useSelector(keyRequestSelector);
 
   React.useEffect(() => {
     dispatch(setIsLogin(checkLogin()));
@@ -44,17 +51,17 @@ export default function AdminRoutes() {
     <Routes>
       {user?.type === 'Admin' && (
         <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
-          <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
+          <Route path="/" element={<AdminLayout slot={<HomePage key={keyHome} />} />} />
           <Route path="/manage_user" element={<AdminLayout slot={<UserPage key={keyUser} />} />} />
           <Route path="/manage_asset" element={<AdminLayout slot={<Asset key={keyAsset} />} />} />
           <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage key={keyAssignment} />} />} />
-          <Route path="/requests_for_returning" element={<AdminLayout slot={<RequestsPage />} />} />
+          <Route path="/requests_for_returning" element={<AdminLayout slot={<RequestsPage key={keyRequest} />} />} />
         </Route>
       )}
 
       {user?.type === 'Staff' && (
         <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
-          <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
+          <Route path="/" element={<AdminLayout slot={<HomePage key={keyHome} />} />} />
         </Route>
       )}
 
@@ -67,9 +74,6 @@ export default function AdminRoutes() {
       <Route element={<PublicRoutes isAuthenticate={isAuthenticate} />}>
         <Route path="/login" element={<LoginLayout slot={<LoginPage />} />} />
       </Route>
-
-      <Route path="/asset" element={<AdminLayout slot={<AssetCreate />} />} />
-      <Route path="/edit-asset/:id" element={<AdminLayout slot={<AssetEdit />} />} />
     </Routes>
   );
 }

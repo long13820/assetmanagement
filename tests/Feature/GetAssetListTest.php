@@ -40,4 +40,14 @@ class GetAssetListTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(["data"]);
     }
+
+    public function test_assignments_by_search()
+    {
+        Sanctum::actingAs(User::factory()->create(), ["*"]);
+        $response = $this->json(
+            "GET",
+            "/api/assets?search=Laptop"
+        );
+        $response->assertStatus(500);
+    }
 }

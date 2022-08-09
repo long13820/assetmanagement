@@ -23,7 +23,7 @@ class UserController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request)
     {
         return $this->userService->getAllUser($request);
     }
@@ -45,7 +45,7 @@ class UserController extends Controller
      * @param int $id
      * @return JsonResponse
      */
-    public function show(int $id): JsonResponse
+    public function show(int $id)
     {
         return $this->userService->getUserById($id);
     }
@@ -54,7 +54,7 @@ class UserController extends Controller
     {
     }
 
-    public function update(EditUserRequest $request, $id): JsonResponse
+    public function update(EditUserRequest $request, $id)
     {
         return $this->userService->updateUser($request, $id);
     }

@@ -6,13 +6,13 @@ import { logout } from '../../../adapter/AppAdapter';
 import Modal from '../../Layouts/Modal';
 
 export default function Logout(props) {
-  const [backdrop, setBackdrop] = React.useState(true);
+  const [backdrop, setBackdrop] = React.useState('static');
 
   const handleLogout = async () => {
     setBackdrop('static');
     const response = await logout();
     if (response === 500) {
-      setBackdrop(true);
+      setBackdrop('static');
     }
   };
 
