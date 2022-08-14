@@ -53,6 +53,9 @@ export const handleChangePassword = async (body, flag) => {
   const { status } = response;
 
   switch (status) {
+    case 401:
+      Notiflix.Block.remove('.modal-content');
+      return status;
     case 403:
       Notiflix.Block.remove('.modal-content');
       return status;
@@ -86,6 +89,9 @@ export const handleLogout = async () => {
         window.location.href = '/login';
       }, 1000);
       break;
+    case 401:
+      Notiflix.Block.remove('.modal-content');
+      return 401;
     default:
       ErrorToast(3500, 'Server error. Please try again');
       Notiflix.Block.remove('.modal-content');

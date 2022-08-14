@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Asset;
+use App\Models\Assignment;
 use App\Models\User;
 use Database\Seeders\AssetSeeder;
 use Database\Seeders\CategorySeeder;
@@ -24,17 +26,77 @@ class GetAssignmentsTest extends TestCase
     /** @test */
     public function test_can_get_assignments()
     {
+        
         $response = $this->get(route('assignments.index'));
         $response->assertStatus(200);
         $response->assertJson(["status" => "success"]);
         $response->assertJsonStructure(["status", "data"]);
+       
     }
+
+    public function test_can_get_assignments_view()
+    {
+        
+        $response = $this->get(route('assignments.index'));
+        $response->assertStatus(200);
+        $response->assertJson(["status" => "success"]);
+        $response->assertJsonStructure(["status", "data"]);
+       
+    }
+
+    public function test_can_get_assignments_sort()
+    {
+        $admin = User::factory()->create(['type' => "Admin"]);
+        Sanctum::actingAs($admin);
+
+        $user = User::factory()->create();
+        $asset = Asset::factory()->create(
+            [
+                "asset_code" => "LA0001",
+                "asset_name" => "Laptop HP Probook 450 G1",
+                "installed_date" => "2000-01-01",
+                "state" => "Available",
+                "specification" => "sfsdfsdfdsfsdsf",
+                "category_id" => rand(1, 3),
+                "location_id" => 1,
+            ]
+        );
+
+        Assignment::factory()->create([
+            'admin_id' => $admin->id,
+            'user_id' => $user->id,
+            'asset_id' => $asset->id,
+            'state' => "Waiting for acceptance",
+            'note' => "aaa",
+        ]);
+
+        $response = $this->json(
+            "GET",
+            "api/assignments?sort[id]=asc&sort[created_at]=desc"
+        );
+        $response->assertStatus(200);
+        $response->assertJson(["status" => "success"]);
+        $response->assertJsonStructure(["status", "data"]);  
+       
+    }
+
 
     public function test_can_get_assignments_with_filter()
     {
         $response = $this->json(
             "GET",
             "/api/assignments?&filter[state]=&filter[assigned_date]=&filter[asset_id]="
+        );
+        $response->assertStatus(200);
+        $response->assertJson(["status" => "success"]);
+        $response->assertJsonStructure(["status", "data"]);
+    }
+
+    public function test_can_get_assignments_with_filter_returned_dated()
+    {
+        $response = $this->json(
+            "GET",
+            "/api/assignments?&filter[state]=&filter[returned_date]=&filter[asset_id]="
         );
         $response->assertStatus(200);
         $response->assertJson(["status" => "success"]);
@@ -108,4 +170,6 @@ class GetAssignmentsTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(["data"]);
     }
+
+
 }

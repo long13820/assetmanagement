@@ -21,3 +21,8 @@ button.filter-button.dropdown-toggle::after {
 .asset_filter .afd-name {
   padding-right: var(--12px);
 }
+
+#asset-filter-category button.filter-button ~ .dropdown-menu.show {
+  width: 160px;
+  overflow-x: hidden;
+}

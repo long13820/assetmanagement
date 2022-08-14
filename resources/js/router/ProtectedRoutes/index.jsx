@@ -1,12 +1,10 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import PropTypes from 'prop-types';
 
-export default function ProtectedRoutes(props) {
-  const { isAuthenticate } = props;
+import { checkLogin } from '../../adapter/AppAdapter';
+
+export default function ProtectedRoutes() {
+  const isAuthenticate = checkLogin();
+
   return isAuthenticate ? <Outlet /> : <Navigate to="/login" />;
 }
-
-ProtectedRoutes.propTypes = {
-  isAuthenticate: PropTypes.bool.isRequired,
-};

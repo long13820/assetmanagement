@@ -45,7 +45,7 @@ class DisableUserTest extends TestCase
             "assigned_date" => "2022-01-01",
         ]);
         $this->json("DELETE", "/api/users/1")
-            ->assertStatus(400);
+            ->assertStatus(200);
     }
 
 

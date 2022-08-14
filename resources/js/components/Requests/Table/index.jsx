@@ -1,9 +1,12 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { FaCheck, FaTimes } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAssignmentById } from '../../../api/Assignment';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import Modal from '../../Layouts/Modal';
@@ -15,8 +18,9 @@ export default function RequestsTable(props) {
   const [assignmentId, setAssignmentId] = React.useState(-1);
   const [modalCancelRequest, setModalCancelRequest] = React.useState(false);
 
-  function handleCancelClick(e, id) {
-    e.stopPropagation();
+  const dispatch = useDispatch();
+
+  function handleCancelClick(id) {
     setModalCancelRequest(true);
     setAssignmentId(id);
   }
@@ -34,8 +38,13 @@ export default function RequestsTable(props) {
       setAssignmentId(-1);
       // eslint-disable-next-line react/prop-types
       props.forceReload();
+    } else if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('Cancel returning request unsuccessfully', 3000);
+      Notiflix.Block.remove('#root');
     }
   };
 
@@ -93,8 +102,7 @@ export default function RequestsTable(props) {
   const [showModalCompleteRequest, setModalComplelteRequest] = React.useState(false);
   const [idRequest, setRequest] = React.useState('');
   const [idAsset, setIdAsset] = React.useState('');
-  const handleCompleteRequestClick = async (e, id, id_asset) => {
-    e.stopPropagation();
+  const handleCompleteRequestClick = async (id, id_asset) => {
     setModalComplelteRequest(true);
     setRequest(id);
     setIdAsset(id_asset);
@@ -114,7 +122,7 @@ export default function RequestsTable(props) {
           <td>
             <p
               className={`${
-                item.state === 'Completed' ? 'bg-blue-100 text-blue' : 'bg-red-100 text-red'
+                item.state === 'Completed' ? 'bg-success-100 text-success' : 'bg-red-100 text-red'
               } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
             >
               {item.state}
@@ -124,20 +132,24 @@ export default function RequestsTable(props) {
             <div className="d-flex">
               <button
                 id="request-accept-btn"
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
-                disabled={item.state === 'Completed'}
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                  item.state === 'Completed' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleCompleteRequestClick(e, item.id, item.asset_id);
+                  e.stopPropagation();
+                  item.state === 'Completed' ? undefined : handleCompleteRequestClick(item.id, item.asset_id);
                 }}
               >
                 <FaCheck className={`text-danger font-20px ${item.state === 'Completed' ? 'opacity-50' : ''}`} />
               </button>
               <button
                 id="request-cancel-btn"
-                disabled={item.state !== 'Waiting for returning'}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ms-3"
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ms-3 ${
+                  item.state === 'Completed' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleCancelClick(e, item.id);
+                  e.stopPropagation();
+                  item.state === 'Completed' ? undefined : handleCancelClick(item.id);
                 }}
               >
                 <FaTimes className={`text-black font-20px ${item.state === 'Completed' ? 'opacity-50' : ''}`} />

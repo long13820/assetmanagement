@@ -8,7 +8,7 @@ import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { checkDisabledUser, disableUser, getUserById } from '../../../api/User';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { setIsEdit, setUser } from '../../../redux/reducer/user/user.reducer';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
@@ -34,8 +34,13 @@ export default function UserTable(props) {
       dispatch(setUser(data));
       dispatch(setIsEdit(true));
       dispatch(setSubTitle('Edit user'));
+    } else if (data === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
       Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 
@@ -43,28 +48,43 @@ export default function UserTable(props) {
     e.stopPropagation();
     BlockUI('#root', 'fixed');
     const result = await checkDisabledUser(id);
-    if (result === false) {
+    if (result === 405) {
       setCanNotDisable(true);
       Notiflix.Block.remove('#root');
       return;
     }
-    if (result === true) {
+    if (result === 200) {
       setCanDisable(true);
       setIdDisable(id);
       Notiflix.Block.remove('#root');
       return;
+    }
+    if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+      return;
+    }
+    if (result === 500) {
+      Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 
   const handleDisableUser = async () => {
     BlockUI('#root', 'fixed');
     const result = await disableUser(idDisable);
-    if (result === true) {
+    if (result === 200) {
       SuccessToast('The user is disabled successfully', 3000);
       setCanDisable(false);
       setIdDisable(-1);
       props.forceReload();
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
+      Notiflix.Block.remove('#root');
       ErrorToast('The user is disabled unsuccessfully', 3000);
     }
   };
@@ -118,13 +138,18 @@ export default function UserTable(props) {
 
   const handleShowDetail = async (id) => {
     BlockUI('#root', 'fixed');
-    const data = await getUserById(id);
-    if (Object.keys(data).length > 0) {
+    const result = await getUserById(id);
+    if (Object.keys(result).length > 0) {
       Notiflix.Block.remove('#root');
-      setDetail({ ...data });
+      setDetail({ ...result });
       setShowDetail(true);
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
       Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 

@@ -14,7 +14,7 @@ import PropTypes from 'prop-types';
 
 import { addSchema } from '../../adapter/AssetAdapter';
 import { createAsset, createNewCategory, getAllCategories } from '../../api/Asset/assetAPI';
-import { setSubTitle } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { userSelector } from '../../redux/selectors';
 import { formatDate } from '../../utils/formatDate';
@@ -51,6 +51,7 @@ export default function AssetCreate() {
   const [categories, setCategories] = React.useState([]);
   const [errorNameExist, setErrorNameExist] = React.useState('');
   const [errorPrefixExist, setErrorPrefixExist] = React.useState('');
+  const [isOpenDatePicker, setIsOpenDatePicker] = React.useState(false);
 
   const [inputAddCategory, setInputAddCategory] = React.useState({
     category_prefix: '',
@@ -62,8 +63,20 @@ export default function AssetCreate() {
   }, []);
 
   const fetchCategories = async () => {
+    BlockUI('#root', 'fixed');
     const result = await getAllCategories();
-    setCategories(result);
+    if (result.length >= 0) {
+      setCategories(result);
+      Notiflix.Block.remove('#root');
+    } else if (result === 401) {
+      handleSetUnthorization();
+      Notiflix.Block.remove('#root');
+    } else {
+      Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
+      dispatch(assetAction.setIsAdd(false));
+      dispatch(setSubTitle(''));
+    }
   };
 
   const preAddCate = () => {
@@ -102,7 +115,6 @@ export default function AssetCreate() {
     data.location_id = user.location_id;
     data.installed_date = formatDate(data.installed_date, 'YYYY-MM-DD');
     const result = await createAsset(data);
-    Notiflix.Block.remove('#root');
     if (result === 200) {
       SuccessToast('Create asset successfully', 3000);
       dispatch(assetAction.setIsAdd(false));
@@ -118,9 +130,12 @@ export default function AssetCreate() {
           'sort[updated_at]': 'desc',
         })
       );
+    } else if (result === 401) {
+      handleSetUnthorization();
     } else {
       ErrorToast('Create asset unsuccessfully', 3000);
     }
+    Notiflix.Block.remove('#root');
   };
 
   const removeNewCategory = () => {
@@ -150,39 +165,45 @@ export default function AssetCreate() {
 
     const result = await createNewCategory(inputAddCategory);
     Notiflix.Block.remove('#root');
-    if (result.error?.category_name && result.error?.category_prefix) {
-      setErrorNameExist('Category is already exists. Please enter a different category');
-      setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
-      return;
-    }
+    if (result !== 401 && result !== 500) {
+      if (result.error?.category_name && result.error?.category_prefix) {
+        setErrorNameExist('Category is already exists. Please enter a different category');
+        setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
+        return;
+      }
 
-    if (result.error?.category_name && !result.error?.category_prefix) {
-      setErrorNameExist('Category is already exists. Please enter a different category');
-      setErrorPrefixExist('');
-      return;
-    }
+      if (result.error?.category_name && !result.error?.category_prefix) {
+        setErrorNameExist('Category is already exists. Please enter a different category');
+        setErrorPrefixExist('');
+        return;
+      }
 
-    if (!result.error?.category_name && result.error?.category_prefix) {
-      setErrorNameExist('');
-      setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
-      return;
-    }
+      if (!result.error?.category_name && result.error?.category_prefix) {
+        setErrorNameExist('');
+        setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
+        return;
+      }
 
-    if (result.category_name && result.category_prefix && result.id) {
-      setCategories([
-        ...categories,
-        {
-          category_name: result.category_name,
-          category_prefix: result.category_prefix,
-          id: result.id,
-        },
-      ]);
-      setShow(false);
-      setInputAddCategory({
-        category_name: '',
-        category_prefix: '',
-      });
-      SuccessToast('Add new category successfully', 3000);
+      if (result.category_name && result.category_prefix && result.id) {
+        setCategories([
+          ...categories,
+          {
+            category_name: result.category_name,
+            category_prefix: result.category_prefix,
+            id: result.id,
+          },
+        ]);
+        setShow(false);
+        setInputAddCategory({
+          category_name: '',
+          category_prefix: '',
+        });
+        SuccessToast('Add new category successfully', 3000);
+      }
+    } else if (result === 401) {
+      handleSetUnthorization();
+    } else {
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 
@@ -195,6 +216,16 @@ export default function AssetCreate() {
     control,
     name: 'asset_name',
   });
+
+  const specification = useWatch({
+    control,
+    name: 'specification',
+  });
+
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
+  };
 
   return (
     <div className="asset-create-form d-flex justify-content-center">
@@ -335,7 +366,12 @@ export default function AssetCreate() {
                 <p className="font-weight-bold">Specification</p>
               </td>
               <td width="70%">
-                <Form.Control className="textarea-input" as="textarea" {...register('specification')} />
+                <Form.Control className="textarea-input" as="textarea" {...register('specification')} maxLength={200} />
+                <div className="d-flex justify-content-end">
+                  <small className="font-weight-bold">
+                    {specification === undefined ? 0 : specification.length}/200
+                  </small>
+                </div>
               </td>
             </tr>
 
@@ -362,8 +398,12 @@ export default function AssetCreate() {
                           yearDropdownItemNumber={50}
                           placeholderText="dd/mm/yyyy"
                           maxDate={new Date()}
+                          onClickOutside={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          onSelect={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          onFocus={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          open={isOpenDatePicker}
                         />
-                        <FaCalendarAlt className="icon-date" />
+                        <FaCalendarAlt className="icon-date" onClick={() => setIsOpenDatePicker(!isOpenDatePicker)} />
                       </>
                     )}
                   />

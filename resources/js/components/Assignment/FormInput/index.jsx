@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { BsSearch } from 'react-icons/bs';
 import { useDispatch, useSelector } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -12,7 +12,7 @@ import * as yup from 'yup';
 import { editAssetById } from '../../../api/Asset/assetAPI';
 import { getAllAssets, handleCreate } from '../../../api/Assignment';
 import { getAllUsers } from '../../../api/User';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import {
   setAssetCode,
   setAssetName,
@@ -33,7 +33,7 @@ const schema = yup
   .object({
     asset_name: yup.string().required(),
     user_name: yup.string().required(),
-    note: yup.string(),
+    note: yup.string().max(200),
     assigned_date: yup
       .date()
       .min(new Date(Date.now() - 86400000))
@@ -52,6 +52,7 @@ export default function FormInput(props) {
   const [totalRecord, setTotalRecord] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(0);
   const dispatch = useDispatch();
+
   const handleStateModalAsset = (value) => {
     if (value === 'save') {
       setFlagSave(1);
@@ -108,20 +109,34 @@ export default function FormInput(props) {
 
   const handleGetUsers = async () => {
     const result = await getAllUsers({ sort: [{ key: 'first_name', value: 'asc' }] });
-    setUser(result.data);
-    setTotalRecord(result.meta.total);
-    setTotalPage(result.meta.last_page);
+    if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setUser(result.data);
+      setTotalRecord(result.meta.total);
+      setTotalPage(result.meta.last_page);
+      setShowUser(true);
+    }
     Notiflix.Block.remove('#root');
-    setShowUser(true);
   };
 
   const handleGetAssets = async () => {
     const result = await getAllAssets();
-    setAsset(result.data);
-    setTotalRecord(result.meta.total);
-    setTotalPage(result.meta.last_page);
+    if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAsset(result.data);
+      setTotalRecord(result.meta.total);
+      setTotalPage(result.meta.last_page);
+      setShowAsset(true);
+    }
     Notiflix.Block.remove('#root');
-    setShowAsset(true);
   };
 
   const admin = useSelector((state) => state.app.user);
@@ -129,6 +144,7 @@ export default function FormInput(props) {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { isValid },
   } = useForm({
     mode: 'onChange',
@@ -137,6 +153,11 @@ export default function FormInput(props) {
       assigned_date: formatDate(new Date(), 'yyyy-MM-DD'),
     },
     resolver: yupResolver(schema),
+  });
+
+  const note = useWatch({
+    control,
+    name: 'note',
   });
 
   const handleCurrentSetAssetName = (name, id, code) => {
@@ -198,8 +219,19 @@ export default function FormInput(props) {
     }
   };
 
+  const sumbitUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
+    Notiflix.Block.remove('#root');
+  };
+
+  const submitServerError = () => {
+    ErrorToast('Created assignment is unsuccessfully', 3000);
+    Notiflix.Block.remove('#root');
+  };
+
   const onSubmit = async (data) => {
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     data.assigned_date = formatDate(data.assigned_date, 'yyyy-MM-DD');
     const response = await handleCreate({
       ...data,
@@ -208,13 +240,20 @@ export default function FormInput(props) {
       admin_id: admin.id,
     });
     const stateField = { state: 'Assigned' };
-    const response_2 = await editAssetById(currentAssetName.id, stateField);
-    if (response === 201 && response_2 === 200) {
-      SuccessToast('Create assignment is successfully', 3000);
-      props.backtoManageAssignment('created_at');
+    if (response === 201) {
+      const response_2 = await editAssetById(currentAssetName.id, stateField);
+      if (response_2 === 200) {
+        SuccessToast('Create assignment is successfully', 3000);
+        props.backtoManageAssignment('created_at');
+      } else if (response_2 === 401) {
+        sumbitUnthorization();
+      } else {
+        submitServerError();
+      }
+    } else if (response === 401) {
+      sumbitUnthorization();
     } else {
-      ErrorToast('Created assignment is unsuccessfully', 3000);
-      Notiflix.Block.remove('#root');
+      submitServerError();
     }
   };
 
@@ -328,7 +367,10 @@ export default function FormInput(props) {
                 <Form.Label className="font-weight-bold">Note</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <Form.Control as="textarea" {...register('note')} />
+                <Form.Control as="textarea" maxLength={200} {...register('note')} />
+                <div className="d-flex justify-content-end align-items-center font-weight-bold">
+                  <small>{note !== undefined ? note.length : 0}/200</small>
+                </div>
               </Col>
             </Row>
           </Form.Group>

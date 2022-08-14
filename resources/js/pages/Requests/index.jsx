@@ -1,11 +1,13 @@
 import React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 
 import { requests_table_header } from '../../../assets/data/requests_table_header';
 import { getAllRequests } from '../../api/Requests';
+import { ErrorToast } from '../../components/Layouts/Alerts';
 import NotFoundData from '../../components/Layouts/NotFoundData';
 import { BlockUI } from '../../components/Layouts/Notiflix';
 import Pagination from '../../components/Layouts/Pagination';
@@ -13,7 +15,8 @@ import Skeleton from '../../components/Layouts/Skeleton';
 import FilterReturnedDate from '../../components/Requests/FilterReturnedDate/FilterReturnedDate';
 import FilterStateButton from '../../components/Requests/FilterStateButton/FilterStateButton';
 import RequestsTable from '../../components/Requests/Table';
-import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
+import { userSelector } from '../../redux/selectors';
 
 export default function Requests() {
   const [loading, setLoading] = React.useState(true);
@@ -32,6 +35,7 @@ export default function Requests() {
   const [totalRecord, setTotalRecord] = React.useState(0);
   const [perPage] = React.useState(20);
   const [totalPage, setTotalPage] = React.useState(0);
+  const user = useSelector(userSelector);
 
   const dispatch = useDispatch();
 
@@ -51,18 +55,30 @@ export default function Requests() {
       sort: tempSort,
       page: tempPage,
     });
-    setRequests(result);
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'page');
+    }
     Notiflix.Block.remove('#root');
   };
 
   const handleGetAllRequests = async () => {
     const result = await getAllRequests({ sort });
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result);
+    }
     setLoading(false);
-    setRequests(result);
   };
 
   const handleSort = async (sort, header) => {
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSearch;
     let tempFilter;
     let tempFilterDate;
@@ -77,7 +93,13 @@ export default function Requests() {
       filter: tempFilter,
       filterDate: tempFilterDate,
     });
-    setRequests(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -92,7 +114,7 @@ export default function Requests() {
       setFilter(value);
       if (value === 'Completed' || value === 'Waiting for returning') tempFilter = value;
     }
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSearch;
     let tempSort;
     let tempFilterDate;
@@ -105,7 +127,13 @@ export default function Requests() {
       filter: tempFilter,
       filterDate: tempFilterDate,
     });
-    setRequests(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -117,7 +145,7 @@ export default function Requests() {
     } else {
       setFilterDate('');
     }
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSearch;
     let tempSort;
     let tempFilter;
@@ -130,13 +158,19 @@ export default function Requests() {
       filter: tempFilter,
       filterDate: tempFilterDate,
     });
-    setRequests(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSort;
     let tempFilter;
     let tempFilterDate;
@@ -150,12 +184,24 @@ export default function Requests() {
         filter: tempFilter,
         filterDate: tempFilterDate,
       });
-      setRequests(result, 'reset-page');
+      if (result === 401) {
+        handleSetUnthorization();
+      } else if (result === 500) {
+        ErrorToast('Something went wrong. Please try again', 3000);
+      } else {
+        setRequests(result, 'reset-page');
+      }
       Notiflix.Block.remove('#root');
       return;
     }
     const result = await getAllRequests({ sort: tempSort, filter: tempFilter, filterDate: tempFilterDate });
-    setRequests(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -181,7 +227,13 @@ export default function Requests() {
       filterDate: tempFilterDate,
       page,
     });
-    setRequests(result, 'page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setRequests(result, 'page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -194,69 +246,79 @@ export default function Requests() {
     setTotalPage(result.meta.last_page);
   };
 
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
+  };
+
   return (
-    <section>
-      <h5 className="text-danger font-weight-bold mb-3">Request List</h5>
-      <div className="mb-3 d-flex align-items-center justify-content-between">
-        <div className="d-flex">
-          <FilterStateButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
-          <div className="ms-3">
-            <FilterReturnedDate setCurrentFilter={handleCurrentFilterDate} date={filterDate} />
-          </div>
-          {filterDate !== '' && (
-            <Button
-              id="reset-date"
-              variant="danger"
-              className="font-weight-bold ms-3"
-              onClick={() => handleCurrentFilterDate('')}
-            >
-              Reset date
-            </Button>
-          )}
-        </div>
-        <div>
-          <Form onSubmit={(e) => handleSearch(e)}>
-            <InputGroup>
-              <Form.Control
-                placeholder="
+    <>
+      {user?.type === 'Admin' && (
+        <section>
+          <h5 className="text-danger font-weight-bold mb-3">Request List</h5>
+          <div className="mb-3 d-flex align-items-center justify-content-between">
+            <div className="d-flex">
+              <FilterStateButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
+              <div className="ms-3">
+                <FilterReturnedDate setCurrentFilter={handleCurrentFilterDate} date={filterDate} />
+              </div>
+              {filterDate !== '' && (
+                <Button
+                  id="reset-date"
+                  variant="danger"
+                  className="font-weight-bold ms-3"
+                  onClick={() => handleCurrentFilterDate('')}
+                >
+                  Reset date
+                </Button>
+              )}
+            </div>
+            <div>
+              <Form onSubmit={(e) => handleSearch(e)}>
+                <InputGroup>
+                  <Form.Control
+                    placeholder="
                 Asset code or asset name or requester's username"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <Button id="search-user" variant="danger" type="submit">
-                <FaSearch />
-              </Button>
-            </InputGroup>
-          </Form>
-        </div>
-      </div>
-      {!loading ? (
-        <>
-          {data?.length > 0 ? (
-            <RequestsTable
-              data={data}
-              sort={sort}
-              renderTableHeader={renderTableHeader}
-              handleSort={handleSort}
-              forceReload={forceReload}
-            />
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <Button id="search-user" variant="danger" type="submit">
+                    <FaSearch />
+                  </Button>
+                </InputGroup>
+              </Form>
+            </div>
+          </div>
+          {!loading ? (
+            <>
+              {data?.length > 0 ? (
+                <RequestsTable
+                  data={data}
+                  sort={sort}
+                  renderTableHeader={renderTableHeader}
+                  handleSort={handleSort}
+                  forceReload={forceReload}
+                />
+              ) : (
+                <NotFoundData />
+              )}
+            </>
           ) : (
-            <NotFoundData />
+            <Skeleton column={9} />
           )}
-        </>
-      ) : (
-        <Skeleton column={9} />
+          {totalPage > 1 && (
+            <div className="d-flex justify-content-end align-items-center mt-3">
+              <Pagination
+                handlePageChange={handlePageChange}
+                perPage={perPage}
+                currentPage={page}
+                totalRecord={totalRecord}
+              />
+            </div>
+          )}
+        </section>
       )}
-      {totalPage > 1 && (
-        <div className="d-flex justify-content-end align-items-center mt-3">
-          <Pagination
-            handlePageChange={handlePageChange}
-            perPage={perPage}
-            currentPage={page}
-            totalRecord={totalRecord}
-          />
-        </div>
-      )}
-    </section>
+      {user?.type === 'Staff' && <Navigate to="/" />}
+    </>
   );
 }

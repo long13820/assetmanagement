@@ -10,6 +10,7 @@ import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
 import {
   setIsAdd as setIsAddAssignment,
+  setIsEdit as setIsEditAssignment,
   setKey as setKeyAssignment,
 } from '../../../redux/reducer/assignment/assignment.reducer';
 import { setHomeKey } from '../../../redux/reducer/home/home.reducer';
@@ -86,6 +87,7 @@ export default function Header() {
     }
     if (title === 'Manage Assignment') {
       dispatch(setIsAddAssignment(false));
+      dispatch(setIsEditAssignment(false));
       dispatch(setKeyAssignment(keyAssignment + 1));
       dispatch(
         assetAction.setFilter({
@@ -123,7 +125,7 @@ export default function Header() {
           )}
         </Navbar.Brand>
         {Object.keys(user).length > 0 && (
-          <NavDropdown title={user.full_name} className="justify-content-end text-white" id="nav-user-dropdown">
+          <NavDropdown title={user.username} className="justify-content-end text-white" id="nav-user-dropdown">
             <NavDropdown.Item className="font-weight-medium" onClick={() => setStateModal(true)}>
               Change Password
             </NavDropdown.Item>

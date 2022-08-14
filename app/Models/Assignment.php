@@ -33,22 +33,22 @@ class Assignment extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id')->withTrashed();
     }
 
     public function asset(): BelongsTo
     {
-        return $this->belongsTo(Asset::class, "asset_id");
+        return $this->belongsTo(Asset::class, "asset_id")->withTrashed();
     }
 
     public function admin(): BelongsTo
     {
-        return $this->belongsTo(User::class, "admin_id");
+        return $this->belongsTo(User::class, "admin_id")->withTrashed();
     }
 
     public function request(): BelongsTo
     {
-        return $this->belongsTo(User::class, "requested_id");
+        return $this->belongsTo(User::class, "requested_id")->withTrashed();
     }
 
     public function scopeFilter($query, $request)

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import Notiflix from 'notiflix';
@@ -5,11 +6,12 @@ import Notiflix from 'notiflix';
 import { home_table_header } from '../../../assets/data/home_table_header';
 import { getAllAssignmentsById } from '../../api/Assignment';
 import HomeTable from '../../components/Home/Table';
+import { ErrorToast } from '../../components/Layouts/Alerts';
 import NotFoundData from '../../components/Layouts/NotFoundData';
 import { BlockUI } from '../../components/Layouts/Notiflix';
 import Pagination from '../../components/Layouts/Pagination';
 import Skeleton from '../../components/Layouts/Skeleton';
-import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -29,11 +31,31 @@ export default function Home() {
   const [totalPage, setTotalPage] = React.useState(0);
 
   React.useEffect(() => {
+    const firstSort = [
+      {
+        key: 'created_at',
+        value: 'desc',
+      },
+    ];
+    const handleGetAllMyAssignments = async () => {
+      const result = await getAllAssignmentsById({ firstSort });
+      if (result === 401) {
+        handleSetUnthorization();
+      } else if (result === 500) {
+        ErrorToast('Something went wrong. Please try again', 3000);
+      } else {
+        setAssignmentUser(result);
+      }
+      setLoading(false);
+    };
     dispatch(setTitle('Home'));
     dispatch(setSubTitle(''));
     handleGetAllMyAssignments();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
+    return () => {
+      setData([]);
+    };
+  }, [dispatch]);
 
   const forceReload = async () => {
     let tempSort;
@@ -44,14 +66,14 @@ export default function Home() {
       sort: tempSort,
       page: tempPage,
     });
-    setAssignmentUser(result);
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignmentUser(result, 'page');
+    }
     Notiflix.Block.remove('#root');
-  };
-
-  const handleGetAllMyAssignments = async () => {
-    const result = await getAllAssignmentsById({ sort });
-    setLoading(false);
-    setAssignmentUser(result);
   };
 
   const handleSort = async (sort, header) => {
@@ -59,7 +81,13 @@ export default function Home() {
     setCurrentSort(sort);
     setRenderTableHeader(header);
     const result = await getAllAssignmentsById({ sort });
-    setAssignmentUser(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignmentUser(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -76,7 +104,13 @@ export default function Home() {
       sort: tempSort,
       page,
     });
-    setAssignmentUser(result, 'page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignmentUser(result, 'page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -87,6 +121,11 @@ export default function Home() {
     }
     setTotalRecord(result.meta.total);
     setTotalPage(result.meta.last_page);
+  };
+
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
   };
 
   return (

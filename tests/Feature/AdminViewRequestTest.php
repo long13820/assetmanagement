@@ -7,6 +7,8 @@ use Tests\TestCase;
 use App\Models\User;
 use App\Models\Asset;
 use App\Models\Assignment;
+use App\Models\Category;
+use Database\Seeders\CategorySeeder;
 use Database\Seeders\LocationSeeder;
 class AdminViewRequestTest extends TestCase
 {
@@ -14,6 +16,7 @@ class AdminViewRequestTest extends TestCase
     {
         parent::setUp();
         $this->seed(LocationSeeder::class);
+        $this->seed(CategorySeeder::class);
       
     }
     public function testAdminViewAllRequests()
@@ -50,4 +53,5 @@ class AdminViewRequestTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonStructure(["data"]);
     }
+
 }

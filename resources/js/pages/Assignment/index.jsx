@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 import Notiflix from 'notiflix';
 
 import { assignment_table_header } from '../../../assets/data/assignment_table_header';
@@ -12,18 +13,25 @@ import FilterButton from '../../components/Assignment/FilterButton';
 import FilterDate from '../../components/Assignment/FilterDate';
 import FormInput from '../../components/Assignment/FormInput';
 import AssignmentTable from '../../components/Assignment/Table';
+import { ErrorToast } from '../../components/Layouts/Alerts';
 import NotFoundData from '../../components/Layouts/NotFoundData';
 import { BlockUI } from '../../components/Layouts/Notiflix';
 import Pagination from '../../components/Layouts/Pagination';
 import Skeleton from '../../components/Layouts/Skeleton';
-import { setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { setIsAdd, setIsEdit } from '../../redux/reducer/assignment/assignment.reducer';
+import { userSelector } from '../../redux/selectors';
 
 export default function Assignment() {
   const [loading, setLoading] = React.useState(true);
   const [data, setData] = React.useState([]);
   const [renderTableHeader, setRenderTableHeader] = React.useState([...assignment_table_header]);
-  const [sort, setCurrentSort] = React.useState([]);
+  const [sort, setCurrentSort] = React.useState([
+    {
+      key: 'created_at',
+      value: 'desc',
+    },
+  ]);
   const [search, setSearch] = React.useState('');
   const [filter, setFilter] = React.useState('All');
   const [filterDate, setFilterDate] = React.useState('');
@@ -34,6 +42,8 @@ export default function Assignment() {
   const isAdd = useSelector((state) => state.assignment.isAdd);
   const isEdit = useSelector((state) => state.assignment.isEdit);
   const [sortDate, setSortDate] = React.useState('');
+  const user = useSelector(userSelector);
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
     dispatch(setIsAdd(false));
@@ -52,18 +62,30 @@ export default function Assignment() {
       sort: tempSort,
       page: tempPage,
     });
-    setAssignment(result);
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'page');
+    }
     Notiflix.Block.remove('#root');
   };
 
   const handleGetAllAssignments = async () => {
-    const result = await getAllAssignments();
+    const result = await getAllAssignments({ sort });
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result);
+    }
     setLoading(false);
-    setAssignment(result);
   };
 
   const handleSort = async (sort, header) => {
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSearch;
     let tempFilter;
     let tempSortDate;
@@ -87,7 +109,13 @@ export default function Assignment() {
       filterDate: tempFilterDate,
       edit: tempSortDate,
     });
-    setAssignment(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -99,7 +127,7 @@ export default function Assignment() {
     } else {
       setFilterDate('');
     }
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSearch;
     let tempSort;
     let tempSortDate;
@@ -121,7 +149,13 @@ export default function Assignment() {
       filterDate: tempFilterDate,
       edit: tempSortDate,
     });
-    setAssignment(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -158,19 +192,20 @@ export default function Assignment() {
       filterDate: tempFilterDate,
       edit: tempSortDate,
     });
-    setAssignment(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
-  const dispatch = useDispatch();
   const goToCreateNewAssignment = (e) => {
     e.stopPropagation();
-    setTimeout(() => {
-      Notiflix.Block.remove('#root');
-      dispatch(setIsAdd(true));
-      dispatch(setSubTitle('Create Assignment'));
-    }, 500);
-    BlockUI('#root', 'fixed');
+    dispatch(setIsAdd(true));
+    dispatch(setSubTitle('Create Assignment'));
   };
 
   const backToManageAssignment = async (field) => {
@@ -197,7 +232,13 @@ export default function Assignment() {
       page: tempPage,
       edit: field,
     });
-    setAssignment(result);
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'page');
+    }
     if (field === 'created_at') dispatch(setIsAdd(false));
     if (field === 'updated_at') dispatch(setIsEdit(false));
     Notiflix.Block.remove('#root');
@@ -205,7 +246,7 @@ export default function Assignment() {
 
   const handleSearch = async (e) => {
     e.preventDefault();
-    BlockUI('#root');
+    BlockUI('#root', 'fixed');
     let tempSort;
     let tempFilter;
     let tempSortDate;
@@ -227,7 +268,13 @@ export default function Assignment() {
         filter: tempFilter,
         filterDate: tempFilterDate,
       });
-      setAssignment(result, 'reset-page');
+      if (result === 401) {
+        handleSetUnthorization();
+      } else if (result === 500) {
+        ErrorToast('Something went wrong. Please try again', 3000);
+      } else {
+        setAssignment(result, 'reset-page');
+      }
       Notiflix.Block.remove('#root');
       return;
     }
@@ -237,7 +284,13 @@ export default function Assignment() {
       edit: tempSortDate,
       filterDate: tempFilterDate,
     });
-    setAssignment(result, 'reset-page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'reset-page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -272,7 +325,13 @@ export default function Assignment() {
       edit: tempSortDate,
       filterDate: tempFilterDate,
     });
-    setAssignment(result, 'page');
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
+      setAssignment(result, 'page');
+    }
     Notiflix.Block.remove('#root');
   };
 
@@ -283,77 +342,87 @@ export default function Assignment() {
     setTotalPage(result.meta.last_page);
   };
 
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
+  };
+
   return (
-    <section>
-      {!isAdd && !isEdit && <h5 className="text-danger font-weight-bold mb-3">Assignment List</h5>}
-      {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create Assignment</h5>}
-      {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit Assignment</h5>}
-      {!isAdd && !isEdit ? (
-        <div className="mb-3 d-flex align-items-center justify-content-between">
-          <div className="d-flex">
-            <FilterButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
-            <div className="ms-3">
-              <FilterDate setCurrentFilter={handleCurrentFilterDate} />
-            </div>
-          </div>
-          <div className="d-flex">
-            <Form onSubmit={(e) => handleSearch(e)}>
-              <InputGroup>
-                <Form.Control
-                  placeholder="Asset or Assigned to"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <Button variant="danger" type="submit">
-                  <FaSearch />
+    <>
+      {user?.type === 'Admin' && (
+        <section>
+          {!isAdd && !isEdit && <h5 className="text-danger font-weight-bold mb-3">Assignment List</h5>}
+          {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create Assignment</h5>}
+          {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit Assignment</h5>}
+          {!isAdd && !isEdit ? (
+            <div className="mb-3 d-flex align-items-center justify-content-between">
+              <div className="d-flex">
+                <FilterButton currentFilter={filter} setCurrentFilter={handleCurrentFilter} />
+                <div className="ms-3">
+                  <FilterDate setCurrentFilter={handleCurrentFilterDate} />
+                </div>
+              </div>
+              <div className="d-flex">
+                <Form onSubmit={(e) => handleSearch(e)}>
+                  <InputGroup>
+                    <Form.Control
+                      placeholder="Asset or Assigned to"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                    <Button variant="danger" type="submit">
+                      <FaSearch />
+                    </Button>
+                  </InputGroup>
+                </Form>
+                <Button onClick={goToCreateNewAssignment} variant="danger" className="font-weight-bold ms-3">
+                  Create new assignment
                 </Button>
-              </InputGroup>
-            </Form>
-            <Button onClick={goToCreateNewAssignment} variant="danger" className="font-weight-bold ms-3">
-              Create new assignment
-            </Button>
-          </div>
-        </div>
-      ) : (
-        ''
-      )}
-      {!isAdd && !isEdit ? (
-        <>
-          {!loading ? (
+              </div>
+            </div>
+          ) : (
+            ''
+          )}
+          {!isAdd && !isEdit ? (
             <>
-              {data?.length > 0 ? (
-                <AssignmentTable
-                  data={data}
-                  forceReload={forceReload}
-                  sort={sort}
-                  renderTableHeader={renderTableHeader}
-                  handleSort={handleSort}
-                  backtoManageAssignment={backToManageAssignment}
-                />
+              {!loading ? (
+                <>
+                  {data?.length > 0 ? (
+                    <AssignmentTable
+                      data={data}
+                      forceReload={forceReload}
+                      sort={sort}
+                      renderTableHeader={renderTableHeader}
+                      handleSort={handleSort}
+                      backtoManageAssignment={backToManageAssignment}
+                    />
+                  ) : (
+                    <NotFoundData />
+                  )}
+                </>
               ) : (
-                <NotFoundData />
+                <Skeleton column={6} />
+              )}
+              {totalPage > 1 && (
+                <div className="d-flex justify-content-end align-items-center mt-3">
+                  <Pagination
+                    handlePageChange={handlePageChange}
+                    perPage={perPage}
+                    currentPage={page}
+                    totalRecord={totalRecord}
+                  />
+                </div>
               )}
             </>
           ) : (
-            <Skeleton column={6} />
+            <>
+              {isEdit && <AssignmentEditForm backtoManageAssignment={backToManageAssignment} />}
+              {isAdd && <FormInput backtoManageAssignment={backToManageAssignment} />}
+            </>
           )}
-          {totalPage > 1 && (
-            <div className="d-flex justify-content-end align-items-center pe-5 me-5 mt-3">
-              <Pagination
-                handlePageChange={handlePageChange}
-                perPage={perPage}
-                currentPage={page}
-                totalRecord={totalRecord}
-              />
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          {isEdit && <AssignmentEditForm backtoManageAssignment={backToManageAssignment} />}
-          {isAdd && <FormInput backtoManageAssignment={backToManageAssignment} />}
-        </>
+        </section>
       )}
-    </section>
+      {user?.type === 'Staff' && <Navigate to="/" />}
+    </>
   );
 }

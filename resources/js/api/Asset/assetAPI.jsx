@@ -1,5 +1,5 @@
 import axiosClient from '../axiosClient';
-const token = localStorage.getItem('token');
+// const token = localStorage.getItem('token');
 
 export const configHeadersAuthenticate = () => {
   const token = localStorage.getItem('token');
@@ -13,11 +13,12 @@ export const configHeadersAuthenticate = () => {
 
 const assetAPI = {
   async getlistAsset(params) {
+    const getToken = localStorage.getItem('token');
     const response = await axiosClient
       .get('/assets', {
         params,
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${getToken}`,
         },
       })
       .then((respo) => {
@@ -35,11 +36,7 @@ const assetAPI = {
   },
   async getDetailAsset(params) {
     const response = await axiosClient
-      .get(`/assets/${params}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(`/assets/${params}`, configHeadersAuthenticate())
       .then((respo) => {
         return respo;
       })
@@ -59,49 +56,101 @@ export default assetAPI;
 export const editAssetById = async (id, body) => {
   const url = `/assets/${id}`;
   const response = await axiosClient.put(url, body, configHeadersAuthenticate());
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 404;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else if (response.status === 500) {
+    return 500;
+  } else {
+    return 404;
+  }
 };
 
 export const getAllCategories = async () => {
   const url = '/categories';
   const response = await axiosClient.get(url, configHeadersAuthenticate());
-  if (response.status === 'success') return response.data.data;
-  if (response.status !== 'success') return [];
+  if (response.status === 'success') {
+    return response.data.data;
+  } else if (response.status === 401) {
+    return 401;
+  } else if (response.status === 500) {
+    return 500;
+  } else {
+    return 404;
+  }
 };
 
 export const getAssetById = async (id) => {
   const url = `/assets/${id}`;
   const response = await axiosClient.get(url, configHeadersAuthenticate());
-  return response.status === 'success' ? response.data[0] : {};
+  if (response.status === 'success') {
+    return response.data[0];
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const createAsset = async (body) => {
   const url = '/assets';
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
-  return response.success === true ? 200 : 400;
+  if (response.success === true) {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 400;
+  }
 };
 
 export const editAsset = async (body, id) => {
   const url = `/assets/${id}`;
   const response = await axiosClient.put(url, body, configHeadersAuthenticate());
-  return response.status === 'success' ? 200 : 400;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 400;
+  }
 };
 
 export const createNewCategory = async (body) => {
   const url = '/categories';
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
-  return response.status === 409 ? response.data : response.data;
+  if (response.status === 409) {
+    return response.data;
+  } else if (response.status === 'success') {
+    return response.data;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const deleteAssetById = async (id) => {
   const url = `/assets/${id}`;
   const response = await axiosClient.delete(url, configHeadersAuthenticate());
-  return response.success === true ? 200 : 400;
+  if (response.success === true) {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 400;
+  }
 };
 
 export const checkAssetById = async (id) => {
   const url = `/check_asset/${id}`;
   const response = await axiosClient.put(url, {}, configHeadersAuthenticate());
-  return response.success === true ? 200 : 400;
+  if (response.success === true) {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 400;
+  }
 };

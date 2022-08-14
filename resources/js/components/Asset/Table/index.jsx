@@ -7,11 +7,12 @@ import PropTypes from 'prop-types';
 
 import { asset_table_header } from '../../../../assets/data/asset_table_header';
 import { checkAssetById, deleteAssetById, getAssetById } from '../../../api/Asset/assetAPI';
-import { setSubTitle, setTotalRecord } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle, setTotalRecord } from '../../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../../redux/reducer/asset/asset.reducer';
 import { categoryAction } from '../../../redux/reducer/category/category.reducer';
 import { currentPageSelector } from '../../../redux/selectors';
 import {
+  assetCode,
   assetFilterSelector,
   assetListSelector,
   assetLoadingAssetFilterSelector,
@@ -35,7 +36,11 @@ export default function AssetTable(props) {
   const [confirmIdDelete, setConfirmIdDelete] = React.useState(-1);
   const [confirmDeleteWrong, setConfirmDeleteWrong] = React.useState(false);
   const dispatch = useDispatch();
+  const code = useSelector(assetCode);
+  const current_code = code;
+
   useEffect(() => {
+    const tempCode = current_code;
     dispatch(
       assetAction.fetchListAsset({
         'filter[state]': assetFilterState['filter[state]'],
@@ -48,8 +53,11 @@ export default function AssetTable(props) {
         page: current_page,
       })
     );
+    if (tempCode === 401) {
+      handleSetUnthorization();
+    }
     dispatch(categoryAction.fetchListCategory());
-  }, [dispatch, current_page, assetFilterState]);
+  }, [dispatch, current_page, assetFilterState, current_code]);
   // Sort
   const initialStateSortAssets = {
     1: 'sort[asset_code]',
@@ -125,9 +133,17 @@ export default function AssetTable(props) {
   const assetList = useSelector(assetListSelector);
   const totalRecordPage = useSelector(assetTotalRecordPageSelector);
   const body_sample_data = assetList;
+
   useEffect(() => {
     dispatch(setTotalRecord(totalRecordPage));
   }, [dispatch, totalRecordPage]);
+
+  useEffect(() => {
+    const tempCode = current_code;
+    if (tempCode === 401) {
+      handleSetUnthorization();
+    }
+  });
 
   // Show ditail
   const [showDetail, setShowDetailAsset] = useState(false);
@@ -141,8 +157,7 @@ export default function AssetTable(props) {
     }, 200);
   };
 
-  const handleEditAsset = async (e, dataId) => {
-    e.stopPropagation();
+  const handleEditAsset = async (dataId) => {
     BlockUI('#root', 'fixed');
     const result = await getAssetById(dataId);
     if (Object.keys(result).length > 0) {
@@ -154,6 +169,8 @@ export default function AssetTable(props) {
         })
       );
       dispatch(setSubTitle('Edit asset'));
+    } else if (result === 401) {
+      handleSetUnthorization();
     }
     Notiflix.Block.remove('#root');
   };
@@ -189,17 +206,25 @@ export default function AssetTable(props) {
             <td>
               <div className="d-flex">
                 <button
-                  className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
-                  onClick={item.state === 'Assigned' ? undefined : (e) => handleEditAsset(e, item.id)}
-                  disabled={item.state === 'Assigned'}
+                  className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                    item.state === 'Assigned' && 'cursor-no-drop'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    item.state === 'Assigned' ? undefined : handleEditAsset(item.id);
+                  }}
                 >
                   <FaPen className={`text-black font-20px ${item.state === 'Assigned' ? 'opacity-50' : ''}`} />
                 </button>
 
                 <button
-                  className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
-                  onClick={item.state === 'Assigned' ? undefined : (e) => handleDeleteAsset(e, item.id)}
-                  disabled={item.state === 'Assigned'}
+                  className={`br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                    item.state === 'Assigned' && 'cursor-no-drop'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    item.state === 'Assigned' ? undefined : handleDeleteAsset(item.id);
+                  }}
                 >
                   <FaTimesCircle className={`text-danger font-20px ${item.state === 'Assigned' ? 'opacity-50' : ''}`} />
                 </button>
@@ -213,14 +238,16 @@ export default function AssetTable(props) {
   const statusList = useSelector(assetLoadingSelector);
   const statusFilterLoading = useSelector(assetLoadingAssetFilterSelector);
 
-  const handleDeleteAsset = async (e, id) => {
-    e.stopPropagation();
+  const handleDeleteAsset = async (id) => {
     setConfirmIdDelete(id);
     BlockUI('#root', 'fixed');
     const result = await checkAssetById(id);
     if (result === 200) {
       Notiflix.Block.remove('#root');
       setConfirmDelete(true);
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      handleSetUnthorization();
     } else {
       Notiflix.Block.remove('#root');
       setConfirmDeleteWrong(true);
@@ -253,6 +280,8 @@ export default function AssetTable(props) {
       );
       props.backtoManageAsset();
       setStateModalDelete();
+    } else if (response === 401) {
+      handleSetUnthorization();
     } else {
       ErrorToast('Delete asset is unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
@@ -271,8 +300,15 @@ export default function AssetTable(props) {
         })
       );
       dispatch(setSubTitle('Edit asset'));
+    } else if (result === 401) {
+      handleSetUnthorization();
     }
     Notiflix.Block.remove('#root');
+  };
+
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
   };
 
   return (
@@ -298,7 +334,9 @@ export default function AssetTable(props) {
         setStateModalDeleteWrong={() => setStateModalDeleteWrong()}
         handleSoftDeleteAssetWrong={handleSoftDeleteAssetWrong}
       />
-      <ShowDetailAsset show={showDetail} setStateModal={() => setShowDetailAsset(false)} />
+      {current_code !== undefined && current_code === 200 && (
+        <ShowDetailAsset show={showDetail} setStateModal={() => setShowDetailAsset(false)} />
+      )}
     </>
   );
 }

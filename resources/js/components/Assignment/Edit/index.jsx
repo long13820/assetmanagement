@@ -6,7 +6,13 @@ import PropTypes from 'prop-types';
 import { editAssetById } from '../../../api/Asset/assetAPI';
 import { editAssignmentById } from '../../../api/Assignment';
 import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
-import { setAssetId, setIsEdit, setUserId } from '../../../redux/reducer/assignment/assignment.reducer';
+import {
+  setAssetId,
+  setIsEdit,
+  setIsFocusAsset,
+  setIsFocusUser,
+  setUserId,
+} from '../../../redux/reducer/assignment/assignment.reducer';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import { BlockUI } from '../../Layouts/Notiflix';
 
@@ -16,6 +22,8 @@ import DropdownListUser from './DropdownListUser';
 export default function AssignmentEditForm(props) {
   const dispatch = useDispatch();
   const assignment = useSelector((state) => state.assignment.assignment);
+  const isSearching = useSelector((state) => state.assignment.isSearching);
+  const isSearchingAsset = useSelector((state) => state.assignment.isSearchingAsset);
   const newUserId = useSelector((state) => state.assignment.userId);
   const newAssetId = useSelector((state) => state.assignment.assetId);
   const [note, setNote] = React.useState(assignment.note);
@@ -32,12 +40,16 @@ export default function AssignmentEditForm(props) {
       asset_id: newAssetId === 0 ? assignment.asset_id : newAssetId,
       user_id: newUserId === 0 ? assignment.user_id : newUserId,
     };
-    if (newAssetId === 0) {
+    if (newAssetId === 0 || newAssetId === assignment.asset_id) {
       const result = await editAssignmentById(assignment.id, stateFieldAssignment);
       if (result === 200) {
         props.backtoManageAssignment('updated_at', 'edit');
         dispatch(setIsEdit(false));
         dispatch(setSubTitle(''));
+        dispatch(setUserId(0));
+        dispatch(setAssetId(0));
+        dispatch(setIsFocusAsset(false));
+        dispatch(setIsFocusUser(false));
         SuccessToast('The assignment is editing successfully', 2000);
       } else {
         ErrorToast('Update assignment unsuccessfully', 2000);
@@ -52,6 +64,10 @@ export default function AssignmentEditForm(props) {
         props.backtoManageAssignment('updated_at', 'edit');
         dispatch(setIsEdit(false));
         dispatch(setSubTitle(''));
+        dispatch(setUserId(0));
+        dispatch(setAssetId(0));
+        dispatch(setIsFocusAsset(false));
+        dispatch(setIsFocusUser(false));
         SuccessToast('The assignment is editing successfully', 2000);
       } else {
         ErrorToast('Update assignment unsuccessfully', 2000);
@@ -64,6 +80,14 @@ export default function AssignmentEditForm(props) {
     dispatch(setUserId(0));
     dispatch(setAssetId(0));
     setNote(assignment.note);
+    dispatch(setIsFocusAsset(false));
+    dispatch(setIsFocusUser(false));
+  };
+  const handleEditNote = (e) => {
+    e.preventDefault();
+    setNote(e.target.value);
+    dispatch(setIsFocusAsset(false));
+    dispatch(setIsFocusUser(false));
   };
   return (
     <div className="d-flex justify-content-center">
@@ -72,7 +96,7 @@ export default function AssignmentEditForm(props) {
           <Form.Group className="mb-3">
             <Row>
               <Col md={3} xs={12}>
-                <Form.Label className="font-weight-bold">User</Form.Label>
+                <Form.Label className="font-weight-bold pt-2">User</Form.Label>
               </Col>
               <Col md={9} xs={12}>
                 <DropdownListUser defaultValue={assignment.full_name} />
@@ -82,7 +106,7 @@ export default function AssignmentEditForm(props) {
           <Form.Group className="mb-3">
             <Row>
               <Col md={3} xs={12}>
-                <Form.Label className="font-weight-bold">Asset</Form.Label>
+                <Form.Label className="font-weight-bold pt-2">Asset</Form.Label>
               </Col>
               <Col md={9} xs={12}>
                 <DropdownListAsset defaultValue={assignment.asset_name} />
@@ -92,7 +116,7 @@ export default function AssignmentEditForm(props) {
           <Form.Group className="mb-3">
             <Row>
               <Col md={3} xs={12}>
-                <Form.Label className="font-weight-bold">Assigned Date</Form.Label>
+                <Form.Label className="font-weight-bold pt-2">Assigned Date</Form.Label>
               </Col>
               <Col md={9} xs={12}>
                 <Form.Control type="date" disabled defaultValue={assignment.assigned_date} />
@@ -102,10 +126,13 @@ export default function AssignmentEditForm(props) {
           <Form.Group>
             <Row>
               <Col md={3} xs={12}>
-                <Form.Label className="font-weight-bold">Note</Form.Label>
+                <Form.Label className="font-weight-bold pt-2">Note</Form.Label>
               </Col>
               <Col md={9} xs={12}>
-                <Form.Control onChange={(e) => setNote(e.target.value)} value={note} as="textarea" />
+                <Form.Control onChange={handleEditNote} maxLength={200} value={note} as="textarea" />
+                <div className="d-flex justify-content-end font-weight-bold">
+                  <small>{note !== null ? note.length : 0}/200</small>
+                </div>
               </Col>
             </Row>
           </Form.Group>
@@ -116,7 +143,9 @@ export default function AssignmentEditForm(props) {
                 (newAssetId === 0 && newUserId === 0 && note === assignment.note) ||
                 (newAssetId === assignment.asset_id && newUserId === 0 && note === assignment.note) ||
                 (newAssetId === 0 && newUserId === assignment.user_id && note === assignment.note) ||
-                (newUserId === assignment.user_id && newAssetId === assignment.asset_id && note === assignment.note)
+                (newUserId === assignment.user_id && newAssetId === assignment.asset_id && note === assignment.note) ||
+                isSearching ||
+                isSearchingAsset
                   ? true
                   : false
               }
@@ -135,20 +164,12 @@ export default function AssignmentEditForm(props) {
               Cancel
             </Button>
           </div>
-          <div className="mt-3 text-justify">
-            <small>
-              (*) If <span className="font-weight-bold">Asset name</span> is change, you can not select that{' '}
-              <span className="font-weight-bold">Asset name</span> again. Refresh page or click on{' '}
-              <span className="font-weight-bold">Cancel</span> button to turn back to{' '}
-              <span className="font-weight-bold">Manage Assignment</span> page.
-            </small>
-          </div>
         </Form>
       </div>
     </div>
   );
 }
 
-AssignmentEditForm.protoTypes = {
+AssignmentEditForm.propTypes = {
   backtoManageAssignment: PropTypes.func,
 };

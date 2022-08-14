@@ -65,16 +65,6 @@ class UserRepository
     {
         $user = User::query()->find($id);
         if ($user) {
-            if ($user->assignment()->exists()) {
-                return response()->json(
-                    [
-                        "success" => false,
-                        "message" =>
-                            "There are valid assignments belonging to this user.",
-                    ],
-                    400
-                );
-            }
             $user->delete();
             return response()->json(
                 [
@@ -89,7 +79,7 @@ class UserRepository
     public function checkAssignmentExits($id)
     {
         $user = User::query()->find($id);
-        if ($user->assignment()->exists()) {
+        if ($user->assignment()->whereNotIn('state', array("Completed", "Declined"))->exists()) {
             return response()->json(
                 [
                     "success" => true,

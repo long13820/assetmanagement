@@ -12,12 +12,11 @@ class RequestsRepository
     public function getAllRequests($request)
     {
         $data = Assignment::query()
-            ->where('admin_id', '=', auth()->id())
-            ->where('state', '=', 'Waiting for returning')
-            ->orWhere('state', '=', 'Completed')
             ->filter($request)
             ->sort($request)
             ->search($request)
+            ->where('admin_id', '=', auth()->id())
+            ->whereIn('state', array('Waiting for returning', 'Completed'))
             ->paginate($this->paginate);
 
         if ($request->has('sort.id')) {

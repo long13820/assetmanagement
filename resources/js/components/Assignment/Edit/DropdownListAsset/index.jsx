@@ -1,28 +1,47 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { InputGroup } from 'react-bootstrap';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Form from 'react-bootstrap/Form';
 import { HiOutlineChevronDown } from 'react-icons/hi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { getAllAssets } from '../../../../api/Assignment';
-import { setAssetId } from '../../../../redux/reducer/assignment/assignment.reducer';
+import {
+  setAssetId,
+  setIsFocusAsset,
+  setIsFocusUser,
+  setIsSearchingAsset,
+} from '../../../../redux/reducer/assignment/assignment.reducer';
 
 import './style.css';
 
 export default function DropdownListAsset(props) {
-  const [search, setSearch] = React.useState('');
+  const assignment = useSelector((state) => state.assignment.assignment);
+  const [search, setSearch] = React.useState(assignment.asset_name);
+  const isFocusAsset = useSelector((state) => state.assignment.isFocusAsset);
   const [asset, setAssetData] = useState([]);
+  const [selectedData, setSelectedData] = useState(assignment.name);
   const handleGetAsset = async () => {
     const result = await getAllAssets();
     setAssetData(result.data);
   };
   const [currentData, setCurrentData] = useState(props.defaultValue);
+
+  const handleChange = (e) => {
+    setSearch(e.target.value);
+    dispatch(setIsSearchingAsset(true));
+    dispatch(setIsFocusAsset(true));
+    dispatch(setIsFocusUser(false));
+  };
   useEffect(() => {
     handleGetAsset();
-  }, [currentData]);
-  const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+    if (search === selectedData || search === assignment.asset_name) {
+      dispatch(setIsSearchingAsset(false));
+    }
+  }, []);
+  const CustomToggle = React.forwardRef(({ onClick }, ref) => (
     <InputGroup
       className="textFieldBoth"
       onClick={(e) => {
@@ -30,7 +49,15 @@ export default function DropdownListAsset(props) {
         onClick(e);
       }}
     >
-      <Form.Control ref={ref} variant="outline-secondary" defaultValue={children} className="textField" readOnly />
+      <Form.Control
+        ref={ref}
+        variant="outline-secondary"
+        className="textField"
+        placeholder="Search by Asset Name or Asset Code..."
+        onChange={handleChange}
+        value={search}
+        autoFocus={isFocusAsset ? true : false}
+      />
       <InputGroup.Text className="textField">
         <HiOutlineChevronDown />
       </InputGroup.Text>
@@ -40,22 +67,13 @@ export default function DropdownListAsset(props) {
   const CustomMenu = React.forwardRef(({ children, className, 'aria-labelledby': labeledBy }, ref) => {
     return (
       <div ref={ref} style={{ width: '100%' }} className={className} aria-labelledby={labeledBy}>
-        <div className="textSearch">
-          <Form.Control
-            autoFocus
-            placeholder="Search by User Name or Staff Code..."
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
-          />
-        </div>
         <ul className="list-unstyled dropdownScroll">
           {React.Children.toArray(children).filter(
             (child) =>
               !search ||
               child.props.children.toString().toLowerCase().match(search) ||
               child.props.children.toString().toUpperCase().match(search) ||
-              child.props.children.toString().match(search) ||
-              child.props.children.toString().toUpperCase().match(search)
+              child.props.children.toString().match(search)
           )}
         </ul>
       </div>
@@ -66,6 +84,20 @@ export default function DropdownListAsset(props) {
   const handleGetData = (name, id) => {
     dispatch(setAssetId(id));
     setCurrentData(name);
+    setSearch(name);
+    dispatch(setIsSearchingAsset(false));
+    dispatch(setIsFocusAsset(false));
+    dispatch(setIsFocusUser(false));
+    setSelectedData(name);
+  };
+  const handleGetCurrentData = (name, id) => {
+    dispatch(setAssetId(id));
+    setCurrentData(name);
+    setSearch(name);
+    dispatch(setIsSearchingAsset(false));
+    dispatch(setIsFocusAsset(false));
+    dispatch(setIsFocusUser(false));
+    setSelectedData(name);
   };
   return (
     <div>
@@ -75,9 +107,13 @@ export default function DropdownListAsset(props) {
         </Dropdown.Toggle>
 
         <Dropdown.Menu as={CustomMenu}>
+          <Dropdown.Item onClick={() => handleGetCurrentData(assignment.asset_name, assignment.asset_id)}>
+            {assignment.asset_code}&nbsp;&nbsp;-&nbsp;&nbsp;{assignment.asset_name}&nbsp;&nbsp;&nbsp;
+            <span className="text-secondary">{'(Current asset)'}</span>
+          </Dropdown.Item>
           {asset.map((item) => {
             return (
-              <Dropdown.Item onClick={() => handleGetData(item.asset_name, item.id)} key={item.id}>
+              <Dropdown.Item key={item.id} onClick={() => handleGetData(item.asset_name, item.id)}>
                 {item.asset_code}&nbsp;&nbsp;-&nbsp;&nbsp;{item.asset_name}
               </Dropdown.Item>
             );
@@ -93,5 +129,6 @@ DropdownListAsset.propTypes = {
   style: PropTypes.node,
   className: PropTypes.node,
   'aria-labelledby': PropTypes.node,
-  defaultValue: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string,
+  autoFocus: PropTypes.bool,
 };

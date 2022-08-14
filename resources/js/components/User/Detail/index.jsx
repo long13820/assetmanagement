@@ -27,83 +27,83 @@ export default function UserDetail(props) {
           <table align="center" border="0" className="table table-bordered mb-0">
             <tbody>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Staff Code</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{props.detail?.staff_code}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{props.detail?.staff_code}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Full Name</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{props.detail?.full_name}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{props.detail?.full_name}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Username</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{props.detail?.username}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{props.detail?.username}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Date of birth</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{formatDate(props.detail?.date_of_birth, 'DD/MM/YYYY')}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{formatDate(props.detail?.date_of_birth, 'DD/MM/YYYY')}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Gender</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{capitalizeFirstLetter(props.detail?.gender)}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{capitalizeFirstLetter(props.detail?.gender)}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Joined Date</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{formatDate(props.detail?.joined_date, 'DD/MM/YYYY')}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{formatDate(props.detail?.joined_date, 'DD/MM/YYYY')}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Type</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{props.detail?.type}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{props.detail?.type}</p>
                 </td>
               </tr>
               <tr>
-                <td className="ps-0">
+                <td width="30%" className="ps-0">
                   <p>
                     <strong>Location</strong>
                   </p>
                 </td>
-                <td className="pe-0">
-                  <p>{props.detail?.user_location.name}</p>
+                <td width="70%" className="pe-0">
+                  <p className="word-break">{props.detail?.user_location.name}</p>
                 </td>
               </tr>
             </tbody>

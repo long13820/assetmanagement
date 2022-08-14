@@ -18,15 +18,12 @@ import {
   keyHomeSelector,
   keyRequestSelector,
   keyUserSelector,
-  userSelector,
 } from '../../redux/selectors';
 import ProtectedRoutes from '../ProtectedRoutes';
-import PublicRoutes from '../PublicRoutes';
 
 export default function AdminRoutes() {
   const dispatch = useDispatch();
   const isAuthenticate = useSelector(isLoginSelector);
-  const user = useSelector(userSelector);
   const keyHome = useSelector(keyHomeSelector);
   const keyUser = useSelector(keyUserSelector);
   const keyAsset = useSelector((state) => state.asset.key);
@@ -49,30 +46,13 @@ export default function AdminRoutes() {
 
   return (
     <Routes>
-      {user?.type === 'Admin' && (
-        <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
-          <Route path="/" element={<AdminLayout slot={<HomePage key={keyHome} />} />} />
-          <Route path="/manage_user" element={<AdminLayout slot={<UserPage key={keyUser} />} />} />
-          <Route path="/manage_asset" element={<AdminLayout slot={<Asset key={keyAsset} />} />} />
-          <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage key={keyAssignment} />} />} />
-          <Route path="/requests_for_returning" element={<AdminLayout slot={<RequestsPage key={keyRequest} />} />} />
-        </Route>
-      )}
-
-      {user?.type === 'Staff' && (
-        <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
-          <Route path="/" element={<AdminLayout slot={<HomePage key={keyHome} />} />} />
-        </Route>
-      )}
-
-      {Object.keys(user).length === 0 && (
-        <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
-          <Route path="/" element={<AdminLayout slot={<HomePage />} />} />
-        </Route>
-      )}
-
-      <Route element={<PublicRoutes isAuthenticate={isAuthenticate} />}>
-        <Route path="/login" element={<LoginLayout slot={<LoginPage />} />} />
+      <Route path="/login" element={<LoginLayout slot={<LoginPage />} />} />
+      <Route element={<ProtectedRoutes isAuthenticate={isAuthenticate} />}>
+        <Route path="/" element={<AdminLayout slot={<HomePage key={keyHome} />} />} />
+        <Route path="/manage_user" element={<AdminLayout slot={<UserPage key={keyUser} />} />} />
+        <Route path="/manage_asset" element={<AdminLayout slot={<Asset key={keyAsset} />} />} />
+        <Route path="/manage_assignment" element={<AdminLayout slot={<AssignmentPage key={keyAssignment} />} />} />
+        <Route path="/requests_for_returning" element={<AdminLayout slot={<RequestsPage key={keyRequest} />} />} />
       </Route>
     </Routes>
   );

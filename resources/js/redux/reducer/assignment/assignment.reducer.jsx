@@ -16,6 +16,10 @@ export const assignmentReducer = createSlice({
     isEdit: false,
     assetId: 0,
     userId: 0,
+    isSearching: false,
+    isSearchingAsset: false,
+    isFocusAsset: false,
+    isFocusUser: false,
   },
   reducers: {
     setKey: (state, action) => {
@@ -57,6 +61,18 @@ export const assignmentReducer = createSlice({
     setAssetId: (state, action) => {
       state.assetId = action.payload;
     },
+    setIsSearching: (state, action) => {
+      state.isSearching = action.payload;
+    },
+    setIsSearchingAsset: (state, action) => {
+      state.isSearchingAsset = action.payload;
+    },
+    setIsFocusAsset: (state, action) => {
+      state.isFocusAsset = action.payload;
+    },
+    setIsFocusUser: (state, action) => {
+      state.isFocusUser = action.payload;
+    },
   },
 });
 
@@ -74,5 +90,9 @@ export const {
   setAssignment,
   setUserId,
   setAssetId,
+  setIsSearching,
+  setIsSearchingAsset,
+  setIsFocusAsset,
+  setIsFocusUser,
 } = assignmentReducer.actions;
 export default assignmentReducer.reducer;

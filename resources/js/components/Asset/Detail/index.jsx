@@ -55,7 +55,7 @@ export default function ShowDetailAsset(props) {
             <td>{detailAsset?.installed_date}</td>
             <td>{item.assigned_to}</td>
             <td>{item.assigned_by}</td>
-            <td>{item.assigned_date}</td>
+            <td>{item.returned_date}</td>
           </tr>
         );
       })

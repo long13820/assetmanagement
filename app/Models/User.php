@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as AuthenticateTable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -17,6 +18,7 @@ class User extends AuthenticateTable
     use HasFactory;
     use Notifiable;
     use HasApiTokens;
+    use SoftDeletes;
 
     protected $table = 'user';
     protected string $staff_code_prefix = 'SD';

@@ -43,6 +43,11 @@ export const getAllRequests = async ({ sort, filter, search, page, filterDate } 
 
   const response = await axiosClient.get(final_url, configHeadersAuthenticate());
 
-  if (response.status === 'success') return response.data;
-  if (response.status !== 'success') return [];
+  if (response.status === 401) {
+    return 401;
+  } else if (response.status === 'success') {
+    return response.data;
+  } else {
+    return 500;
+  }
 };

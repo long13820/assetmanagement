@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Button, Form, InputGroup } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
+import { Navigate } from 'react-router-dom';
 
 import FilterButtonCategory from '../../components/Asset/FilterButtonCategory';
 import FilterButtonState from '../../components/Asset/FilterButtonState';
@@ -11,6 +12,7 @@ import AssetEdit from '../../components/AssetEdit';
 import PaginationUI from '../../components/Layouts/PaginateRedux';
 import { setCurrentPage, setSubTitle, setTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
+import { userSelector } from '../../redux/selectors';
 import {
   assetFilterSelector,
   assetIsAddSelector,
@@ -40,6 +42,7 @@ export default function Asset() {
   const [checkFilterStateCurrent, setcheckFilterStateCurrent] = useState([]);
   const [checkAllState, setcheckAll] = useState(false);
   const [checkSearch, setCheckSearch] = useState(false);
+  const user = useSelector(userSelector);
   const handleFilterState = async (value) => {
     const currentIndex = checkFilterStateCurrent.indexOf(value);
     const newCheckFilterState = [...checkFilterStateCurrent];
@@ -170,60 +173,65 @@ export default function Asset() {
     dispatch(setSubTitle(''));
   };
   return (
-    <section>
-      {!isEdit && !isAdd && <h5 className="text-danger font-weight-bold mb-3">Asset List</h5>}
-      {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit asset</h5>}
-      {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create new asset</h5>}
-      {!isEdit && !isAdd && (
-        <>
-          <div className="mb-3 d-flex align-items-center justify-content-between">
-            <div className="d-flex">
-              <FilterButtonState
-                currentFilter={filterState}
-                setCurrentFilter={handleFilterState}
-                checkAllState={checkAllState}
-                setAllState={handleCheckAllState}
-              />
-              <div className="ms-3">
-                <FilterButtonCategory
-                  currentFilter={filterCategory}
-                  setCurrentFilter={handleFilterCategory}
-                  setAllCategory={checkAllCategory}
-                />
-              </div>
-            </div>
-            <div className="d-flex">
-              <Form onSubmit={(e) => handleSearchAsset(e)}>
-                <InputGroup>
-                  <Form.Control
-                    placeholder="Asset Code or Asset Name"
-                    aria-describedby="basic-addon2"
-                    value={inputValueSearchAsset}
-                    onChange={(e) => setInputValueSearchAsset(e.target.value)}
+    <>
+      {user?.type === 'Admin' && (
+        <section>
+          {!isEdit && !isAdd && <h5 className="text-danger font-weight-bold mb-3">Asset List</h5>}
+          {isEdit && <h5 className="text-danger font-weight-bold mb-3">Edit asset</h5>}
+          {isAdd && <h5 className="text-danger font-weight-bold mb-3">Create new asset</h5>}
+          {!isEdit && !isAdd && (
+            <>
+              <div className="mb-3 d-flex align-items-center justify-content-between">
+                <div className="d-flex">
+                  <FilterButtonState
+                    currentFilter={filterState}
+                    setCurrentFilter={handleFilterState}
+                    checkAllState={checkAllState}
+                    setAllState={handleCheckAllState}
                   />
-                  <Button variant="danger" type="submit">
-                    <FaSearch />
+                  <div className="ms-3">
+                    <FilterButtonCategory
+                      currentFilter={filterCategory}
+                      setCurrentFilter={handleFilterCategory}
+                      setAllCategory={checkAllCategory}
+                    />
+                  </div>
+                </div>
+                <div className="d-flex">
+                  <Form onSubmit={(e) => handleSearchAsset(e)}>
+                    <InputGroup>
+                      <Form.Control
+                        placeholder="Asset Code or Asset Name"
+                        aria-describedby="basic-addon2"
+                        value={inputValueSearchAsset}
+                        onChange={(e) => setInputValueSearchAsset(e.target.value)}
+                      />
+                      <Button variant="danger" type="submit">
+                        <FaSearch />
+                      </Button>
+                    </InputGroup>
+                  </Form>
+                  <Button
+                    onClick={routeChange}
+                    variant="danger"
+                    id="button-addon2"
+                    className="font-weight-bold ms-3 btn btn-danger"
+                  >
+                    Create new asset
                   </Button>
-                </InputGroup>
-              </Form>
-              <Button
-                onClick={routeChange}
-                variant="danger"
-                id="button-addon2"
-                className="font-weight-bold ms-3 btn btn-danger"
-              >
-                Create new asset
-              </Button>
-            </div>
-          </div>
-          <AssetTable sortActive={handleSortActive} backtoManageAsset={backtoManageAsset} />
-          <div className="d-flex justify-content-end align-items-center mt-3">
-            {listState > 20 && <PaginationUI handlePageChange={handlePageChange} />}
-          </div>
-        </>
+                </div>
+              </div>
+              <AssetTable sortActive={handleSortActive} backtoManageAsset={backtoManageAsset} />
+              <div className="d-flex justify-content-end align-items-center mt-3">
+                {listState > 20 && <PaginationUI handlePageChange={handlePageChange} />}
+              </div>
+            </>
+          )}
+          {isAdd && <AssetCreate filterAll={fillterAllItem} />}
+          {isEdit && <AssetEdit filterAll={fillterAllItem} />}
+        </section>
       )}
-      {isAdd && <AssetCreate filterAll={fillterAllItem} />}
-      {isEdit && <AssetEdit filterAll={fillterAllItem} />}
-    </section>
+      {user?.type === 'Staff' && <Navigate to="/" />}
+    </>
   );
 }

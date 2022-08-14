@@ -93,7 +93,10 @@ class AssignmentRepository
                 ["user_id", "=", auth()->user()->id],
                 ["assigned_date", '<=', Carbon::now('Asia/Ho_Chi_Minh')->toDateString()]
             ])
-            ->whereIn('assignment.state', array("Waiting for acceptance", "Accepted", "Waiting for returning"))
+            ->whereIn(
+                'assignment.state',
+                array("Waiting for acceptance", "Accepted", "Waiting for returning", "Completed")
+            )
             ->paginate($this->paginate);
 
         return AssignmentResource::collection($data)->response()->getData();

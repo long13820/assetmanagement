@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 import { addSchema, locationOptions, typeOptions } from '../../../adapter/UserAdapter';
 import { addUser } from '../../../api/User';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { setIsAdd } from '../../../redux/reducer/user/user.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
@@ -88,9 +88,16 @@ function UserAdd(props) {
     if (result === 200) {
       SuccessToast('Create user successfully', 3000);
       props.backToManageUser('created_at', 'create');
-    } else {
+    } else if (result === 404) {
       ErrorToast('Create user unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+    } else {
+      Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 

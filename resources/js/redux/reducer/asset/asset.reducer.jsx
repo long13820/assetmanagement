@@ -30,6 +30,7 @@ export const assetReduccer = createSlice({
     message: '',
     totalRecordPage: 0,
     editData: {},
+    code: 200,
   },
   reducers: {
     setEditData: (state, action) => {
@@ -63,11 +64,23 @@ export const assetReduccer = createSlice({
       state.message = action.payload.data.message;
       state.totalRecordPage = action.payload.data.meta.total;
       state.loadingFilter = false;
+      state.code === 200;
     },
-    fetchListAssetError(state, action) {
+    fetchListAssetError(state) {
       state.loading = false;
+      state.loadingFilter = false;
       state.isListAssetSuccess = false;
-      state.listAsset = action.payload;
+      state.listAsset = [];
+      state.totalRecordPage = 0;
+      state.code = 500;
+    },
+    fetchListAssetUnthorization(state) {
+      state.loading = false;
+      state.loadingFilter = false;
+      state.isListAssetSuccess = false;
+      state.listAsset = [];
+      state.totalRecordPage = 0;
+      state.code = 401;
     },
     setFilter(state, action) {
       state.filter = action.payload;
@@ -78,16 +91,25 @@ export const assetReduccer = createSlice({
     fetctDetailAsset(state) {
       state.loadingDetail = true;
       state.isDetailAssetSuccess = true;
+      state.code = 200;
     },
     fetctDetailAssetSuccess(state, action) {
       state.loadingDetail = false;
       state.isDetailAssetSuccess = false;
       state.detailAsset = action.payload.data;
+      state.code = 200;
     },
-    fetctDetaiAssetError(state, action) {
+    fetctDetaiAssetError(state) {
       state.loadingDetail = false;
       state.isDetailAssetSuccess = false;
-      state.detailAsset = action.payload;
+      state.code = 500;
+      state.detailAsset = {};
+    },
+    fetchDetailAssetUnthorization(state) {
+      state.loadingDetail = false;
+      state.isDetailAssetSuccess = false;
+      state.code = 401;
+      state.detailAsset = {};
     },
 
     fetctDetailAssetAssignment(state) {

@@ -1,10 +1,12 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAsset } from '../../../api/Asset/assetAPI';
 import { completeRequestById } from '../../../api/Assignment';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import Modal from '../../Layouts/Modal';
@@ -12,6 +14,8 @@ import { BlockUI } from '../../Layouts/Notiflix';
 
 import './style.css';
 function ModalCompleteRequest(props) {
+  const dispatch = useDispatch();
+
   const handleCompleteRequest = async () => {
     const id = props.idRequest;
     BlockUI('#root', 'fixed');
@@ -33,6 +37,10 @@ function ModalCompleteRequest(props) {
       Notiflix.Block.remove('#root');
       props.forceReload();
       props.setModalCompleteRequest();
+    } else if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('Create request user unsuccessfully', 3000);
       Notiflix.Block.remove('#root');

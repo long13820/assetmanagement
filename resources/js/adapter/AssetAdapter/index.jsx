@@ -8,7 +8,7 @@ export const addSchema = yup
       .matches(/^[0-9a-zA-Z\s]+$/, 'Invalid asset name format')
       .max(50)
       .trim(),
-    specification: yup.string().required(),
+    specification: yup.string().max(200).required(),
     installed_date: yup.date().required(),
     state: yup.string(),
     category_id: yup.number().required(),
@@ -23,7 +23,7 @@ export const editSchema = yup
       .matches(/^[0-9a-zA-Z\s]+$/, 'Invalid asset name format')
       .max(50)
       .trim(),
-    specification: yup.string().required(),
+    specification: yup.string().max(200).required(),
     installed_date: yup.date().required(),
     state: yup.string(),
   })

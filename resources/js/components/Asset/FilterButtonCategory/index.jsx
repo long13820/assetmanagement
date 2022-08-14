@@ -25,26 +25,28 @@ export default function FilterButtonCategory(props) {
   }
   const [...listCategory] = useSelector(categoryListSelector);
   return (
-    <Dropdown>
+    <Dropdown id="asset-filter-category">
       <Dropdown.Toggle className="d-flex filter-button btn-asset align-items-center justity-content-center btn btn-primary asset_filter">
         <p className="flex-grow-1 afd-name font-weight-bold">Category</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
       </Dropdown.Toggle>
-      <Dropdown.Menu style={{ height: '248px', overflowY: 'auto' }}>
+      <Dropdown.Menu style={{ maxHeight: '248px', overflowY: 'auto' }}>
         <Form>
-          <Form.Check
-            type="checkbox"
-            id="checkbox-all-cate"
-            className="mx-4 font-weight-bold"
-            label="All"
-            checked={checkAll ? true : false}
-            onChange={() => handleFilter(0)}
-          />
+          <Dropdown.Item onClick={() => handleFilter(0)}>
+            <Form.Check
+              type="checkbox"
+              id="checkbox-all-cate"
+              className="mx-4 font-weight-bold"
+              label="All"
+              checked={checkAll ? true : false}
+              onChange={() => handleFilter(0)}
+            />
+          </Dropdown.Item>
           {listCategory.map((item, index) => {
             return (
-              <div key={index}>
+              <Dropdown.Item key={index} onClick={() => handleFilter(item.id)}>
                 <Form.Check
                   type="checkbox"
                   className="mx-4 font-weight-bold"
@@ -53,8 +55,9 @@ export default function FilterButtonCategory(props) {
                   checked={categoryCheck.indexOf(item.id) == -1 ? false : true}
                   label={item.category_name}
                   onChange={() => handleFilter(item.id)}
+                  style={{ whiteSpace: 'break-spaces' }}
                 />
-              </div>
+              </Dropdown.Item>
             );
           })}
         </Form>

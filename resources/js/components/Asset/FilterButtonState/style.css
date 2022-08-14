@@ -18,3 +18,8 @@ button.filter-button:focus {
 button.filter-button.dropdown-toggle::after {
   content: none;
 }
+
+#asset-filter-state button.filter-button ~ .dropdown-menu.show {
+  width: 160px;
+  overflow-x: hidden;
+}

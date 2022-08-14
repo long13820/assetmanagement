@@ -2,15 +2,18 @@ import React from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 import { yupResolver } from '@hookform/resolvers/yup';
 import PropTypes from 'prop-types';
 
 import { changePassword, schemaChangePassword } from '../../../adapter/AppAdapter';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import Modal from '../../Layouts/Modal';
 
 import './style.css';
 
 export default function ChangePassword(props) {
+  const dispatch = useDispatch();
   const [typeOldPassword, setShowOldPassword] = React.useState('password');
   const [typeNewPassword, setShowNewPassword] = React.useState('password');
   const [backdrop, setBackdrop] = React.useState('static');
@@ -31,6 +34,11 @@ export default function ChangePassword(props) {
     setBackdrop('static');
     const status = await changePassword(data, 'no_notification');
     switch (status) {
+      case 401:
+        props.setStateModal();
+        dispatch(setExpiredToken(true));
+        localStorage.removeItem('token');
+        break;
       case 403:
         setError(
           'old_password',

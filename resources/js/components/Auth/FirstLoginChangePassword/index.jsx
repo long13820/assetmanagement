@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import PropTypes from 'prop-types';
 
 import { changePassword, handleGetMe, schemaFirstChangePassword } from '../../../adapter/AppAdapter';
-import { setUser } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setUser } from '../../../redux/reducer/app/app.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
 import Modal from '../../Layouts/Modal';
@@ -37,6 +37,11 @@ export default function ChangePassword(props) {
     data.old_password = `${user.username}@${date_of_birth}`;
     const status = await changePassword(data, 'no_notification');
     switch (status) {
+      case 401:
+        props.closeModal();
+        dispatch(setExpiredToken(true));
+        localStorage.removeItem('token');
+        break;
       case 403:
         break;
       case 422:

@@ -6,6 +6,7 @@ export const assetFilterSelector = (state) => state.asset.filter;
 export const assetKeySelector = (state) => state.asset.key;
 export const assetEditData = (state) => state.asset.editData;
 export const assetIsDeleteSelector = (state) => state.asset.isDelete;
+export const assetCode = (state) => state.asset.code;
 // Show detail Asset
 export const assetLoadingDetailSelector = (state) => state.asset.loadingDetail;
 export const assetDetailSelector = (state) => state.asset.detailAsset;

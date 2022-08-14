@@ -15,7 +15,9 @@ export const configHeadersAuthenticate = () => {
 
 export const handleCreate = async (body) => {
   const response = await axiosClient.post('/assignments', body, configHeadersAuthenticate());
-
+  if (response.data.message === 'Unauthenticated.') {
+    return 401;
+  }
   if (response.data.status === 201) {
     return 201;
   }
@@ -50,8 +52,13 @@ export const getAllAssets = async ({ sort, filter, search, page } = {}) => {
 
   const response = await axiosClient.get(final_url, configHeadersAuthenticate());
 
-  if (response.status === 'success') return response.data;
-  if (response.status !== 'success') return [];
+  if (response.status === 401) {
+    return 401;
+  } else if (response.status === 'success') {
+    return response.data;
+  } else {
+    return 500;
+  }
 };
 
 export const getAllAssignmentsAsset = async (params) => {
@@ -113,22 +120,39 @@ export const getAllAssignments = async ({ sort, filter, search, page, edit, filt
 
   const response = await axiosClient.get(final_url, configHeadersAuthenticate());
 
-  if (response.status === 'success') return response.data;
-  if (response.status !== 'success') return [];
+  if (response.status === 401) {
+    return 401;
+  } else if (response.status === 'success') {
+    return response.data;
+  } else {
+    return 500;
+  }
 };
 
 export const getAssignmentById = async (id) => {
   const url = `/assignments/${id}`;
   const response = await axiosClient.get(url, configHeadersAuthenticate());
-  if (response.status === 'success') return response.data;
-  if (response.status !== 'success') return {};
+  if (response.status === 'success') {
+    return response.data;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const editAssignmentById = async (id, body) => {
   const url = `/assignments/${id}`;
   const response = await axiosClient.put(url, body, configHeadersAuthenticate());
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 404;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else if (response.status === 500) {
+    return 500;
+  } else {
+    return 404;
+  }
 };
 
 export const getAllAssignmentsById = async ({ sort, page } = {}) => {
@@ -149,15 +173,25 @@ export const getAllAssignmentsById = async ({ sort, page } = {}) => {
 
   const response = await axiosClient.get(final_url, configHeadersAuthenticate());
 
-  if (response.status === 'success') return response.data;
-  if (response.status !== 'success') return [];
+  if (response.status === 'success') {
+    return response.data;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const deleteAssignment = async (id) => {
   const url = `/assignments/${id}`;
   const response = await axiosClient.delete(url, configHeadersAuthenticate());
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 404;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 404;
+  }
 };
 
 export const getReturnRequestById = async (id) => {
@@ -196,6 +230,13 @@ export const declineAssignment = async (id) => {
 export const completeRequestById = async (id, body) => {
   const url = `/assignments/${id}`;
   const response = await axiosClient.put(url, body, configHeadersAuthenticate());
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 404;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else if (response.status === 500) {
+    return 500;
+  } else {
+    return 404;
+  }
 };

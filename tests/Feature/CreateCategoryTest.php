@@ -6,12 +6,15 @@ use Database\Seeders\LocationSeeder;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use App\Models\User;
+use Database\Seeders\CategorySeeder;
+
 class CreateCategoryTest extends TestCase
 {
    public function setUp(): void
    {
     parent::setUp();
     $this->seed(LocationSeeder::class);
+    $this->seed(CategorySeeder::class);
    }
 
    /** @test */
@@ -44,17 +47,10 @@ class CreateCategoryTest extends TestCase
    /** @test */
    public function test_get_all_categories()
    {
-       Sanctum::actingAs(User::factory()->create([
-           "first_name" => "To Duc",
-           "last_name" => "Phuong",
-           "date_of_birth" => "2000-01-01",
-           "joined_date" => "2020-01-01",
-           "type" => "Staff",
-           "location_id" => 1,
-       ]));
-       $response = $this->json("GET", "/api/categories");
-       $response->assertStatus(200);
-       $response->assertJson(["status" => "success"]);
+    Sanctum::actingAs(User::factory()->create(), ["*"]);
+    $response = $this->json("GET", "/api/categories");
+    $response->assertStatus(200);
+    $response->assertJson(["status" => "success"]);
            
    }
 

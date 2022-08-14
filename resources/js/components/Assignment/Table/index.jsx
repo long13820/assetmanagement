@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 
 import { editAssetById } from '../../../api/Asset/assetAPI';
 import { deleteAssignment, editAssignmentById, getAssignmentById, getReturnRequestById } from '../../../api/Assignment';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { setAssignment, setIsEdit } from '../../../redux/reducer/assignment/assignment.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
@@ -28,9 +28,9 @@ export default function AssignmentTable(props) {
   const [assignmentId, setAssignmentId] = React.useState(-1);
   const [modalReturnAssignment, setModalReturnAssignment] = React.useState(false);
   const [assignedIdAdmin, setAssignedIdAdmin] = React.useState('');
+  const dispatch = useDispatch();
 
-  const handleReturnAssignmentClick = async (e, id, assigned_by_id) => {
-    e.stopPropagation();
+  const handleReturnAssignmentClick = async (id, assigned_by_id) => {
     setModalReturnAssignment(true);
     setAssignmentId(id);
     setAssignedIdAdmin(assigned_by_id);
@@ -56,9 +56,8 @@ export default function AssignmentTable(props) {
       ErrorToast('The request for returning is created unsuccessfully', 3000);
     }
   };
-  const dispatch = useDispatch();
-  const handleEditAssignment = async (e, id) => {
-    e.stopPropagation();
+
+  const handleEditAssignment = async (id) => {
     BlockUI('#root', 'fixed');
     const data = await getAssignmentById(id);
     if (Object.keys(data).length > 0) {
@@ -77,16 +76,10 @@ export default function AssignmentTable(props) {
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
 
     if (!valueAsc && !valueDesc) {
-      if (tempSort.length === 0) {
-        tempSort.push({
-          key: '',
-          value: '',
-        });
-      }
       tempSort[0].key = key;
       tempSort[0].value = 'asc';
       if (tempSort[0].key === 'No.') {
-        tempSort[0].key = 'Id';
+        tempSort[0].key = 'Created At';
       }
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
@@ -99,16 +92,10 @@ export default function AssignmentTable(props) {
     }
 
     if (valueAsc && !valueDesc) {
-      if (tempSort.length === 0) {
-        tempSort.push({
-          key: '',
-          value: '',
-        });
-      }
       tempSort[0].key = key;
       tempSort[0].value = 'desc';
       if (tempSort[0].key === 'No.') {
-        tempSort[0].key = 'Id';
+        tempSort[0].key = 'Created At';
       }
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
@@ -121,7 +108,8 @@ export default function AssignmentTable(props) {
     }
 
     if (!valueAsc && valueDesc) {
-      tempSort = [];
+      tempSort[0].key = 'created_at';
+      tempSort[0].value = 'desc';
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = false;
       tempTableHeader.forEach((_, index) => {
@@ -142,26 +130,38 @@ export default function AssignmentTable(props) {
       Notiflix.Block.remove('#root');
       setDetail({ ...data });
       setShowDetail(true);
+    } else if (data === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
       Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
   const handleSoftDeleteAssigment = async (id, assetId) => {
     BlockUI('#root', 'fixed');
     const stateField = { state: 'Available' };
     const response = await deleteAssignment(id);
-    const responseTwo = await editAssetById(assetId, stateField);
-    if (response === 200 && responseTwo === 200) {
-      SuccessToast('Delete assignment is successfully', 3000);
-      props.backtoManageAssignment();
-      setStateModalDelete();
+    if (response === 200) {
+      const responseTwo = await editAssetById(assetId, stateField);
+      if (responseTwo === 200) {
+        SuccessToast('Delete assignment is successfully', 3000);
+        props.backtoManageAssignment();
+        setStateModalDelete();
+      } else if (response === 401) {
+        dispatch(setExpiredToken(true));
+        localStorage.removeItem('token');
+      }
+    } else if (response === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
       ErrorToast('Delete assignment is unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
     }
   };
-  const handleShowConfirm = (e, id, assetId) => {
-    e.stopPropagation();
+  const handleShowConfirm = (id, assetId) => {
     setConfirmIdDelete(id);
     setConfirmIdAsset(assetId);
     setConfirmDelete(true);
@@ -186,7 +186,7 @@ export default function AssignmentTable(props) {
             <p
               className={`${item.state === 'Waiting for returning' && 'bg-blue-100 text-blue'} ${
                 item.state === 'Accepted' && 'bg-red-100 text-red'
-              } ${item.state === 'Waiting for acceptance' && 'bg-success-100 text-success'} ${
+              } ${item.state === 'Waiting for acceptance' && 'bg-infor-100 text-info'} ${
                 item.state === 'Declined' && 'bg-warning-100 text-warning'
               } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
             >
@@ -197,17 +197,25 @@ export default function AssignmentTable(props) {
             <div className="d-flex">
               <button
                 id="manage-assignment-edit-btn"
-                disabled={item.state !== 'Waiting for acceptance'}
-                onClick={(e) => handleEditAssignment(e, item.id)}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  item.state !== 'Waiting for acceptance' ? undefined : handleEditAssignment(item.id);
+                }}
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                  item.state !== 'Waiting for acceptance' && 'cursor-no-drop'
+                }`}
               >
                 <FaPen className={`text-black font-20px ${item.state !== 'Waiting for acceptance' && 'opacity-50'}`} />
               </button>
               <button
                 id="manage-assignment-delete-btn"
-                disabled={item.state !== 'Waiting for acceptance'}
-                onClick={(e) => handleShowConfirm(e, item.id, item.asset_id)}
-                className="br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  item.state !== 'Waiting for acceptance' ? undefined : handleShowConfirm(item.id, item.asset_id);
+                }}
+                className={`br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3 ${
+                  item.state !== 'Waiting for acceptance' && 'cursor-no-drop'
+                }`}
               >
                 <FaTimesCircle
                   className={`text-danger font-20px ${item.state !== 'Waiting for acceptance' && 'opacity-50'}`}
@@ -215,10 +223,12 @@ export default function AssignmentTable(props) {
               </button>
               <button
                 id="manage-assignment-request-btn"
-                disabled={item.state !== 'Accepted'}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                  item.state !== 'Accepted' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleReturnAssignmentClick(e, item.id, item.assigned_by_id);
+                  e.stopPropagation();
+                  item.state !== 'Accepted' ? undefined : handleReturnAssignmentClick(item.id, item.assigned_by_id);
                 }}
               >
                 <FaUndoAlt className={`text-blue font-18px ${item.state !== 'Accepted' && 'opacity-50'}`} />

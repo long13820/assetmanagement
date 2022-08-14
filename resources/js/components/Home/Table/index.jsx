@@ -3,11 +3,13 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { FaCheck, FaTimes, FaUndoAlt } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAsset } from '../../../api/Asset/assetAPI';
 import { acceptAssignment, declineAssignment, getAssignmentById } from '../../../api/Assignment';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
@@ -15,6 +17,7 @@ import Table from '../../Layouts/Table';
 import UserCreateRequest from '../createRequestUser';
 
 export default function HomeTable(props) {
+  const dispatch = useDispatch();
   const [showModalCreateRequestUser, setModalCreateRequestUser] = React.useState(false);
   const [idCreateRequestUser, setCreateRequestUser] = React.useState('');
   const [assignedIdAdmin, setAssignedIdAdmin] = React.useState('');
@@ -25,21 +28,18 @@ export default function HomeTable(props) {
   const [modalDetailAssignment, setModalDetailAssignment] = React.useState(false);
   const [detail, setDetail] = React.useState({});
 
-  const handleCreateRequestUser = async (e, id, assigned_by_id) => {
-    e.stopPropagation();
+  const handleCreateRequestUser = async (id, assigned_by_id) => {
     setModalCreateRequestUser(true);
     setCreateRequestUser(id);
     setAssignedIdAdmin(assigned_by_id);
   };
 
-  const handleAcceptAssignmentClick = async (e, id) => {
-    e.stopPropagation();
+  const handleAcceptAssignmentClick = async (id) => {
     setModalAcceptAssignment(true);
     setAcceptId(id);
   };
 
-  const handleDeclineAssigmentClick = async (e, id, id_asset) => {
-    e.stopPropagation();
+  const handleDeclineAssigmentClick = async (id, id_asset) => {
     setModalDeclineAssignment(true);
     setAcceptId(id);
     setAssetId(id_asset);
@@ -134,6 +134,13 @@ export default function HomeTable(props) {
       setDetail({ ...result });
       setModalDetailAssignment(true);
       Notiflix.Block.remove('#root');
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+    } else {
+      Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 
@@ -149,8 +156,8 @@ export default function HomeTable(props) {
             <p
               className={`${item.state === 'Waiting for returning' && 'bg-blue-100 text-blue'} ${
                 item.state === 'Accepted' && 'bg-red-100 text-red'
-              } ${
-                item.state === 'Waiting for acceptance' && 'bg-success-100 text-success'
+              } ${item.state === 'Waiting for acceptance' && 'bg-infor-100 text-info'} ${
+                item.state === 'Completed' && 'bg-success-100 text-success'
               } font-weight-bold br-6px py-2 px-3 w-fit-content d-flex align-items-center text-center`}
             >
               {item.state}
@@ -160,10 +167,12 @@ export default function HomeTable(props) {
             <div className="d-flex">
               <button
                 id="home-accept-btn"
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
-                disabled={item.state !== 'Waiting for acceptance'}
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                  item.state !== 'Waiting for acceptance' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleAcceptAssignmentClick(e, item.id);
+                  e.stopPropagation();
+                  item.state !== 'Waiting for acceptance' ? undefined : handleAcceptAssignmentClick(item.id);
                 }}
               >
                 <FaCheck
@@ -172,10 +181,14 @@ export default function HomeTable(props) {
               </button>
               <button
                 id="home-decline-btn"
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3"
-                disabled={item.state !== 'Waiting for acceptance'}
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none mx-3 ${
+                  item.state !== 'Waiting for acceptance' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleDeclineAssigmentClick(e, item.id, item.asset_id);
+                  e.stopPropagation();
+                  item.state !== 'Waiting for acceptance'
+                    ? undefined
+                    : handleDeclineAssigmentClick(item.id, item.asset_id);
                 }}
               >
                 <FaTimes
@@ -185,10 +198,12 @@ export default function HomeTable(props) {
 
               <button
                 id="home-request-btn"
-                disabled={item.state !== 'Accepted'}
-                className="br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none"
+                className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
+                  item.state !== 'Accepted' && 'cursor-no-drop'
+                }`}
                 onClick={(e) => {
-                  handleCreateRequestUser(e, item.id, item.assigned_by_id);
+                  e.stopPropagation();
+                  item.state !== 'Accepted' ? undefined : handleCreateRequestUser(item.id, item.assigned_by_id);
                 }}
               >
                 <FaUndoAlt className={`text-blue font-18px ${item.state !== 'Accepted' ? 'opacity-50' : ''}`} />

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 import { editSchema } from '../../../adapter/UserAdapter';
 import { editUserById } from '../../../api/User';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import { setIsEdit } from '../../../redux/reducer/user/user.reducer';
 import { userDetailSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
@@ -86,9 +86,16 @@ function UserEdit(props) {
     if (result === 200) {
       SuccessToast('Updated user successfully', 3000);
       props.backToManageUser('updated_at', 'edit');
-    } else {
+    } else if (result === 404) {
       ErrorToast('Updated user unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
+    } else if (result === 401) {
+      Notiflix.Block.remove('#root');
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+    } else {
+      Notiflix.Block.remove('#root');
+      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 

@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 
 import { editSchema } from '../../adapter/AssetAdapter';
 import { editAsset } from '../../api/Asset/assetAPI';
-import { setSubTitle } from '../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../redux/reducer/app/app.reducer';
 import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { assetEditData, assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
 import { formatDate } from '../../utils/formatDate';
@@ -27,6 +27,7 @@ function EditAsset(props) {
   const dataId = useSelector(assetgetIdSelector);
   const editData = useSelector(assetEditData);
   const id = dataId;
+  const [isOpenDatePicker, setIsOpenDatePicker] = React.useState(false);
 
   React.useEffect(() => {
     if (editData) {
@@ -81,6 +82,9 @@ function EditAsset(props) {
     if (result === 200) {
       SuccessToast('Update asset successfully', 3000);
       backToManageAssetDispatch();
+    } else if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     } else {
       ErrorToast('Update asset unsuccessfully', 3000);
     }
@@ -90,6 +94,11 @@ function EditAsset(props) {
   const asset_name = useWatch({
     control,
     name: 'asset_name',
+  });
+
+  const specification = useWatch({
+    control,
+    name: 'specification',
   });
 
   return (
@@ -127,7 +136,17 @@ function EditAsset(props) {
                 <p className="font-weight-bold">Specification</p>
               </td>
               <td width="70%">
-                <Form.Control id="edit-asset-specification" as="textarea" {...register('specification')} />
+                <Form.Control
+                  id="edit-asset-specification"
+                  maxLength={200}
+                  as="textarea"
+                  {...register('specification')}
+                />
+                <div className="d-flex justify-content-end">
+                  <small className="font-weight-bold">
+                    {specification === undefined ? 0 : specification.length}/200
+                  </small>
+                </div>
               </td>
             </tr>
             <tr required>
@@ -153,8 +172,12 @@ function EditAsset(props) {
                           yearDropdownItemNumber={50}
                           placeholderText="dd/mm/yyyy"
                           maxDate={new Date()}
+                          onClickOutside={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          onSelect={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          onFocus={() => setIsOpenDatePicker(!isOpenDatePicker)}
+                          open={isOpenDatePicker}
                         />
-                        <FaCalendarAlt className="icon-date" />
+                        <FaCalendarAlt className="icon-date" onClick={() => setIsOpenDatePicker(!isOpenDatePicker)} />
                       </>
                     )}
                   />

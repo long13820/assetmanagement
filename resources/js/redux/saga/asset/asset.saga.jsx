@@ -6,10 +6,12 @@ import { assetAction } from '../../reducer/asset/asset.reducer';
 function* handleListAsset(action) {
   try {
     const response = yield call(assetAPI.getlistAsset, action.payload);
-    if (response.status == 'success') {
+    if (response.status === 'success') {
       yield put(assetAction.fetchListAssetSuccess(response));
+    } else if (response === 401) {
+      yield put(assetAction.fetchListAssetUnthorization());
     } else {
-      yield put(assetAction.fetchListAssetError(response));
+      yield put(assetAction.fetchListAssetError());
     }
   } catch (error) {
     yield put(assetAction.fetchListAssetError(error));
@@ -20,8 +22,11 @@ function* handleListAsset(action) {
 function* handleAssetDetail(action) {
   try {
     const response = yield call(assetAPI.getDetailAsset, action.payload);
-
-    yield put(assetAction.fetctDetailAssetSuccess(response));
+    if (response.status === 'success') {
+      yield put(assetAction.fetctDetailAssetSuccess(response));
+    } else if (response === 401) {
+      yield put(assetAction.fetchDetailAssetUnthorization());
+    }
   } catch (error) {
     yield put(assetAction.fetctDetaiAssetError());
   }

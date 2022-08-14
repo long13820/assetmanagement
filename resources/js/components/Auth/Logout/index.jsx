@@ -1,18 +1,27 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { logout } from '../../../adapter/AppAdapter';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import Modal from '../../Layouts/Modal';
 
 export default function Logout(props) {
   const [backdrop, setBackdrop] = React.useState('static');
+
+  const dispatch = useDispatch();
 
   const handleLogout = async () => {
     setBackdrop('static');
     const response = await logout();
     if (response === 500) {
       setBackdrop('static');
+    }
+    if (response === 401) {
+      props.setStateModal();
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
     }
   };
 

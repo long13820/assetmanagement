@@ -18,3 +18,7 @@ button.assignment-filter-date:focus {
 button.assignment-filter-date.dropdown-toggle::after {
   content: none;
 }
+
+#dropdown-date-assignment {
+  border-width: var(--2px);
+}
