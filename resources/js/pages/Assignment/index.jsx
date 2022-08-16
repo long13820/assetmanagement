@@ -28,7 +28,7 @@ export default function Assignment() {
   const [renderTableHeader, setRenderTableHeader] = React.useState([...assignment_table_header]);
   const [sort, setCurrentSort] = React.useState([
     {
-      key: 'created_at',
+      key: 'assigned_date',
       value: 'desc',
     },
   ]);
@@ -241,6 +241,7 @@ export default function Assignment() {
     }
     if (field === 'created_at') dispatch(setIsAdd(false));
     if (field === 'updated_at') dispatch(setIsEdit(false));
+    dispatch(setSubTitle(''));
     Notiflix.Block.remove('#root');
   };
 
@@ -375,7 +376,12 @@ export default function Assignment() {
                     </Button>
                   </InputGroup>
                 </Form>
-                <Button onClick={goToCreateNewAssignment} variant="danger" className="font-weight-bold ms-3">
+                <Button
+                  id="create-new-assignment-btn"
+                  onClick={goToCreateNewAssignment}
+                  variant="danger"
+                  className="font-weight-bold ms-3"
+                >
                   Create new assignment
                 </Button>
               </div>

@@ -4,6 +4,7 @@ namespace App\Repositories\Requests;
 
 use App\Http\Resources\Request\RequestCollection;
 use App\Models\Assignment;
+use Illuminate\Support\Facades\DB;
 
 class RequestsRepository
 {
@@ -15,28 +16,11 @@ class RequestsRepository
             ->filter($request)
             ->sort($request)
             ->search($request)
-            ->where('admin_id', '=', auth()->id())
+            ->where('admin_id', '=', auth()->user()->id)
             ->whereIn('state', array('Waiting for returning', 'Completed'))
+            ->select(DB::raw('ROW_NUMBER() OVER(ORDER BY assignment.updated_at DESC) AS Row, assignment.*'))
             ->paginate($this->paginate);
 
-        if ($request->has('sort.id')) {
-            $list = new RequestCollection($data);
-            $dataCollection = collect($list);
-
-            foreach ($request->query("sort") as $value) {
-                if ($value === 'asc') {
-                    return [
-                        'data' => $dataCollection['data']->sortBy('no')->values()->all(),
-                        'meta' => $dataCollection['meta'],
-                    ];
-                } elseif ($value === 'desc') {
-                    return [
-                        'data' => $dataCollection['data']->sortByDesc('no')->values()->all(),
-                        'meta' => $dataCollection['meta'],
-                    ];
-                }
-            }
-        }
         return new RequestCollection($data);
     }
 }

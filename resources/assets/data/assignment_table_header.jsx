@@ -43,7 +43,7 @@ export const assignment_table_header = [
     id: 6,
     name: 'Assigned date',
     isSortAsc: false,
-    isSortDesc: false,
+    isSortDesc: true,
     isSort: true,
     cursor: true,
   },

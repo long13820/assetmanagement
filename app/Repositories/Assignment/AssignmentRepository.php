@@ -6,6 +6,7 @@ use App\Http\Resources\Assignment\AssignmentCollection;
 use App\Http\Resources\Assignment\AssignmentResource;
 use App\Models\Assignment;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AssignmentRepository
 {
@@ -14,33 +15,15 @@ class AssignmentRepository
     public function index($request)
     {
         $data = Assignment::query()
+            ->join('user', 'admin_id', '=', 'user.id')
+            ->where('user.location_id', '=', auth()->user()->location_id)
+            ->select(DB::raw('ROW_NUMBER() OVER(ORDER BY assignment.assigned_date DESC) AS Row, assignment.*'))
             ->filter($request)
             ->sort($request)
             ->search($request)
-            ->where([
-                ["admin_id", '=', auth()->id()],
-                ["state", '!=', 'Completed']
-            ])
+            ->where('state', '!=', 'Completed')
             ->paginate($this->paginate);
 
-        if ($request->has('sort.id')) {
-            $list = new AssignmentCollection($data);
-            $dataCollection = collect($list);
-
-            foreach ($request->query("sort") as $value) {
-                if ($value === 'asc') {
-                    return [
-                        'data' => $dataCollection['data']->sortBy('no')->values()->all(),
-                        'meta' => $dataCollection['meta'],
-                    ];
-                } elseif ($value === 'desc') {
-                    return [
-                        'data' => $dataCollection['data']->sortByDesc('no')->values()->all(),
-                        'meta' => $dataCollection['meta'],
-                    ];
-                }
-            }
-        }
         return new AssignmentCollection($data);
     }
 
@@ -77,7 +60,15 @@ class AssignmentRepository
     public function handleUpdateAssignment($request, $id)
     {
         $assignment = Assignment::query()->where('id', '=', $id)->first();
-        $assignment->update($request->all());
+        if ($request->state !== 'Accepted') {
+            $assignment->update($request->all());
+        } else {
+            if ($assignment->user_id === auth()->user()->id) {
+                $assignment->update($request->all());
+            } else {
+                $assignment = [];
+            }
+        }
         return $assignment;
     }
 

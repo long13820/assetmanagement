@@ -26,13 +26,16 @@ export default function FilterButtonCategory(props) {
   const [...listCategory] = useSelector(categoryListSelector);
   return (
     <Dropdown id="asset-filter-category">
-      <Dropdown.Toggle className="d-flex filter-button btn-asset align-items-center justity-content-center btn btn-primary asset_filter">
+      <Dropdown.Toggle
+        id="asset-filter-category-btn"
+        className="d-flex filter-button btn-asset align-items-center justity-content-center btn btn-primary asset_filter"
+      >
         <p className="flex-grow-1 afd-name font-weight-bold">Category</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
       </Dropdown.Toggle>
-      <Dropdown.Menu style={{ maxHeight: '248px', overflowY: 'auto' }}>
+      <Dropdown.Menu id="asset-filter-category-menu" style={{ maxHeight: '248px', overflowY: 'auto' }}>
         <Form>
           <Dropdown.Item onClick={() => handleFilter(0)}>
             <Form.Check

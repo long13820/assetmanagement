@@ -12,13 +12,16 @@ export default function FilterButton(props) {
 
   return (
     <Dropdown>
-      <Dropdown.Toggle className="filter-button d-flex align-items-center justity-content-center">
+      <Dropdown.Toggle
+        id="user-type-filter-btn"
+        className="filter-button d-flex align-items-center justity-content-center"
+      >
         <p className="flex-grow-1 font-weight-bold">Type</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
       </Dropdown.Toggle>
-      <Dropdown.Menu>
+      <Dropdown.Menu id="user-type-filter-menu">
         <Form>
           <Dropdown.Item onClick={() => handleFilter('All')}>
             <Form.Check

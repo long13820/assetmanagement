@@ -1,18 +1,21 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAssignmentById } from '../../../api/Assignment';
+import { setExpiredToken } from '../../../redux/reducer/app/app.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
 import Modal from '../../Layouts/Modal';
 import { BlockUI } from '../../Layouts/Notiflix';
 
 import './style.css';
+
 function UserCreateRequest(props) {
   const userDetail = useSelector(userSelector);
+  const dispatch = useDispatch();
 
   const handleCreateRequestUser = async () => {
     const id = props.idCreateRequestUser;
@@ -27,6 +30,10 @@ function UserCreateRequest(props) {
       Notiflix.Block.remove('#root');
       props.forceReload();
       props.setModalCreateRequestUser();
+    } else if (result === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('The request for returning is created unsuccessfully', 3000);
       Notiflix.Block.remove('#root');

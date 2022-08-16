@@ -301,6 +301,7 @@ export default function User() {
                 <Form onSubmit={(e) => handleSearch(e)}>
                   <InputGroup>
                     <Form.Control
+                      id="search-user"
                       placeholder="Staff code or name"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}

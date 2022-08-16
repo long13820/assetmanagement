@@ -19,6 +19,7 @@ import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { userSelector } from '../../redux/selectors';
 import { formatDate } from '../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../Layouts/Alerts';
+import Notification from '../Layouts/Notification';
 import { BlockUI } from '../Layouts/Notiflix';
 
 import './style.css';
@@ -57,6 +58,8 @@ export default function AssetCreate() {
     category_prefix: '',
     category_name: '',
   });
+
+  const [showNotification, setShowNotifcation] = React.useState(false);
 
   React.useEffect(() => {
     fetchCategories();
@@ -165,7 +168,11 @@ export default function AssetCreate() {
 
     const result = await createNewCategory(inputAddCategory);
     Notiflix.Block.remove('#root');
-    if (result !== 401 && result !== 500) {
+    if (result === 401) {
+      handleSetUnthorization();
+    } else if (result === 500) {
+      ErrorToast('Something went wrong. Please try again', 3000);
+    } else {
       if (result.error?.category_name && result.error?.category_prefix) {
         setErrorNameExist('Category is already exists. Please enter a different category');
         setErrorPrefixExist('Prefix is already exists. Please enter a different prefix');
@@ -200,14 +207,11 @@ export default function AssetCreate() {
         });
         SuccessToast('Add new category successfully', 3000);
       }
-    } else if (result === 401) {
-      handleSetUnthorization();
-    } else {
-      ErrorToast('Something went wrong. Please try again', 3000);
     }
   };
 
   const backtoManagerAsset = () => {
+    setShowNotifcation(false);
     dispatch(assetAction.setIsAdd(false));
     dispatch(setSubTitle(''));
   };
@@ -437,14 +441,24 @@ export default function AssetCreate() {
           </tbody>
         </table>
         <div className="d-flex justify-content-end mt-3">
-          <Button variant="danger" type="submit" disabled={!isValid}>
+          <Button id="save-create-btn-asset" variant="danger" type="submit" disabled={!isValid}>
             Save
           </Button>
-          <Button variant="outline-secondary" className="ms-3" onClick={backtoManagerAsset}>
+          <Button
+            id="cancel-create-btn-asset"
+            variant="outline-secondary"
+            className="ms-3"
+            onClick={() => setShowNotifcation(true)}
+          >
             Cancel
           </Button>
         </div>
       </Form>
+      <Notification
+        show={showNotification}
+        backToView={() => backtoManagerAsset()}
+        setStateModal={() => setShowNotifcation(false)}
+      />
     </div>
   );
 }

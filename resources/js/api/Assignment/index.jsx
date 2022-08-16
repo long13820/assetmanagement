@@ -210,8 +210,13 @@ export const acceptAssignment = async (id) => {
     },
     configHeadersAuthenticate()
   );
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 400;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const declineAssignment = async (id) => {
@@ -223,8 +228,13 @@ export const declineAssignment = async (id) => {
     },
     configHeadersAuthenticate()
   );
-  if (response.status === 'success') return 200;
-  if (response.status !== 'success') return 400;
+  if (response.status === 'success') {
+    return 200;
+  } else if (response.status === 401) {
+    return 401;
+  } else {
+    return 500;
+  }
 };
 
 export const completeRequestById = async (id, body) => {

@@ -88,7 +88,7 @@ class AssetRepository
                 return response()->json(
                     [
                         "success" => false,
-                        "message" => "There are valid assignments belonging to this asset.Please change state"
+                        "message" => "There are valid assignments belonging to this asset. Please change state"
                     ],
                     400
                 );
@@ -97,7 +97,7 @@ class AssetRepository
             return response()->json(
                 [
                     "success" => true,
-                    "message" => "User is deleted"
+                    "message" => "Asset is deleted"
                 ],
                 200
             );
@@ -121,7 +121,7 @@ class AssetRepository
             return response()->json(
                 [
                     "success" => true,
-                    "message" => "User can deleted"
+                    "message" => "Asset can deleted"
                 ],
                 200
             );

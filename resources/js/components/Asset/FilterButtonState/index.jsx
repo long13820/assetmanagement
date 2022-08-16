@@ -29,13 +29,16 @@ export default function FilterButtonState(props) {
 
   return (
     <Dropdown id="asset-filter-state">
-      <Dropdown.Toggle className="filter-button btn-asset d-flex align-items-center justity-content-center">
+      <Dropdown.Toggle
+        id="asset-filter-state-btn"
+        className="filter-button btn-asset d-flex align-items-center justity-content-center"
+      >
         <p className="flex-grow-1 font-weight-bold">State</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
       </Dropdown.Toggle>
-      <Dropdown.Menu>
+      <Dropdown.Menu id="asset-filter-state-menu">
         <Form>
           <Dropdown.Item onClick={() => handleFilter('All')}>
             <Form.Check

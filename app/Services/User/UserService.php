@@ -36,7 +36,7 @@ class UserService
         $result = $this->userRepository->store($request);
 
         if ($result) {
-            return $this->apiResponse([], 'success', 'Create User Successfully');
+            return $this->apiResponse($result, 'success', 'Create User Successfully');
         }
     }
 

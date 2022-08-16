@@ -21,6 +21,7 @@ class CategoryRepository
         $data = $this->query->select(
             "categories.id",
             "categories.category_name",
+            "categories.category_prefix"
         )->get();
 
         return CategoryResource::collection($data)->response()->getData();

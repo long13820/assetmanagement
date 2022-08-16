@@ -122,7 +122,7 @@ export const createNewCategory = async (body) => {
   const response = await axiosClient.post(url, body, configHeadersAuthenticate());
   if (response.status === 409) {
     return response.data;
-  } else if (response.status === 'success') {
+  } else if (response.success === true) {
     return response.data;
   } else if (response.status === 401) {
     return 401;

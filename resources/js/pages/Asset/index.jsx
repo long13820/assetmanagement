@@ -214,7 +214,7 @@ export default function Asset() {
                   <Button
                     onClick={routeChange}
                     variant="danger"
-                    id="button-addon2"
+                    id="create-new-asset"
                     className="font-weight-bold ms-3 btn btn-danger"
                   >
                     Create new asset

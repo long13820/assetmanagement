@@ -17,9 +17,9 @@ class RequestCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'data' => $this->collection->map(function ($item, $key) {
+            'data' => $this->collection->map(function ($item) {
                 return [
-                    "no" => $key + 1,
+                    "no" => $item->row,
                     "id" => $item->id,
                     "asset_id" => $item->asset_id,
                     "asset_name" => $item->asset->asset_name,

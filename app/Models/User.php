@@ -105,7 +105,7 @@ class User extends AuthenticateTable
             $tmp_firstLetter .= $w[0];
         }
         $tmp_username = $firstName . strtolower($tmp_firstLetter);
-        $count = User::query()
+        $count = User::withTrashed()
             ->where("username", "LIKE", "{$tmp_username}%")
             ->count();
         return $tmp_username . ($count > 0 ? $count : "");

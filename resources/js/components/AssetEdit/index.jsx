@@ -16,6 +16,7 @@ import { assetAction } from '../../redux/reducer/asset/asset.reducer';
 import { assetEditData, assetgetIdSelector } from '../../redux/selectors/asset/asset.selector';
 import { formatDate } from '../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../Layouts/Alerts';
+import Notification from '../Layouts/Notification';
 import { BlockUI } from '../Layouts/Notiflix';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -28,6 +29,7 @@ function EditAsset(props) {
   const editData = useSelector(assetEditData);
   const id = dataId;
   const [isOpenDatePicker, setIsOpenDatePicker] = React.useState(false);
+  const [showNotification, setShowNotifcation] = React.useState(false);
 
   React.useEffect(() => {
     if (editData) {
@@ -223,15 +225,21 @@ function EditAsset(props) {
             id="edit-asset-cancel-btn"
             variant="outline-secondary"
             className="font-weight-bold"
-            onClick={() => {
-              dispatch(assetAction.setIsEdit(false));
-              dispatch(setSubTitle(''));
-            }}
+            onClick={() => setShowNotifcation(true)}
           >
             Cancel
           </Button>
         </div>
       </Form>
+      <Notification
+        show={showNotification}
+        backToView={() => {
+          setShowNotifcation(false);
+          dispatch(assetAction.setIsEdit(false));
+          dispatch(setSubTitle(''));
+        }}
+        setStateModal={() => setShowNotifcation(false)}
+      />
     </div>
   );
 }

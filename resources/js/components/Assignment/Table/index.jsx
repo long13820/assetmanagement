@@ -6,9 +6,16 @@ import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAssetById } from '../../../api/Asset/assetAPI';
-import { deleteAssignment, editAssignmentById, getAssignmentById, getReturnRequestById } from '../../../api/Assignment';
+import { deleteAssignment, editAssignmentById, getAssignmentById } from '../../../api/Assignment';
 import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
-import { setAssignment, setIsEdit } from '../../../redux/reducer/assignment/assignment.reducer';
+import {
+  setAssetId,
+  setAssignment,
+  setIsEdit,
+  setIsFocusAsset,
+  setIsFocusUser,
+  setUserId,
+} from '../../../redux/reducer/assignment/assignment.reducer';
 import { userSelector } from '../../../redux/selectors';
 import { formatDate } from '../../../utils/formatDate';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
@@ -27,45 +34,52 @@ export default function AssignmentTable(props) {
   const [confirmIdAsset, setConfirmIdAsset] = React.useState(-1);
   const [assignmentId, setAssignmentId] = React.useState(-1);
   const [modalReturnAssignment, setModalReturnAssignment] = React.useState(false);
-  const [assignedIdAdmin, setAssignedIdAdmin] = React.useState('');
   const dispatch = useDispatch();
 
-  const handleReturnAssignmentClick = async (id, assigned_by_id) => {
+  const handleReturnAssignmentClick = async (id) => {
     setModalReturnAssignment(true);
     setAssignmentId(id);
-    setAssignedIdAdmin(assigned_by_id);
   };
 
   const changeStateToReturnAssignment = async () => {
     BlockUI('#root', 'fixed');
-    const resultAssigmentReturnId = await getReturnRequestById(assignedIdAdmin);
-    const countReturnId = resultAssigmentReturnId == undefined ? 1 : parseInt(resultAssigmentReturnId.returned_id) + 1;
     const state = {
       state: 'Waiting for returning',
-      returned_id: countReturnId,
       requested_id: userDetail.id,
     };
-
     const result = await editAssignmentById(assignmentId, state);
     if (result === 200) {
       SuccessToast('The request for returning is created successfully', 3000);
       setModalReturnAssignment(false);
       setAssignmentId(-1);
       props.forceReload();
+    } else if (result === 401) {
+      handleSetUnthorization();
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('The request for returning is created unsuccessfully', 3000);
+      Notiflix.Block.remove('#root');
     }
   };
 
   const handleEditAssignment = async (id) => {
     BlockUI('#root', 'fixed');
+    dispatch(setUserId(0));
+    dispatch(setAssetId(0));
+    dispatch(setIsFocusAsset(false));
+    dispatch(setIsFocusUser(false));
     const data = await getAssignmentById(id);
     if (Object.keys(data).length > 0) {
       dispatch(setAssignment(data));
       dispatch(setIsEdit(true));
       dispatch(setSubTitle('Edit assignment'));
       Notiflix.Block.remove('#root');
+    } else if (data === 401) {
+      dispatch(setExpiredToken(true));
+      localStorage.removeItem('token');
+      Notiflix.Block.remove('#root');
     } else {
+      ErrorToast('Something went wrong. Please try again', 3000);
       Notiflix.Block.remove('#root');
     }
   };
@@ -76,10 +90,13 @@ export default function AssignmentTable(props) {
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
 
     if (!valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({ key: '', value: '' });
+      }
       tempSort[0].key = key;
       tempSort[0].value = 'asc';
       if (tempSort[0].key === 'No.') {
-        tempSort[0].key = 'Created At';
+        tempSort[0].key = 'Row';
       }
       tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
@@ -92,10 +109,13 @@ export default function AssignmentTable(props) {
     }
 
     if (valueAsc && !valueDesc) {
+      if (tempSort.length === 0) {
+        tempSort.push({ key: '', value: '' });
+      }
       tempSort[0].key = key;
       tempSort[0].value = 'desc';
       if (tempSort[0].key === 'No.') {
-        tempSort[0].key = 'Created At';
+        tempSort[0].key = 'Row';
       }
       tempTableHeader[findIndexHeader].isSortAsc = false;
       tempTableHeader[findIndexHeader].isSortDesc = true;
@@ -107,10 +127,29 @@ export default function AssignmentTable(props) {
       });
     }
 
-    if (!valueAsc && valueDesc) {
-      tempSort[0].key = 'created_at';
-      tempSort[0].value = 'desc';
+    if (!valueAsc && valueDesc && key !== 'Assigned date') {
+      tempSort = [];
+      tempSort.push({ key: 'assigned_date', value: 'desc' });
       tempTableHeader[findIndexHeader].isSortAsc = false;
+      tempTableHeader[findIndexHeader].isSortDesc = false;
+      tempTableHeader.forEach((_, index) => {
+        if (index != findIndexHeader && index != 7 && index !== 5) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = false;
+        }
+        if (index === 5) {
+          tempTableHeader[index].isSortAsc = false;
+          tempTableHeader[index].isSortDesc = true;
+        }
+      });
+    }
+
+    if (!valueAsc && valueDesc && key === 'Assigned date') {
+      tempSort = [];
+      tempSort.push({ key: '', value: '' });
+      tempSort[0].key = key;
+      tempSort[0].value = 'asc';
+      tempTableHeader[findIndexHeader].isSortAsc = true;
       tempTableHeader[findIndexHeader].isSortDesc = false;
       tempTableHeader.forEach((_, index) => {
         if (index != findIndexHeader && index != 7) {
@@ -150,12 +189,12 @@ export default function AssignmentTable(props) {
         props.backtoManageAssignment();
         setStateModalDelete();
       } else if (response === 401) {
-        dispatch(setExpiredToken(true));
-        localStorage.removeItem('token');
+        handleSetUnthorization();
+        Notiflix.Block.remove('#root');
       }
     } else if (response === 401) {
-      dispatch(setExpiredToken(true));
-      localStorage.removeItem('token');
+      handleSetUnthorization();
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('Delete assignment is unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
@@ -170,6 +209,10 @@ export default function AssignmentTable(props) {
     setConfirmIdDelete(-1);
     setConfirmIdAsset(-1);
     setConfirmDelete(false);
+  };
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
   };
 
   const renderTableBody = () => {
@@ -228,7 +271,7 @@ export default function AssignmentTable(props) {
                 }`}
                 onClick={(e) => {
                   e.stopPropagation();
-                  item.state !== 'Accepted' ? undefined : handleReturnAssignmentClick(item.id, item.assigned_by_id);
+                  item.state !== 'Accepted' ? undefined : handleReturnAssignmentClick(item.id);
                 }}
               >
                 <FaUndoAlt className={`text-blue font-18px ${item.state !== 'Accepted' && 'opacity-50'}`} />

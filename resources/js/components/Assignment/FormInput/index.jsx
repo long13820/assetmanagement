@@ -24,6 +24,7 @@ import { formatDate } from '../../../utils/formatDate';
 import GetAssetTable from '../../Assignment/GetAssetTable/';
 import GetUserTable from '../../Assignment/GetUserTable/';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Notification from '../../Layouts/Notification';
 import { BlockUI } from '../../Layouts/Notiflix';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -51,6 +52,7 @@ export default function FormInput(props) {
   const [asset, setAsset] = useState([]);
   const [totalRecord, setTotalRecord] = React.useState(0);
   const [totalPage, setTotalPage] = React.useState(0);
+  const [showNotification, setShowNotification] = React.useState(false);
   const dispatch = useDispatch();
 
   const handleStateModalAsset = (value) => {
@@ -277,10 +279,16 @@ export default function FormInput(props) {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={() => handleStateModalUser('save')} className="font-weight-bold">
+          <Button
+            id="save-user-btn"
+            variant="danger"
+            onClick={() => handleStateModalUser('save')}
+            className="font-weight-bold"
+          >
             Save
           </Button>
           <Button
+            id="cancel-user-btn"
             variant="outline-secondary"
             onClick={() => handleStateModalUser('close')}
             className="ms-3 font-weight-bold"
@@ -307,10 +315,16 @@ export default function FormInput(props) {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={() => handleStateModalAsset('save')} className="font-weight-bold">
+          <Button
+            id="save-asset-btn"
+            variant="danger"
+            onClick={() => handleStateModalAsset('save')}
+            className="font-weight-bold"
+          >
             Save
           </Button>
           <Button
+            id="cancel-asset-btn"
             variant="outline-secondary"
             onClick={() => handleStateModalAsset('close')}
             className="ms-3 font-weight-bold"
@@ -376,15 +390,19 @@ export default function FormInput(props) {
           </Form.Group>
           {isValid}
           <div className="d-flex justify-content-end mt-4">
-            <Button className="font-weight-bold" variant="danger" disabled={!isValid} type="submit">
+            <Button
+              id="save-create-assignment"
+              className="font-weight-bold"
+              variant="danger"
+              disabled={!isValid}
+              type="submit"
+            >
               Save
             </Button>
             <Button
+              id="cancel-create-assignment"
               className="font-weight-bold ms-3"
-              onClick={() => {
-                dispatch(setSubTitle(''));
-                dispatch(setIsAdd(false));
-              }}
+              onClick={() => setShowNotification(true)}
               variant="outline-secondary"
               type="cancel"
             >
@@ -405,6 +423,15 @@ export default function FormInput(props) {
             </small>
           </div>
         </Form>
+        <Notification
+          show={showNotification}
+          backToView={() => {
+            setShowNotification(true);
+            dispatch(setSubTitle(''));
+            dispatch(setIsAdd(false));
+          }}
+          setStateModal={() => setShowNotification(false)}
+        />
       </div>
     </div>
   );

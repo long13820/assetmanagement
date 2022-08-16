@@ -15,7 +15,10 @@ export default function FilterDate(props) {
 
   return (
     <Dropdown>
-      <Dropdown.Toggle className="assignment-filter-date d-flex align-items-center justity-content-center">
+      <Dropdown.Toggle
+        id="assigned-date-filter-assignment-btn"
+        className="assignment-filter-date d-flex align-items-center justity-content-center"
+      >
         <p className="flex-grow-1 afd-name font-weight-bold">Assigned Date</p>
         <div className="fb-icon">
           <BsFillCalendarDateFill />

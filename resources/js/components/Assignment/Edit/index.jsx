@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
+import Notiflix from 'notiflix';
 import PropTypes from 'prop-types';
 
 import { editAssetById } from '../../../api/Asset/assetAPI';
 import { editAssignmentById } from '../../../api/Assignment';
-import { setSubTitle } from '../../../redux/reducer/app/app.reducer';
+import { setExpiredToken, setSubTitle } from '../../../redux/reducer/app/app.reducer';
 import {
   setAssetId,
   setIsEdit,
@@ -14,6 +15,7 @@ import {
   setUserId,
 } from '../../../redux/reducer/assignment/assignment.reducer';
 import { ErrorToast, SuccessToast } from '../../Layouts/Alerts';
+import Notification from '../../Layouts/Notification';
 import { BlockUI } from '../../Layouts/Notiflix';
 
 import DropdownListAsset from './DropdownListAsset';
@@ -27,6 +29,7 @@ export default function AssignmentEditForm(props) {
   const newUserId = useSelector((state) => state.assignment.userId);
   const newAssetId = useSelector((state) => state.assignment.assetId);
   const [note, setNote] = React.useState(assignment.note);
+  const [showNotification, setShowNotifcation] = React.useState(false);
 
   const onSubmit = async (e, data) => {
     e.preventDefault();
@@ -51,8 +54,13 @@ export default function AssignmentEditForm(props) {
         dispatch(setIsFocusAsset(false));
         dispatch(setIsFocusUser(false));
         SuccessToast('The assignment is editing successfully', 2000);
+      } else if (result === 401) {
+        dispatch(setExpiredToken(true));
+        localStorage.removeItem('token');
+        Notiflix.Block.remove('#root');
       } else {
         ErrorToast('Update assignment unsuccessfully', 2000);
+        Notiflix.Block.remove('#root');
       }
     }
     if (newAssetId !== 0) {
@@ -69,12 +77,18 @@ export default function AssignmentEditForm(props) {
         dispatch(setIsFocusAsset(false));
         dispatch(setIsFocusUser(false));
         SuccessToast('The assignment is editing successfully', 2000);
+      } else if (result === 401 || resultUpdateNewAsset === 401 || resultUpdateOldAsset === 401) {
+        dispatch(setExpiredToken(true));
+        localStorage.removeItem('token');
+        Notiflix.Block.remove('#root');
       } else {
         ErrorToast('Update assignment unsuccessfully', 2000);
+        Notiflix.Block.remove('#root');
       }
     }
   };
   const handleBackToAssignment = () => {
+    setShowNotifcation(false);
     dispatch(setIsEdit(false));
     dispatch(setSubTitle(''));
     dispatch(setUserId(0));
@@ -139,6 +153,7 @@ export default function AssignmentEditForm(props) {
 
           <div className="d-flex justify-content-end mt-4">
             <Button
+              id="save-edit-btn"
               disabled={
                 (newAssetId === 0 && newUserId === 0 && note === assignment.note) ||
                 (newAssetId === assignment.asset_id && newUserId === 0 && note === assignment.note) ||
@@ -156,15 +171,20 @@ export default function AssignmentEditForm(props) {
               Save
             </Button>
             <Button
-              onClick={handleBackToAssignment}
+              id="cancel-edit-btn"
+              onClick={() => setShowNotifcation(true)}
               className="font-weight-bold ms-3"
               variant="outline-secondary"
-              type="cancel"
             >
               Cancel
             </Button>
           </div>
         </Form>
+        <Notification
+          show={showNotification}
+          backToView={() => handleBackToAssignment()}
+          setStateModal={() => setShowNotifcation(false)}
+        />
       </div>
     </div>
   );

@@ -53,7 +53,7 @@ export default function RequestsTable(props) {
     const tempTableHeader = JSON.parse(JSON.stringify(props.renderTableHeader));
     const findIndexHeader = props.renderTableHeader.findIndex((e) => e.name === key);
     if (!valueAsc && !valueDesc) {
-      if (key === 'No.') key = 'id';
+      if (key === 'No.') key = 'row';
       if (key === 'Requested by') key = 'Assigned to';
       if (key === 'Accepted by') key = 'Assigned by';
       tempSort[0].key = key;
@@ -69,7 +69,7 @@ export default function RequestsTable(props) {
     }
 
     if (valueAsc && !valueDesc) {
-      if (key === 'No.') key = 'id';
+      if (key === 'No.') key = 'row';
       if (key === 'Requested by') key = 'Assigned to';
       if (key === 'Accepted by') key = 'Assigned by';
       tempSort[0].key = key;

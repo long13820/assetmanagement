@@ -206,6 +206,7 @@ export default function AssetTable(props) {
             <td>
               <div className="d-flex">
                 <button
+                  id="edit-asset"
                   className={`br-6px p-2 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
                     item.state === 'Assigned' && 'cursor-no-drop'
                   }`}
@@ -218,6 +219,7 @@ export default function AssetTable(props) {
                 </button>
 
                 <button
+                  id="delete-asset"
                   className={`br-6px p-2 ms-3 bg-gray-100 w-48px h-48px d-flex align-items-center justify-content-center border-none ${
                     item.state === 'Assigned' && 'cursor-no-drop'
                   }`}

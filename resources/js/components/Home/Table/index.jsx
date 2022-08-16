@@ -53,8 +53,14 @@ export default function HomeTable(props) {
       setModalAcceptAssignment(false);
       setAcceptId(-1);
       props.forceReload();
+    } else if (result === 401) {
+      handleSetUnthorization();
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('Accept assignment unsuccessfully', 3000);
+      setModalAcceptAssignment(false);
+      setAcceptId(-1);
+      props.forceReload();
     }
   };
 
@@ -73,8 +79,12 @@ export default function HomeTable(props) {
       setAcceptId(-1);
       setAssetId(-1);
       props.forceReload();
+    } else if (result === 401) {
+      handleSetUnthorization();
+      Notiflix.Block.remove('#root');
     } else {
       ErrorToast('Decline assignment unsuccessfully', 3000);
+      Notiflix.Block.remove('#root');
     }
   };
 
@@ -136,12 +146,16 @@ export default function HomeTable(props) {
       Notiflix.Block.remove('#root');
     } else if (result === 401) {
       Notiflix.Block.remove('#root');
-      dispatch(setExpiredToken(true));
-      localStorage.removeItem('token');
+      handleSetUnthorization();
     } else {
       Notiflix.Block.remove('#root');
       ErrorToast('Something went wrong. Please try again', 3000);
     }
+  };
+
+  const handleSetUnthorization = () => {
+    dispatch(setExpiredToken(true));
+    localStorage.removeItem('token');
   };
 
   const renderTableBody = () => {

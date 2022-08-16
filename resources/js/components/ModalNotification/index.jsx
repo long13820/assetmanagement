@@ -7,7 +7,7 @@ export default function ModalNotification({ title = 'Notifications!', content, s
     <div>
       <Modal show={show} onHide={() => setShow(false)} top id="detail-dialog">
         <Modal.Header closeButton>
-          <Modal.Title style={{ color: '#CF2338' }}>{title}</Modal.Title>
+          <h6 className="text-danger">{title}</h6>
         </Modal.Header>
         <Modal.Body>{content}</Modal.Body>
       </Modal>

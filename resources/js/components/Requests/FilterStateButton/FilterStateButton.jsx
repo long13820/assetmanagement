@@ -16,7 +16,7 @@ export default function FilterStateButton(props) {
         id="filter-state-button"
         className="filter-state-button d-flex align-items-center justify-content-center"
       >
-        <p className="flex-grow-1 font-weight-bold">Type</p>
+        <p className="flex-grow-1 font-weight-bold">State</p>
         <div className="fb-icon">
           <HiFilter />
         </div>
