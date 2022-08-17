@@ -73,7 +73,6 @@ export default function DropdownListAsset(props) {
   const handlePageChange = async (page) => {
     setIsLoading(true);
     const result = await getAllAssets({
-      sort: [{ key: 'staff_code', value: 'asc' }],
       search: debouncedSearch,
       page,
     });

@@ -53,13 +53,13 @@ export default function AssignmentEditForm(props) {
         dispatch(setAssetId(0));
         dispatch(setIsFocusAsset(false));
         dispatch(setIsFocusUser(false));
-        SuccessToast('The assignment is editing successfully', 2000);
+        SuccessToast('The assignment is edited successfully', 2000);
       } else if (result === 401) {
         dispatch(setExpiredToken(true));
         localStorage.removeItem('token');
         Notiflix.Block.remove('#root');
       } else {
-        ErrorToast('Update assignment unsuccessfully', 2000);
+        ErrorToast('Updated assignment unsuccessfully', 2000);
         Notiflix.Block.remove('#root');
       }
     }
@@ -76,13 +76,13 @@ export default function AssignmentEditForm(props) {
         dispatch(setAssetId(0));
         dispatch(setIsFocusAsset(false));
         dispatch(setIsFocusUser(false));
-        SuccessToast('The assignment is editing successfully', 2000);
+        SuccessToast('The assignment is edited successfully', 2000);
       } else if (result === 401 || resultUpdateNewAsset === 401 || resultUpdateOldAsset === 401) {
         dispatch(setExpiredToken(true));
         localStorage.removeItem('token');
         Notiflix.Block.remove('#root');
       } else {
-        ErrorToast('Update assignment unsuccessfully', 2000);
+        ErrorToast('Updated assignment unsuccessfully', 2000);
         Notiflix.Block.remove('#root');
       }
     }

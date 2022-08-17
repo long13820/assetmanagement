@@ -185,7 +185,7 @@ export default function AssignmentTable(props) {
     if (response === 200) {
       const responseTwo = await editAssetById(assetId, stateField);
       if (responseTwo === 200) {
-        SuccessToast('Delete assignment is successfully', 3000);
+        SuccessToast('The assignment is deleted successfully', 3000);
         props.backtoManageAssignment();
         setStateModalDelete();
       } else if (response === 401) {
@@ -196,7 +196,7 @@ export default function AssignmentTable(props) {
       handleSetUnthorization();
       Notiflix.Block.remove('#root');
     } else {
-      ErrorToast('Delete assignment is unsuccessfully', 3000);
+      ErrorToast('The assignment is deleted unsuccessfully', 3000);
       Notiflix.Block.remove('#root');
     }
   };
